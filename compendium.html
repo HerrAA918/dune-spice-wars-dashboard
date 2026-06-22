@@ -5537,56 +5537,77 @@ renderAll();
         const FACTIONS_DATA = {"atreides":{"name":"House Atreides","quote":"\"The stellar reputation of House Atreides owes a lot to its leader’s commanding style: firm yet honorable and fair. By imperial decree, the Atreides have just inherited the stewardship of Arrakis and have a lot of work to do to take over from the Harkonnens.\"","bonuses":["Can use the Peaceful Annexation Ability","Other factions lose no Authority from treaties with you","Other factions lose 100% more Landsraad Standing when breaking a Truce with you","− Cannot pillage neutral Villages"],"hegemony5k":["While under the effect of a positive Resolution, gain +10% Solari","While under the effects of a negative Resolution, gain +10% unit Power"],"hegemony10k":["You can ignore Charters prerequisites except for the necessary Landsraad Standing","Permanently gain +2% resource production upon being elected for a positive Resolution (x10 max)"],"councilors":[{"name":"Thufir Hawat","effects":["Agents have 1 additional trait","Can Hasten mission progress and construction of Village Buildings at the cost of Solari","Increases Building construction speed","Increases Mission progress speed"]},{"name":"Dr. Wellington Yueh","effects":["Produce +2 Knowledge","Non-mechanical Military Units have +15% max Health","Non-mechanical Military Units have +30% regeneration speed"]},{"name":"Lady Jessica","effects":["Can spend Influence to force Truce with another faction","Non-mechanical units in the same region get +15% Power"]},{"name":"Paul Atreides","effects":["Peaceful Annexations are performed instantly","Destroyed Villages are repaired instantly"]}]},"harkonnen":{"name":"House Harkonnen","quote":"\"House Harkonnen shares its chilling reputation with its leader, Baron Vladimir Harkonnen. They have been called despotic, merciless, scheming and devious. And those are only their finer qualities.\"","bonuses":["Can use the Oppression Ability on Harkonnen Villages","Gain 50 Intel when you pillage a Village","Villages gain +5% resource production per active Militia","− Villages suffer -10% resource production"],"hegemony5k":["Can sacrifice an Agent to reduce a Mission's cost and preparation time.","Killing an enemy military unit gives a 5% chance to receive a Brainwashed Agent"],"hegemony10k":["Sacrificed Agents give a chance to not consume an operation on use","Grants +1 additional Agent slot in each non-faction field"],"councilors":[{"name":"Cron Vatia","effects":["Villages under Oppression construct Buildings 200% faster","On Village Oppression, gain 2 Manpower for each empty and potential building slot","Gain 50 Solari upon killing Rebels"]},{"name":"Umman Kudu","effects":["Produce +2 Manpower","Units take -30% time to recruit","Units in a region with an active Harkonnen operation gain +1 Armor"]},{"name":"Feyd-Rautha Harkonnen","effects":["Can use Corruption on Landsraad resolutions","Gain +1% Hegemony per unit trained","Units have +10% damage when pillageing"]},{"name":"Piter De Vries","effects":["Agents produce +1 Intel","Agent traits present only once on an Information field apply their effects twice"]}]},"smugglers":{"name":"Smugglers","quote":"\"There’s a fine line between smugglers and full-fledged bandits, and Esmar Tuek is adept at walking that line.  Smugglers can provide anything to anyone, provided they put the price… and do not look at the specifics too closely.\"","bonuses":["Can install Underworld Headquarters in opponent’s Villages","Gain +30% resources from pillaging a Village","Authority cost to Annex a Village is not increased by distance from your Main Base","− Authority cost to Annex a Village is increased 100% more by owner Villages"],"hegemony5k":["Can place a Bounty on Landsraad Resolutions","Join the Landsraad Council with 50 Votes"],"hegemony10k":["Smuggler's Villages under siege do not resupply the occupant","Automatically installs a Major Underworld Headquarters in every enemy Main Base"],"councilors":[{"name":"Staban Tuek","effects":["Underworld Headquarters have +1 Extension slots"]},{"name":"Lingar Bewt","effects":["Produces 12 Water","Unlocks the Water Network and Water Seller Extensions in Underworld Headquarters"]},{"name":"Lashon Hara","effects":["Every time a trade successfully goes through with a faction, gain 1 Information level in this faction","Faction Information levels reduce 50% slower","Each faction Information level gives +15 Solari production and +1 Influence production"]},{"name":"Esmar Tuek","effects":["Starting Influence and Intel production +5","Pillageing Villages generates +1 Authority"]}]},"fremen":{"name":"Fremen","quote":"\"Fremen are the only people native to Arrakis and will do anything to protect their way against the offworlders.  While their leader, Liet-Kynes, doesn’t originally come from Dune, she is every bit as determined and attached to the planet as the next Fremen.\"","bonuses":["Spice Fields in neutral and controlled regions are harvested by Harvesting Teams, a mobile unit","Can form alliances with Sietches outside of your territory","May use Thumpers for Wormriding","− Villages have -1 maximum Building slot"],"hegemony5k":["Surrounding a Deep Desert region grants control over it","Thumpers are generated passively and attract larger Sandworms that can travel further"],"hegemony10k":["Grants knowledge of enemy alliances with Sietches","Every allied Sietch automatically has a Settlement on it, allowing you to build unique Sietch Buildings"],"councilors":[{"name":"Shimoom","effects":["Each Village producing at least 12 Water gives -4% Solari Upkeep globally","Each Village producing at least 12 Water gives +4 Plascrete production","Villages produce 1 Water on empty and potential Building slots"]},{"name":"Jamis","effects":["Gain 70 Authority upon liberating an enemy Village","Military Units outside of Fremen territory inflict +10% damage","Trade 10 Authority for 30 Manpower in the top bar"]},{"name":"Mother Ramallo","effects":["Can use Incite Rebellion on Landsraad resolutions","Gain +3 Influence when another faction loses a Village","Martyrs spawned by incited Rebellions have +50% Health"]},{"name":"Stilgar","effects":["Sietches produce +20% Water","Non-mechanical units in allied Sietch territory have Stealth"]}]},"corrino":{"name":"House Corrino","quote":"\"Imperial House Corrino has ruled the galaxy for ten millenia, and Shaddam IV intends to keep it that way. The situation on Arrakis calls for the direct intervention of the Padishah Emperor, who will use all His wit and the might of His administration to turn the war to His benefit.\"","bonuses":["Can use Imperial Edict on Landsraad Resolutions to switch their scope","Villages have +1  Building slots","Units from any faction that recently betrayed a Truce receive +10% damage from Corrino","− +100% Authority cost to annex Villages due to the distance from Main Base"],"hegemony5k":["Can use Main Base Deployment on Corrino and neutral Villages once","Can offer Imperial Mandate, which gives Sardaukar to another faction, as part of a trade"],"hegemony10k":["Military Units gain +5% Power per faction with less CHOAM Shares","Gain +1 Guild Favour production per faction with less CHOAM Shares"],"councilors":[{"name":"Princess Irulan","effects":["Every building can be constructed one more time anywhere on the map"]},{"name":"Zum Garon","effects":["Military Units have +15% Power per faction in Truce","Proposing an Imperial Mandate has no cost"]},{"name":"Gaius Helen Mohaim","effects":["Every Corrino vote placed on a resolution affected by an Imperial Edict counts double","Support to increase Charter Priority counts double"]},{"name":"Hasimir Fenring","effects":["Each Agent produces +1 Influence","Trade 5 Influence for 10 Manpower"]}]},"ecaz":{"name":"House Ecaz","quote":"\"House Ecaz is known for it's touristic resorts, it's recreational drugs, and it's patronage for the Art. But behind this enticing exterior, the refined house and it's no less refined ruler, Archduchess Armanda, are ruthless and efficient defenders of their interests.\"","bonuses":["Surrounded neutral Villages become Sanctuaries that cannot be attacked by other factions","Gain 1 Authority production per Sanctuary","Villages adjacent to a Sanctuary gain +1 instance of the Village's traits","− Cannot betray a faction in Truce"],"hegemony5k":["A single Ecazi Village can be turned into a Garden Resort","A single Ecazi non-mechanical unit can be named Champion, who raises Hegemony by killing other factions' units"],"hegemony10k":["Turn 0.2% of your Hegemony in to Solari production","The first 50 votes placed on each Resolution are free"],"councilors":[{"name":"Sanya Ecaz","effects":["For each Sanctuary on the map, gain +15 Solari production","For each Sanctuary on the map, gain -40% Masterpiece construction costs"]},{"name":"Rivvy Dinari","effects":["Military units at max level have no Solari upkeep","Military units start with 1 more Experience level"]},{"name":"Ibbo Vipp","effects":["Can use Landsraad Immunity on a resolution to become ineligible","Gain 2 Landsraad Standing upon building a Masterpiece"]},{"name":"Mesa Ecaz","effects":["Abandoning a Village grants 100 Influence","Can trade 30 Influence for 1 Masterpiece"]}]}};
         const OPERATIONS_DATA = [{"name":"Probe Setup","cost":"50 Intel","difficulty":"Easy","description":"Removes Fog of War in the targeted region for 3 days.","faction":"Generic"},{"name":"Supply Drop","cost":"100 Intel","difficulty":"Easy","description":"Military units in the targeted region gain +100% Supply and suffer no Supply drain for 1 day.","faction":"Generic"},{"name":"Defense Breaches","cost":"100 Intel","difficulty":"Easy","description":"Villages in the targeted region lose 20% Health per day and Missile Batteries stop firing for 1 day.","faction":"Generic"},{"name":"Leave Order","cost":"100 Intel","difficulty":"Easy","description":"All non-mechanical enemy units in the targeted region must immediately retreat to their nearest base.","faction":"Generic"},{"name":"Gear Sabotage","cost":"200 Intel, 100 Solari","difficulty":"Medium","description":"Enemy units in the targeted region suffer -20% Power and +20% damage received for 1 day.","faction":"Generic"},{"name":"Treachery","cost":"300 Intel, 200 Solari","difficulty":"Hard","description":"Immediately disband a targeted enemy military unit or cause a rebellion in an enemy Village.","faction":"Generic"},{"name":"Assassination","cost":"Varies","difficulty":"Epic","description":"Requires max Infiltration of the target faction. Initiates an assassination attempt against the enemy leader. If successful, the faction is instantly defeated.","faction":"Generic"},{"name":"Support Intelligence","cost":"Variable","difficulty":"Faction","description":"Any operations launched on the zone apply -5% damage received to ally units.","faction":"Atreides"},{"name":"Arrakis Diplomacy","cost":"Variable","difficulty":"Faction","description":"Disband all rebellions and raids; +200% relation gain and resources from Sietch trades.","faction":"Atreides"},{"name":"Cease Fire","cost":"Variable","difficulty":"Faction","description":"Interrupts and prevents battles.","faction":"Atreides"},{"name":"Combat Drugs","cost":"Variable","difficulty":"Faction","description":"Ally non-mechanical units: -10% Health/day, +10% Speed, +30% attack damage.","faction":"Harkonnen"},{"name":"Sleeper Agent","cost":"Variable","difficulty":"Faction","description":"50% chance for non-temporary non-mechanical units to spawn Sleeper Agent on death.","faction":"Harkonnen"},{"name":"Toxic Vapors","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units: no health regeneration, -30% Health per day.","faction":"Harkonnen"},{"name":"Poison the Reserves","cost":"Variable","difficulty":"Faction","description":"Enemies losing supply: -20% Speed, -5% Health per day.","faction":"Smugglers"},{"name":"Extraction Network","cost":"Variable","difficulty":"Faction","description":"Instantly extract all units around village to Sietch Tuek for duration.","faction":"Smugglers"},{"name":"Communication Jamming","cost":"Variable","difficulty":"Faction","description":"Blocks all operations on the Region.","faction":"Smugglers"},{"name":"Hiding Tracks","cost":"Variable","difficulty":"Faction","description":"Ally units get Stealth; enemy units get -10% Speed in region and neighbors.","faction":"Fremen"},{"name":"Hidden Thumpers","cost":"Variable","difficulty":"Faction","description":"Sandworm riding doesn't consume Thumpers; military units gain Stealth.","faction":"Fremen"},{"name":"Awake the People","cost":"Variable","difficulty":"Faction","description":"Start a rebellion in the village.","faction":"Fremen"},{"name":"Consolidation","cost":"Variable","difficulty":"Faction","description":"Apply to Allies: +2 Armor to mechanical units and structures.","faction":"Corrino"},{"name":"Interdiction Zone","cost":"Variable","difficulty":"Faction","description":"Apply to Enemies: disable Carryalls and Airfields.","faction":"Corrino"},{"name":"Orbital Strike","cost":"Variable","difficulty":"Faction","description":"Missile strike dealing 40 Power to all ground units, villages, and bases in area.","faction":"Corrino"},{"name":"Epic Quest","cost":"Variable","difficulty":"Faction","description":"Strongest military unit's attacks deal +100% damage.","faction":"Ecaz"},{"name":"Live Performance","cost":"Variable","difficulty":"Faction","description":"+5 Influence per enemy kill; -5 Influence per unit death/departure.","faction":"Ecaz"},{"name":"Elacca Fog","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units cannot be controlled in combat.","faction":"Ecaz"},{"name":"Ambient Connection","cost":"Variable","difficulty":"Faction","description":"Ally mechanical units are Tethered remotely.","faction":"Vernius"},{"name":"Empirical Data","cost":"Variable","difficulty":"Faction","description":"+1 Knowledge per unit of any faction in combat in region.","faction":"Vernius"},{"name":"Hidden Backdoor","cost":"Variable","difficulty":"Faction","description":"Enemy mechanical units cannot be controlled and attack their allies.","faction":"Vernius"}];
         
-        function renderFactionsOverview(factionId) {
-            let key = factionId.toLowerCase();
-            if (key === 'all' || !FACTIONS_DATA[key]) key = 'atreides';
-            
+        // Build the overview block (traits + hegemony + councilors) for a single faction.
+        function factionOverviewBlock(key) {
             const data = FACTIONS_DATA[key];
-            if (!data) return;
-            
-            let councilorsHtml = data.councilors.filter(c => c.name !== 'Villages' && c.name !== 'Main article: Units').map(c => `
-                <div class="landsraad-card">
-                    <h3 style="color: var(--accent-gold); margin-top: 0;">${c.name}</h3>
-                    <ul style="padding-left: 20px;">
-                        ${c.effects.map(e => `<li>${e}</li>`).join('')}
-                    </ul>
-                </div>
-            `).join('');
+            if (!data) return '';
 
-            const htmlContent = `
-                <div id="factions-overview-section" class="tab-content active" style="display: grid; grid-template-columns: 1fr;">
-                    <div class="landsraad-card" style="--accent-gold: var(--color-${key}); padding: 30px;">
-                        <h2 style="color: var(--color-${key}); font-size: 32px; margin-top: 0;">${data.name}</h2>
-                        <p style="font-style: italic; color: #aaa;">${data.quote}</p>
-                        
-                        <h3 style="color: white; border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 30px;">Faction Traits</h3>
+            const councilorsHtml = data.councilors
+                .filter(c => c.name !== 'Villages' && c.name !== 'Main article: Units')
+                .map(c => `
+                    <div class="landsraad-card">
+                        <h3 style="color: var(--accent-gold); margin-top: 0;">${c.name}</h3>
                         <ul style="padding-left: 20px;">
-                            ${data.bonuses.map(b => `<li>${b}</li>`).join('')}
+                            ${c.effects.map(e => `<li>${e}</li>`).join('')}
                         </ul>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                            <div>
-                                <h4 style="color: #4a90e2;">5k Hegemony</h4>
-                                <ul style="padding-left: 20px;">${data.hegemony5k.map(b => `<li>${b}</li>`).join('')}</ul>
-                            </div>
-                            <div>
-                                <h4 style="color: #9b51e0;">10k Hegemony</h4>
-                                <ul style="padding-left: 20px;">${data.hegemony10k.map(b => `<li>${b}</li>`).join('')}</ul>
-                            </div>
+                    </div>
+                `).join('');
+
+            return `
+                <div class="landsraad-card" style="--accent-gold: var(--color-${key}); padding: 30px;">
+                    <h2 style="color: var(--color-${key}); font-size: 32px; margin-top: 0;">${data.name}</h2>
+                    <p style="font-style: italic; color: #aaa;">${data.quote}</p>
+
+                    <h3 style="color: white; border-bottom: 1px solid #444; padding-bottom: 10px; margin-top: 30px;">Faction Traits</h3>
+                    <ul style="padding-left: 20px;">
+                        ${data.bonuses.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                        <div>
+                            <h4 style="color: #4a90e2;">5k Hegemony</h4>
+                            <ul style="padding-left: 20px;">${data.hegemony5k.map(b => `<li>${b}</li>`).join('')}</ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #9b51e0;">10k Hegemony</h4>
+                            <ul style="padding-left: 20px;">${data.hegemony10k.map(b => `<li>${b}</li>`).join('')}</ul>
                         </div>
                     </div>
-                    
-                    <div>
-                        <h3 style="font-size: 28px; margin-top: 20px; border-bottom: 1px solid var(--accent-gold); padding-bottom: 10px;">Councilors</h3>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                        ${councilorsHtml}
-                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 28px; margin-top: 20px; border-bottom: 1px solid var(--color-${key}); padding-bottom: 10px;">Councilors</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    ${councilorsHtml}
                 </div>
             `;
-            
-            document.getElementById('compendium-content').innerHTML = htmlContent;
-            document.getElementById('result-count').textContent = 'Viewing Factions Overview';
+        }
+
+        function renderFactionsOverview(factionId) {
+            const key = (factionId || 'all').toLowerCase();
+            const order = ['atreides', 'harkonnen', 'smugglers', 'fremen', 'corrino', 'ecaz', 'vernius'];
+
+            let blocks, countText;
+            if (key === 'all') {
+                // Show every faction we have data for, stacked.
+                blocks = order
+                    .filter(k => FACTIONS_DATA[k])
+                    .map(k => `<div style="margin-bottom: 50px;">${factionOverviewBlock(k)}</div>`)
+                    .join('');
+                countText = 'Viewing all factions';
+            } else {
+                const k = FACTIONS_DATA[key] ? key : 'atreides';
+                blocks = factionOverviewBlock(k);
+                countText = 'Viewing Factions Overview';
+            }
+
+            document.getElementById('compendium-content').innerHTML = `
+                <div id="factions-overview-section" class="tab-content active" style="display: grid; grid-template-columns: 1fr;">
+                    ${blocks}
+                </div>
+            `;
+            document.getElementById('result-count').textContent = countText;
             if (window.lucide) window.lucide.createIcons();
         }
         
