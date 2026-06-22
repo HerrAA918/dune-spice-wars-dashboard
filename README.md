@@ -7,9 +7,9 @@ static page that runs **100% in your browser**. No account, no upload, no server
 
 **▶ Live site: <https://herraa918.github.io/dune-spice-wars-dashboard/>**
 
-![Dune: Spice Wars dashboard](docs/dashboard-hero.png)
+![Dune: Spice Wars dashboard overview](docs/dashboard.png)
 
-> The screenshot above uses sample data. Your own save stays entirely on your machine.
+> All screenshots use sample data. Your own save stays entirely on your machine.
 
 ---
 
@@ -18,12 +18,11 @@ static page that runs **100% in your browser**. No account, no upload, no server
 - **Match-history dashboard** — playtime, win rate, faction activity, victory-condition
   breakdown, a faction performance leaderboard, hero/councillor stats, and a sortable,
   filterable match table with per-game detail.
-- **Multiplayer / Singleplayer / All** mode switch, auto-detected from your save.
 - **Compendium** — searchable reference for units, buildings, sietches, tech trees,
-  Landsraad politics, faction overviews, operations, village bonuses, and a match
-  randomizer (see below).
-- **Shareable links** — send a snapshot of your results to a friend with one click; the
-  data travels inside the URL, so there is still no server involved.
+  Landsraad politics, faction overviews, operations, village bonuses, plus a match
+  randomizer.
+- **Shareable links** — send your full results or a compact summary to a friend; the
+  data rides inside the URL, so there is still no server involved.
 - **Private by design** — everything is parsed and rendered locally in your browser.
 
 ---
@@ -32,7 +31,8 @@ static page that runs **100% in your browser**. No account, no upload, no server
 
 1. Open the **[live site](https://herraa918.github.io/dune-spice-wars-dashboard/)**.
 2. Drag and drop your `profile_stats_*.sav` file onto the page (or click to browse).
-3. Explore your stats. Use the mode switcher and the table filters to slice the data.
+3. Explore your stats. Use the mode switcher (Multiplayer / Singleplayer / All) and the
+   table filters to slice the data.
 
 ### Where is my save file?
 
@@ -47,43 +47,122 @@ The code in the filename (e.g. `XXXXXXX`) is unique to your Steam account — ch
 
 ---
 
-## Features in detail
+## The Dashboard
 
-### Dashboard (`dashboard.html`)
+### Upload your save
 
-- **Summary cards:** total playtime, overall win rate, solo vs. team match counts (and
-  conquest campaigns in single-player mode).
-- **Faction Activity:** how often you play each of the seven factions.
-- **Match Victory Conditions:** how your wins break down across Hegemony, Supremacy,
-  Economy (CHOAM), and Political (Governor).
-- **Faction Performance Leaderboard:** average match length, win rate, and games played
-  per faction.
-- **Hero & Councillor stats:** play/win rates for the leaders and advisors you field.
-- **Match table:** every game with date, faction, outcome, victory condition, format,
-  hero, and duration — searchable, filterable (faction / outcome / format), sortable,
-  and paginated. Click a row for a detail view.
+Open the page and you're greeted with a drop zone. Drag your `profile_stats_*.sav` onto
+it (or click to browse). Parsing happens entirely in your browser — nothing is sent
+anywhere. The page also tells you where to find the file.
 
-### Compendium (`compendium.html`)
+![Upload / drop zone](docs/sec-upload.png)
 
-A reference guide with its own tabbed navigation:
+### At-a-glance stats
 
-- **Units / Buildings / Sietches** — searchable cards with dynamic type-filter pills that
-  adapt to the current tab and selected faction.
-- **Tech Trees** and **Landsraad & Politics** references.
-- **Factions Overview** — traits, Hegemony milestone bonuses, and councillors for every
-  faction (pick "All Factions" to see them all stacked).
-- **Operations** — universal and faction-specific covert operations.
-- **Village Bonuses** — every village specialization and its effect.
-- **Match Randomizer** — add up to four players, assign each a unique random faction
-  (with re-rolls, locks, exclusions, and a random councillor), for drafting fresh games.
+The top row summarizes the currently selected mode: total **playtime**, overall **win
+rate** (and games counted), the **solo / team** split, and — in single-player — your
+**conquest campaign** count.
 
-### Shareable links
+![Summary stat cards](docs/sec-cards.png)
 
-Click **Share Link** after loading a save to copy a self-contained URL to your clipboard.
-The data is gzip-compressed and stored in the URL's `#` fragment, which browsers never
-send to the server — so opening the link renders the same stats locally, with a banner
-making clear it's a shared snapshot. A shared link is only as private as wherever you
-paste it, since anyone with the URL can decode the data it carries.
+### Faction Activity
+
+A bar chart of how many games you've played as each of the seven factions, color-coded to
+match each House. Hover a bar for a quick faction blurb.
+
+![Faction activity chart](docs/sec-faction-activity.png)
+
+### Match Victory Conditions
+
+A doughnut chart breaking down how your matches end — Hegemony, Supremacy, Economy
+(CHOAM), Political (Governor), and any abandoned/incomplete games — so you can see which
+win conditions you actually close out.
+
+![Match victory conditions chart](docs/sec-victory-conditions.png)
+
+### Faction Performance Leaderboard
+
+Each faction's average match length, win rate, and games played, sorted by activity.
+Click any faction to expand a per-**hero** and per-**councillor** breakdown with their own
+play counts and win rates.
+
+![Faction performance leaderboard, expanded](docs/sec-leaderboard.png)
+
+### Match History
+
+Every game in a sortable, paginated table — date, faction, outcome, victory condition,
+format, hero, duration, and sandworm/supply deaths. Search by player, councillor, hero, or
+date, and filter by faction, outcome, or format.
+
+![Match history table with filters](docs/sec-match-history.png)
+
+### Match detail
+
+Click any row to open a full match profile: outcome and winner, end reason, hero unit,
+councillors, duration, difficulty, death breakdown, and the operations executed that game.
+
+![Match detail modal](docs/sec-match-detail.png)
+
+### Sharing your results
+
+Two share buttons live in the header:
+
+![Dashboard header with share buttons](docs/sec-header.png)
+
+- **Share Summary** — copies a short link containing just the aggregates (cards, charts,
+  and leaderboard). It stays small no matter how many games you have (a ~600-character
+  URL), so it pastes inline in most chat apps. The recipient sees a summary view without
+  the per-game table.
+- **Share Full Link** — copies a link containing your full (trimmed) match data so the
+  recipient gets the complete dashboard, including the match table and per-game detail.
+  This link grows with your history and can get long.
+
+Either way the data lives in the URL's `#` fragment, which browsers never send to a
+server, and the recipient sees a banner making clear they're viewing a shared snapshot.
+
+---
+
+## The Compendium
+
+A reference guide with its own tabbed navigation. Click **Compendium** in the dashboard
+header (or the live site's compendium link) to open it.
+
+### Units, Buildings & Sietches
+
+Searchable cards for every unit, building, and sietch, with type-filter pills that adapt
+to the current tab and the selected faction. Filter by House to see only that faction's
+roster.
+
+![Compendium units tab](docs/sec-compendium-units.png)
+
+### Factions Overview
+
+Traits, Hegemony milestone bonuses (5k / 10k), and councillors for every faction. Pick a
+single House to focus on it, or **All Factions** to see them all stacked.
+
+![Factions overview tab](docs/sec-compendium-factions.png)
+
+### Operations
+
+Universal and faction-specific covert operations, with their cost, difficulty, and effect,
+grouped by faction.
+
+![Operations tab](docs/sec-compendium-operations.png)
+
+### Village Bonuses
+
+Every village specialization and production bonus, grouped by category, so you can plan
+how to develop captured villages.
+
+![Village bonuses tab](docs/sec-compendium-village.png)
+
+### Match Randomizer
+
+Add up to four players and assign each a **unique** random faction. Re-roll any faction,
+get a random suggested councillor, and lock or exclude factions to fine-tune the draft —
+handy for spicing up a lobby.
+
+![Match randomizer tab](docs/sec-compendium-randomizer.png)
 
 ---
 
@@ -94,6 +173,8 @@ paste it, since anyone with the URL can decode the data it carries.
   [Lucide](https://lucide.dev/) are loaded from a CDN.
 - **Save parsing** is done client-side with a small [Haxe](https://haxe.org/) deserializer
   (Dune: Spice Wars serializes its save data with Haxe's serialization format).
+- **Share links** gzip the data into the URL fragment (`#…`), which is never sent to the
+  server, so shared stats stay client-side.
 - **Hosting** is static [GitHub Pages](https://pages.github.com/); `index.html` simply
   forwards to `dashboard.html`.
 
@@ -112,7 +193,9 @@ paste it, since anyone with the URL can decode the data it carries.
 
 This tool does not collect, transmit, or store any data on a server. Your save file is
 read in your browser and never leaves your machine unless *you* choose to create and share
-a link. The published site ships with no preloaded match data.
+a link — and a shared link is only as private as wherever you paste it, since anyone with
+the URL can decode the data it carries. The published site ships with no preloaded match
+data.
 
 ## Disclaimer
 
