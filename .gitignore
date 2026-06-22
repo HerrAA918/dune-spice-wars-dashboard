@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+*.sav
+scratch/
+src_scripts/
+src_scripts/node_modules/
