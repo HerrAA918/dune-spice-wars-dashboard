@@ -2300,13 +2300,39 @@
             if (banner) banner.style.display = 'none';
         };
 
+        // Strip a parsed profile down to just the fields the dashboard reads, so
+        // shared links stay as small as possible.
+        function slimProfile(data) {
+            const keep = ['faction', 'hero', 'councilors', 'isMulti', 'isTeamGame',
+                          'isVictory', 'currentTime', 'realDate', 'realDateStr',
+                          'userId', 'difficulty'];
+            const games = (data.games || []).map(g => {
+                const s = {};
+                keep.forEach(k => { if (g[k] !== undefined) s[k] = g[k]; });
+                if (g.endReason && g.endReason.tag) s.endReason = { tag: g.endReason.tag };
+                if (g.stats) {
+                    const st = {};
+                    if (g.stats.DeathByWorm) st.DeathByWorm = g.stats.DeathByWorm;
+                    if (g.stats.DeathBySupply) st.DeathBySupply = g.stats.DeathBySupply;
+                    if (g.stats.OperationUsed) st.OperationUsed = g.stats.OperationUsed;
+                    if (Object.keys(st).length) s.stats = st;
+                }
+                return s;
+            });
+            // Only the conquest count is displayed, so a length-preserving stub suffices.
+            return { conquest: (data.conquest || []).map(() => 0), games };
+        }
+
         window.shareLink = async function() {
             if (!(currentProfileData && currentProfileData.games && currentProfileData.games.length)) {
                 showToast('Load a save file first, then share.', true);
                 return;
             }
             try {
-                const json = JSON.stringify(currentProfileData);
+                // Only pack the fields the dashboard actually renders. The whole
+                // dataset has to ride inside the URL (no server), so trimming
+                // unused save fields keeps the link as short as possible.
+                const json = JSON.stringify(slimProfile(currentProfileData));
                 let frag;
                 if (typeof CompressionStream !== 'undefined') {
                     frag = 'd=' + bytesToB64url(await gzip(json));
@@ -2317,8 +2343,10 @@
                 const url = location.origin + location.pathname + location.search + '#' + frag;
                 history.replaceState(null, document.title, '#' + frag);
                 await copyToClipboard(url);
-                showToast(url.length > 28000
-                    ? 'Link copied — it is large, so some chat apps may shorten or break it.'
+                // Discord/Slack/Teams turn messages past their character limit into a
+                // .txt attachment, so warn once the link gets long.
+                showToast(url.length > 2000
+                    ? 'Link copied! It is long, so some chat apps (e.g. Discord) may attach it as a .txt file — the link inside still works. Tip: paste it into the browser address bar or an email.'
                     : 'Shareable link copied to clipboard!');
             } catch (err) {
                 console.error(err);
