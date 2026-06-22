@@ -1038,9 +1038,13 @@
                     <i data-lucide="upload"></i>
                     Upload profile_stats.sav
                 </label>
-                <button id="share-btn" class="file-upload-btn" onclick="shareLink()">
+                <button id="share-summary-btn" class="file-upload-btn" onclick="shareSummary()">
                     <i data-lucide="share-2"></i>
-                    Share Link
+                    Share Summary
+                </button>
+                <button id="share-btn" class="file-upload-btn" onclick="shareLink()">
+                    <i data-lucide="link"></i>
+                    Share Full Link
                 </button>
                 <button id="reset-btn" class="file-upload-btn" onclick="resetData()">
                     <i data-lucide="refresh-cw"></i>
@@ -1055,7 +1059,7 @@
              background:rgba(201,138,65,0.10); border:1px solid var(--accent-gold, #c98a41);
              border-radius:10px; padding:12px 16px; margin-bottom:24px;">
             <i data-lucide="users" style="width:20px; height:20px; color:var(--accent-spice); flex-shrink:0;"></i>
-            <span style="flex:1; min-width:220px; font-size:0.9rem; color:var(--text-muted, #b8b0a4);">
+            <span id="shared-banner-text" style="flex:1; min-width:220px; font-size:0.9rem; color:var(--text-muted, #b8b0a4);">
                 You're viewing a <strong style="color:var(--text-main, #f0edf5);">shared snapshot</strong>
                 of someone's results. Nothing was uploaded &mdash; the data came from the link.
                 Open the dashboard to load your own save.
@@ -1166,7 +1170,7 @@
                 </div>
 
                 <!-- Panel 4: History Table -->
-                <div class="panel history-panel">
+                <div class="panel history-panel" id="history-panel">
                     <div class="panel-header">
                         <div class="panel-title">
                             <i data-lucide="history"></i> Match History Logs
@@ -2179,11 +2183,18 @@
             }
         };
 
+        // Undo the element hiding done by the summary-only shared view.
+        function restoreFullView() {
+            const hp = document.getElementById('history-panel'); if (hp) hp.style.display = '';
+            const ms = document.querySelector('.mode-switcher'); if (ms) ms.style.display = '';
+        }
+
         window.resetData = function() {
             // Reset to preloaded data
             currentProfileData = PRELOADED_DATA;
             clearShareHash();
             dismissSharedBanner();
+            restoreFullView();
 
             // Hide dashboard and show drop zone
             document.getElementById('dashboard-content').style.display = 'none';
@@ -2354,9 +2365,78 @@
             }
         };
 
+        // Active games for the current mode, used when building a summary to share.
+        function activeGamesForShare() {
+            return (currentProfileData.games || []).filter(g => {
+                if (activeMode === 'multi') return g.isMulti === true;
+                if (activeMode === 'single') return g.isMulti === false;
+                return true;
+            });
+        }
+
+        // Share only the aggregate summary (totals, charts, leaderboard). This is tiny
+        // and scale-invariant, so the link stays short no matter how many games you have.
+        window.shareSummary = async function() {
+            if (!(currentProfileData && currentProfileData.games && currentProfileData.games.length)) {
+                showToast('Load a save file first, then share.', true);
+                return;
+            }
+            try {
+                const summary = computeSummary(activeGamesForShare(), (currentProfileData.conquest || []).length, activeMode);
+                const json = JSON.stringify(summary);
+                let frag;
+                if (typeof CompressionStream !== 'undefined') {
+                    frag = 's=' + bytesToB64url(await gzip(json));
+                } else {
+                    frag = 'sr=' + bytesToB64url(new TextEncoder().encode(json));
+                }
+                const url = location.origin + location.pathname + location.search + '#' + frag;
+                history.replaceState(null, document.title, '#' + frag);
+                await copyToClipboard(url);
+                showToast(url.length > 2000
+                    ? 'Summary link copied! Still a bit long — paste into the address bar or email if a chat app shortens it.'
+                    : 'Summary link copied to clipboard!');
+            } catch (err) {
+                console.error(err);
+                showToast('Could not create a summary link in this browser.', true);
+            }
+        };
+
+        // Render a summary-only shared view: cards, charts, and leaderboard, with the
+        // per-game table, filters, and mode switcher hidden (there is no game list).
+        function renderSummaryView(summary) {
+            activeMode = summary.mode || 'multi';
+            document.getElementById('dashboard-content').style.display = 'block';
+            renderSummaryCards(summary);
+            renderCharts(summary);
+            renderLeaderboard(summary);
+            const hp = document.getElementById('history-panel'); if (hp) hp.style.display = 'none';
+            const ms = document.querySelector('.mode-switcher'); if (ms) ms.style.display = 'none';
+        }
+
         async function tryLoadFromHash() {
             const h = location.hash;
             try {
+                // Summary-only links (#s= / #sr=) carry just aggregates.
+                if (h.startsWith('#s=') || h.startsWith('#sr=')) {
+                    const summaryJson = h.startsWith('#sr=')
+                        ? new TextDecoder().decode(b64urlToBytes(h.slice(4)))
+                        : await gunzip(b64urlToBytes(h.slice(3)));
+                    const summary = JSON.parse(summaryJson);
+                    if (!summary || !summary.factions) return false;
+                    renderSummaryView(summary);
+                    document.getElementById('drop-zone').style.display = 'none';
+                    const txt = document.getElementById('shared-banner-text');
+                    if (txt) txt.innerHTML = "You're viewing a <strong style=\"color:var(--text-main, #f0edf5);\">shared summary</strong> "
+                        + "of someone's results (totals, charts, and leaderboard). The full match list isn't included. "
+                        + "Open the dashboard to load your own save.";
+                    const sBanner = document.getElementById('shared-banner');
+                    if (sBanner) sBanner.style.display = 'flex';
+                    safeCreateIcons();
+                    showToast('Loaded shared summary.');
+                    return true;
+                }
+
                 let json;
                 if (h.startsWith('#d=')) {
                     json = await gunzip(b64urlToBytes(h.slice(3)));
@@ -2400,6 +2480,7 @@
                     currentProfileData = parsed;
                     clearShareHash();
                     dismissSharedBanner();
+                    restoreFullView();
 
                     // Reset mode selection to auto-detect if necessary
                     autoDetectMode(parsed.games);
@@ -2442,6 +2523,60 @@
             }
         }
 
+        // Aggregate a list of games into a compact, scale-invariant summary. This is
+        // what the cards/charts/leaderboard render from, and what the "Share Summary"
+        // link encodes (it stays small even for thousands of games).
+        function computeSummary(activeGames, conquestCount, mode) {
+            const s = {
+                mode: mode,
+                totals: { playSec: 0, wins: 0, games: activeGames.length, solo: 0, team: 0, conquest: conquestCount || 0 },
+                reasons: {},
+                factions: {}
+            };
+            activeGames.forEach(g => {
+                s.totals.playSec += g.currentTime || 0;
+                if (g.isVictory) s.totals.wins++;
+                if (g.isTeamGame) s.totals.team++; else s.totals.solo++;
+
+                let reason = 'Abandoned / Incomplete';
+                if (g.endReason && g.endReason.tag) {
+                    const tag = g.endReason.tag;
+                    if (tag === 'Economy') reason = 'Economy (CHOAM)';
+                    else if (tag === 'Political') reason = 'Political (Governor)';
+                    else if (tag === 'Objective') reason = 'Scenario Objective';
+                    else reason = tag;
+                }
+                s.reasons[reason] = (s.reasons[reason] || 0) + 1;
+
+                const f = g.faction || 'Unknown';
+                const fs = s.factions[f] || (s.factions[f] = { played: 0, wins: 0, totalTime: 0, heroes: {}, councilors: {} });
+                fs.played++;
+                if (g.isVictory) fs.wins++;
+                fs.totalTime += g.currentTime || 0;
+                if (g.hero) {
+                    const h = fs.heroes[g.hero] || (fs.heroes[g.hero] = { played: 0, wins: 0 });
+                    h.played++; if (g.isVictory) h.wins++;
+                }
+                (g.councilors || []).forEach(c => {
+                    const cc = fs.councilors[c] || (fs.councilors[c] = { played: 0, wins: 0 });
+                    cc.played++; if (g.isVictory) cc.wins++;
+                });
+            });
+            return s;
+        }
+
+        // Populate the four summary cards from a summary object.
+        function renderSummaryCards(s) {
+            const conquestCard = document.getElementById('card-conquest');
+            if (conquestCard) conquestCard.style.display = (s.mode === 'multi') ? 'none' : 'flex';
+            document.getElementById('val-conquests').innerText = s.totals.conquest;
+            document.getElementById('val-playtime').innerText = (s.totals.playSec / 3600).toFixed(1) + "h";
+            document.getElementById('val-total-games').innerText = s.totals.games;
+            const winRate = s.totals.games > 0 ? ((s.totals.wins / s.totals.games) * 100).toFixed(1) : 0;
+            document.getElementById('val-winrate').innerText = winRate + "%";
+            document.getElementById('val-match-type-split').innerText = s.totals.solo + " / " + s.totals.team;
+        }
+
         // Render Dashboard Stats, Charts, Leaderboard, Table
         function renderDashboard(data) {
             document.getElementById('dashboard-content').style.display = 'block';
@@ -2461,70 +2596,19 @@
                 return true;
             });
 
-            // Card 1: Conquests
-            const conquestCard = document.getElementById('card-conquest');
-            if (conquestCard) {
-                if (activeMode === 'multi') {
-                    conquestCard.style.display = 'none';
-                } else {
-                    conquestCard.style.display = 'flex';
-                }
-            }
-            document.getElementById('val-conquests').innerText = conquest.length;
+            const summary = computeSummary(activeGames, conquest.length, activeMode);
+            renderSummaryCards(summary);
+            renderCharts(summary);
+            renderLeaderboard(summary);
 
-            // Card 2: Total Playtime
-            let totalSeconds = 0;
-            let wins = 0;
-            let soloGamesCount = 0;
-            let teamGamesCount = 0;
-
-            activeGames.forEach(g => {
-                totalSeconds += g.currentTime || 0;
-                if (g.isVictory) wins++;
-                if (g.isTeamGame) teamGamesCount++;
-                else soloGamesCount++;
-            });
-
-            const hrs = (totalSeconds / 3600).toFixed(1);
-            document.getElementById('val-playtime').innerText = hrs + "h";
-
-            // Card 3: Win rate & Total Games
-            document.getElementById('val-total-games').innerText = activeGames.length;
-            const winRate = activeGames.length > 0 ? ((wins / activeGames.length) * 100).toFixed(1) : 0;
-            document.getElementById('val-winrate').innerText = winRate + "%";
-
-            // Card 4: Solo / Team Split
-            document.getElementById('val-match-type-split').innerText = soloGamesCount + " / " + teamGamesCount;
-
-            // Process Charts
-            renderCharts(activeGames);
-
-            // Process Leaderboard
-            renderLeaderboard(activeGames);
-
-            // Process Table list
+            // Process Table list (full per-game data only)
             applyFilters();
         }
 
-        function renderCharts(activeGames) {
+        function renderCharts(summary) {
             const factionCounts = {};
-            const endReasons = {};
-
-            activeGames.forEach(g => {
-                factionCounts[g.faction] = (factionCounts[g.faction] || 0) + 1;
-                
-                let reason = 'Abandoned / Incomplete';
-                if (g.endReason && g.endReason.tag) {
-                    const tag = g.endReason.tag;
-                    if (tag === 'Supremacy') reason = 'Supremacy';
-                    else if (tag === 'Hegemony') reason = 'Hegemony';
-                    else if (tag === 'Economy') reason = 'Economy (CHOAM)';
-                    else if (tag === 'Political') reason = 'Political (Governor)';
-                    else if (tag === 'Objective') reason = 'Scenario Objective';
-                    else reason = tag;
-                }
-                endReasons[reason] = (endReasons[reason] || 0) + 1;
-            });
+            Object.keys(summary.factions).forEach(f => { factionCounts[f] = summary.factions[f].played; });
+            const endReasons = summary.reasons;
 
             // Chart 1: Faction Games Count
             const factionLabels = Object.keys(factionCounts);
@@ -2618,17 +2702,11 @@
             });
         }
 
-        function renderLeaderboard(activeGames) {
+        function renderLeaderboard(summary) {
             const factionStats = {};
-            activeGames.forEach(g => {
-                const f = g.faction;
-                if (!factionStats[f]) {
-                    factionStats[f] = { played: 0, wins: 0, losses: 0, totalTime: 0 };
-                }
-                factionStats[f].played++;
-                if (g.isVictory) factionStats[f].wins++;
-                else factionStats[f].losses++;
-                factionStats[f].totalTime += g.currentTime || 0;
+            Object.keys(summary.factions).forEach(f => {
+                const fs = summary.factions[f];
+                factionStats[f] = { played: fs.played, wins: fs.wins, losses: fs.played - fs.wins, totalTime: fs.totalTime };
             });
 
             const leaderboard = document.getElementById('faction-leaderboard');
@@ -2667,30 +2745,29 @@
                         '<i data-lucide="chevron-down" class="expansion-chevron" style="width: 16px; height: 16px; transition: transform 0.3s ease; color: var(--text-muted); margin-left: 8px;"></i>' +
                     '</div>';
 
-                // Calculate Hero and Councilor stats for this faction
-                const factionGames = activeGames.filter(g => g.faction === f);
+                // Hero and Councilor stats for this faction, from the summary maps.
+                const fSummary = summary.factions[f];
                 const heroStats = {};
                 const councilorStats = {};
 
-                factionGames.forEach(g => {
-                    // Hero — store heroId + faction for tooltip lookup
-                    const hName = getHeroName(g.hero, g.faction);
+                Object.keys(fSummary.heroes).forEach(heroId => {
+                    const hName = getHeroName(heroId, f);
                     if (hName && hName !== '-') {
-                        if (!heroStats[hName]) heroStats[hName] = { played: 0, wins: 0, heroId: g.hero, faction: g.faction };
-                        heroStats[hName].played++;
-                        if (g.isVictory) heroStats[hName].wins++;
+                        const hm = fSummary.heroes[heroId];
+                        if (!heroStats[hName]) heroStats[hName] = { played: 0, wins: 0, heroId: heroId, faction: f };
+                        heroStats[hName].played += hm.played;
+                        heroStats[hName].wins += hm.wins;
                     }
-                    
-                    // Councilors
-                    const councilors = g.councilors || [];
-                    councilors.forEach(c => {
-                        const cName = getCouncilorName(c);
-                        if (cName && cName !== '-') {
-                            if (!councilorStats[cName]) councilorStats[cName] = { played: 0, wins: 0 };
-                            councilorStats[cName].played++;
-                            if (g.isVictory) councilorStats[cName].wins++;
-                        }
-                    });
+                });
+
+                Object.keys(fSummary.councilors).forEach(c => {
+                    const cName = getCouncilorName(c);
+                    if (cName && cName !== '-') {
+                        const cm = fSummary.councilors[c];
+                        if (!councilorStats[cName]) councilorStats[cName] = { played: 0, wins: 0 };
+                        councilorStats[cName].played += cm.played;
+                        councilorStats[cName].wins += cm.wins;
+                    }
                 });
 
                 // Generate HTML for Heroes
