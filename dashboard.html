@@ -1038,6 +1038,10 @@
                     <i data-lucide="upload"></i>
                     Upload profile_stats.sav
                 </label>
+                <button id="share-btn" class="file-upload-btn" onclick="shareLink()">
+                    <i data-lucide="share-2"></i>
+                    Share Link
+                </button>
                 <button id="reset-btn" class="file-upload-btn" onclick="resetData()">
                     <i data-lucide="refresh-cw"></i>
                     Reset Data
@@ -2052,14 +2056,8 @@
         }
 
         // Initialize elements
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             safeCreateIcons();
-            
-            // Check if preload is populated
-            if (currentProfileData && currentProfileData.games && currentProfileData.games.length) {
-                renderDashboard(currentProfileData);
-                document.getElementById('drop-zone').style.display = 'none';
-            }
 
             // Setup Drag & Drop
             const dropZone = document.getElementById('drop-zone');
@@ -2134,6 +2132,14 @@
                     document.getElementById('detail-modal').classList.remove('active');
                 }
             });
+
+            // Load a shared snapshot from the URL fragment if present; otherwise fall
+            // back to any preloaded data.
+            const loadedFromHash = await tryLoadFromHash();
+            if (!loadedFromHash && currentProfileData && currentProfileData.games && currentProfileData.games.length) {
+                renderDashboard(currentProfileData);
+                document.getElementById('drop-zone').style.display = 'none';
+            }
         });
 
         // Switch active mode (Multiplayer / Singleplayer / All)
@@ -2157,7 +2163,8 @@
         window.resetData = function() {
             // Reset to preloaded data
             currentProfileData = PRELOADED_DATA;
-            
+            clearShareHash();
+
             // Hide dashboard and show drop zone
             document.getElementById('dashboard-content').style.display = 'none';
             document.getElementById('drop-zone').style.display = 'block';
@@ -2172,6 +2179,153 @@
             });
             document.getElementById('mode-multi').classList.add('active');
         };
+
+        /* ──────────────────────────────────────────────────────────────
+           Shareable links
+
+           The dashboard is a static page (GitHub Pages, no backend), so a
+           "share" link has to carry the data itself. We gzip the loaded
+           profile JSON and stash it in the URL fragment (#d=…). Fragments
+           are never sent to the server, so the shared stats stay client-side
+           — the recipient's browser decompresses and renders them locally.
+           ────────────────────────────────────────────────────────────── */
+
+        function bytesToB64url(bytes) {
+            let bin = '';
+            const chunk = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunk) {
+                bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+            }
+            return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+
+        function b64urlToBytes(b64) {
+            b64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4) b64 += '=';
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return bytes;
+        }
+
+        async function gzip(str) {
+            const cs = new CompressionStream('gzip');
+            const writer = cs.writable.getWriter();
+            writer.write(new TextEncoder().encode(str));
+            writer.close();
+            const buf = await new Response(cs.readable).arrayBuffer();
+            return new Uint8Array(buf);
+        }
+
+        async function gunzip(bytes) {
+            const ds = new DecompressionStream('gzip');
+            const writer = ds.writable.getWriter();
+            writer.write(bytes);
+            writer.close();
+            const buf = await new Response(ds.readable).arrayBuffer();
+            return new TextDecoder().decode(buf);
+        }
+
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+        }
+
+        let _toastTimer;
+        function showToast(msg, isError) {
+            let t = document.getElementById('share-toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'share-toast';
+                t.style.cssText =
+                    'position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);' +
+                    'background:#1a1714;color:#f0edf5;padding:12px 20px;border-radius:8px;' +
+                    'border:1px solid #c98a41;font-family:sans-serif;font-size:0.9rem;' +
+                    'box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:99999;opacity:0;' +
+                    'transition:opacity .25s ease, transform .25s ease;max-width:90vw;' +
+                    'text-align:center;pointer-events:none;';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.style.borderColor = isError ? '#eb5757' : '#c98a41';
+            requestAnimationFrame(() => {
+                t.style.opacity = '1';
+                t.style.transform = 'translateX(-50%) translateY(0)';
+            });
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(-50%) translateY(20px)';
+            }, 3500);
+        }
+
+        function clearShareHash() {
+            if (location.hash) {
+                history.replaceState(null, document.title, location.pathname + location.search);
+            }
+        }
+
+        window.shareLink = async function() {
+            if (!(currentProfileData && currentProfileData.games && currentProfileData.games.length)) {
+                showToast('Load a save file first, then share.', true);
+                return;
+            }
+            try {
+                const json = JSON.stringify(currentProfileData);
+                let frag;
+                if (typeof CompressionStream !== 'undefined') {
+                    frag = 'd=' + bytesToB64url(await gzip(json));
+                } else {
+                    // Older browser without CompressionStream: fall back to raw (larger).
+                    frag = 'r=' + bytesToB64url(new TextEncoder().encode(json));
+                }
+                const url = location.origin + location.pathname + location.search + '#' + frag;
+                history.replaceState(null, document.title, '#' + frag);
+                await copyToClipboard(url);
+                showToast(url.length > 28000
+                    ? 'Link copied — it is large, so some chat apps may shorten or break it.'
+                    : 'Shareable link copied to clipboard!');
+            } catch (err) {
+                console.error(err);
+                showToast('Could not create a share link in this browser.', true);
+            }
+        };
+
+        async function tryLoadFromHash() {
+            const h = location.hash;
+            try {
+                let json;
+                if (h.startsWith('#d=')) {
+                    json = await gunzip(b64urlToBytes(h.slice(3)));
+                } else if (h.startsWith('#r=')) {
+                    json = new TextDecoder().decode(b64urlToBytes(h.slice(3)));
+                } else {
+                    return false;
+                }
+                const parsed = JSON.parse(json);
+                if (!parsed || !parsed.games) return false;
+                currentProfileData = parsed;
+                autoDetectMode(parsed.games);
+                renderDashboard(parsed);
+                document.getElementById('drop-zone').style.display = 'none';
+                showToast('Loaded shared results snapshot.');
+                return true;
+            } catch (err) {
+                console.error('Failed to load shared data', err);
+                showToast('This shared link could not be loaded.', true);
+                return false;
+            }
+        }
 
         function processFile(file) {
             const reader = new FileReader();
@@ -2188,10 +2342,11 @@
                     }
                     
                     currentProfileData = parsed;
-                    
+                    clearShareHash();
+
                     // Reset mode selection to auto-detect if necessary
                     autoDetectMode(parsed.games);
-                    
+
                     renderDashboard(parsed);
                     document.getElementById('drop-zone').style.display = 'none';
                     document.getElementById('file-input').value = '';
