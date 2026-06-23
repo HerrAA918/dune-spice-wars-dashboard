@@ -37,6 +37,12 @@
             --tag-ship: #e07a5f;
             --tag-main_base: #c98a41;
             --tag-village: #6fcf97;
+            /* Tech-tree branch palette — single source of truth, shared by
+               .tech-branch-quadrant.*::before (CSS) and getTechColor() (JS). */
+            --tech-military: #e74c3c;
+            --tech-economy: #f1c40f;
+            --tech-statecraft: #9b59b6;
+            --tech-expansion: #2ecc71;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -509,10 +515,11 @@
     border-radius: 14px 14px 0 0;
     opacity: 0.5;
 }
-.tech-branch-quadrant.Military::before { background: #e74c3c; }
-.tech-branch-quadrant.Economy::before { background: #f1c40f; }
-.tech-branch-quadrant.Statecraft::before { background: #9b59b6; }
-.tech-branch-quadrant.Expansion::before { background: #2ecc71; }
+/* Branch colors come from the --tech-* tokens in :root (kept in sync with getTechColor()). */
+.tech-branch-quadrant.Military::before { background: var(--tech-military); }
+.tech-branch-quadrant.Economy::before { background: var(--tech-economy); }
+.tech-branch-quadrant.Statecraft::before { background: var(--tech-statecraft); }
+.tech-branch-quadrant.Expansion::before { background: var(--tech-expansion); }
 
 .tech-branch-title {
     font-size: 24px;
@@ -809,7 +816,7 @@
 }
 .treaty-box h4 {
     margin: 0 0 5px 0;
-    color: #2ecc71;
+    color: var(--accent-gold); /* default heading matches the box's gold left-border; themed treaties override via inline span color */
     font-size: 16px;
 }
 .treaty-box p {
@@ -4729,8 +4736,9 @@ function factionColor(f) {
     const m = { Atreides:'var(--color-atreides)', Harkonnen:'var(--color-harkonnen)',
                 Smugglers:'var(--color-smugglers)', Fremen:'var(--color-fremen)',
                 Corrino:'var(--color-corrino)', Ecaz:'var(--color-ecaz)',
-                Vernius:'var(--color-vernius)', All:'var(--accent-gold)' };
-    return m[f] || 'var(--accent-gold)';
+                Vernius:'var(--color-vernius)',
+                All:'var(--accent-gold)' }; // 'All' = generic/everyone view → intentional gold accent
+    return m[f] || 'var(--color-neutral)'; // genuine unknown faction → neutral gray (matches dashboard's getFactionColor default)
 }
 
 function makeCostChips(cost, upkeep) {
@@ -4863,12 +4871,23 @@ function getBaseCost(tier) {
     }
 }
 
+// Resolves the tech-branch palette from the --tech-* CSS custom properties (:root),
+// so the CSS (.tech-branch-quadrant.*::before) and JS share one source of truth.
+// Values are read once and cached (they never change at runtime).
+let _techColors = null;
 function getTechColor(cat) {
-    if (cat === 'Military') return '#e74c3c';
-    if (cat === 'Economy' || cat === 'Economic') return '#f1c40f';
-    if (cat === 'Statecraft') return '#9b59b6';
-    if (cat === 'Expansion') return '#2ecc71';
-    return '#fff';
+    if (!_techColors) {
+        const cs = getComputedStyle(document.documentElement);
+        const v = name => cs.getPropertyValue(name).trim();
+        _techColors = {
+            Military:   v('--tech-military'),
+            Economy:    v('--tech-economy'),
+            Economic:   v('--tech-economy'), // alias: branchKeys maps 'Economy' → 'Economic'
+            Statecraft: v('--tech-statecraft'),
+            Expansion:  v('--tech-expansion'),
+        };
+    }
+    return _techColors[cat] || '#fff';
 }
 
 function buildTechTreeNode(genericTech, catKey, visited = new Set()) {
@@ -5242,6 +5261,9 @@ function renderResolutionItem(r, type) {
 }
 
 function renderLandsraad() {
+    // Treaty accent colors below are a separate diplomacy palette, intentionally NOT the --tech-* tokens:
+    //   Research = #3498db (Knowledge/blue) — distinct category, no tech-branch equivalent.
+    //   Non-Aggression = #e74c3c, Political = #9b59b6 — share hues with tech branches by design but stay independent.
     let html = `
     <div class="landsraad-container">
         <div class="landsraad-header">
