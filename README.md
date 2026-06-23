@@ -62,8 +62,9 @@ anywhere. The page also tells you where to find the file.
 ### At-a-glance stats
 
 The top row summarizes the currently selected mode: total **playtime**, overall **win
-rate** (and games counted), the **solo / team** split, and — in single-player — your
-**conquest campaign** count.
+rate** (over *decided* games only — abandoned/unfinished games don't count), your
+**win · loss · incomplete** record, and — in single-player — your **conquest campaign**
+count.
 
 ![Summary stat cards](docs/sec-cards.png)
 
@@ -93,8 +94,9 @@ play counts and win rates.
 ### Match History
 
 Every game in a sortable, paginated table — date, faction, outcome, victory condition,
-format, hero, duration, and sandworm/supply deaths. Search by player, councillor, hero, or
-date, and filter by faction, outcome, or format.
+hero, duration, and sandworm/supply deaths. Outcomes are Victory, Defeat, or **Incomplete**
+(abandoned/unfinished games, which are not counted as losses). Search by player, councillor,
+hero, or date, and filter by faction or outcome.
 
 ![Match history table with filters](docs/sec-match-history.png)
 

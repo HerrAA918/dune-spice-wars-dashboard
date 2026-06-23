@@ -713,6 +713,12 @@
             border: 1px solid rgba(235, 87, 87, 0.25);
         }
 
+        .outcome-incomplete {
+            background: rgba(160, 160, 170, 0.12);
+            color: var(--text-muted);
+            border: 1px solid rgba(160, 160, 170, 0.28);
+        }
+
         /* Pagination & Footer */
         .table-footer {
             display: flex;
@@ -1121,17 +1127,17 @@
                     </div>
                     <div class="stat-info">
                         <div class="stat-value" id="val-winrate">-</div>
-                        <div class="stat-label">Win Rate (<span id="val-total-games">-</span> games)</div>
+                        <div class="stat-label">Win Rate (<span id="val-total-games">-</span> decided)</div>
                     </div>
                 </div>
                 <!-- Card 4 -->
                 <div class="stat-card">
                     <div class="stat-icon">
-                        <i data-lucide="users" style="width: 28px; height: 28px;"></i>
+                        <i data-lucide="trophy" style="width: 28px; height: 28px;"></i>
                     </div>
                     <div class="stat-info">
-                        <div class="stat-value" id="val-match-type-split">-</div>
-                        <div class="stat-label">Solo / Team Matches</div>
+                        <div class="stat-value" id="val-record">-</div>
+                        <div class="stat-label" title="Wins · Losses · Incomplete (abandoned/unfinished games are not counted as losses)">Win · Loss · Incomplete</div>
                     </div>
                 </div>
             </div>
@@ -1202,11 +1208,7 @@
                             <option value="">All Outcomes</option>
                             <option value="victory">Victory</option>
                             <option value="defeat">Defeat</option>
-                        </select>
-                        <select id="filter-format" class="filter-select">
-                            <option value="">All Formats</option>
-                            <option value="team">Team Game</option>
-                            <option value="solo">Solo</option>
+                            <option value="incomplete">Incomplete</option>
                         </select>
                     </div>
 
@@ -1219,7 +1221,6 @@
                                     <th onclick="handleSort('faction')">Faction<span id="sort-icon-faction"></span></th>
                                     <th onclick="handleSort('outcome')">Outcome<span id="sort-icon-outcome"></span></th>
                                     <th onclick="handleSort('victoryCondition')">Victory Condition<span id="sort-icon-victoryCondition"></span></th>
-                                    <th onclick="handleSort('matchFormat')">Match Format<span id="sort-icon-matchFormat"></span></th>
                                     <th onclick="handleSort('hero')">Hero<span id="sort-icon-hero"></span></th>
                                     <th onclick="handleSort('duration')">Duration<span id="sort-icon-duration"></span></th>
                                     <th onclick="handleSort('deaths')" title="Deaths: Devoured by Sandworms / Lost to Dehydration (Supply loss)">Deaths (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 13px; height: 13px; display: inline-block; vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" fill="currentColor" /><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /></svg>/<i data-lucide="droplet" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-left: 2px;"></i>)<span id="sort-icon-deaths"></span></th>
@@ -1987,7 +1988,7 @@
 
         // Victory condition helper
         function getVictoryCondition(g) {
-            if (!g || !g.endReason) return 'Unknown';
+            if (!g || !g.endReason) return 'Abandoned / Incomplete';
             const tag = g.endReason.tag;
             if (tag === 'Supremacy') return 'Supremacy';
             if (tag === 'Hegemony') return 'Hegemony';
@@ -1995,6 +1996,22 @@
             if (tag === 'Political') return 'Political (Governor)';
             if (tag === 'Objective') return 'Scenario Objective';
             return tag;
+        }
+
+        // A game only reached a result if it has an endReason. Games with no
+        // endReason were abandoned / never finished, so they are NOT defeats and
+        // must be kept out of the win-rate denominator. (The save's `isVictory`
+        // flag is simply absent on these, which is why they used to read as losses.)
+        function isGameDecided(g) {
+            return !!(g && g.endReason && g.endReason.tag);
+        }
+
+        // Three-state outcome for a game: 'victory' | 'defeat' | 'incomplete'.
+        // A victory is by definition a decided game, so the badge can never
+        // disagree with the win-rate denominator (which only counts decided games).
+        function getOutcome(g) {
+            if (!isGameDecided(g)) return 'incomplete';
+            return (g && g.isVictory) ? 'victory' : 'defeat';
         }
 
         // Date formatting helper
@@ -2149,7 +2166,6 @@
             document.getElementById('filter-search').addEventListener('input', applyFilters);
             document.getElementById('filter-faction').addEventListener('change', applyFilters);
             document.getElementById('filter-outcome').addEventListener('change', applyFilters);
-            document.getElementById('filter-format').addEventListener('change', applyFilters);
 
             // Modal listeners
             document.getElementById('close-modal-btn').addEventListener('click', () => {
@@ -2319,7 +2335,7 @@
         // Strip a parsed profile down to just the fields the dashboard reads, so
         // shared links stay as small as possible.
         function slimProfile(data) {
-            const keep = ['faction', 'hero', 'councilors', 'isMulti', 'isTeamGame',
+            const keep = ['faction', 'hero', 'councilors', 'isMulti',
                           'isVictory', 'currentTime', 'realDate', 'realDateStr',
                           'userId', 'difficulty'];
             const games = (data.games || []).map(g => {
@@ -2388,7 +2404,7 @@
 
             const headers = [
                 'Date', 'Player', 'Faction', 'Outcome', 'Victory Condition',
-                'Mode', 'Format', 'Hero', 'Councillors', 'Duration', 'Duration (s)',
+                'Mode', 'Hero', 'Councillors', 'Duration', 'Duration (s)',
                 'Difficulty', 'Worm Deaths', 'Supply Deaths', 'Operations'
             ];
 
@@ -2409,10 +2425,10 @@
                 // ISO date portion (YYYY-MM-DD) sorts correctly in a spreadsheet.
                 const dateClean = (g.realDateStr || '').split(' ')[0] || 'Unknown';
                 const player = getPlayerName(g.userId);
-                const outcome = g.isVictory ? 'Victory' : 'Defeat';
+                const oc = getOutcome(g);
+                const outcome = oc === 'victory' ? 'Victory' : (oc === 'defeat' ? 'Defeat' : 'Incomplete');
                 const victoryCond = getVictoryCondition(g);
                 const mode = g.isMulti ? 'Multiplayer' : 'Singleplayer';
-                const format = g.isTeamGame ? 'Team' : 'Solo';
                 const hero = getHeroName(g.hero, g.faction);
                 const councillors = (g.councilors || []).map(getCouncilorName).join('; ');
                 const duration = formatDuration(g.currentTime);
@@ -2434,7 +2450,7 @@
 
                 lines.push([
                     dateClean, player, g.faction, outcome, victoryCond,
-                    mode, format, hero, councillors, duration, durationSecs,
+                    mode, hero, councillors, duration, durationSecs,
                     difficulty, wormDeaths, splyDeaths, opsStr
                 ].map(esc).join(','));
             });
@@ -2624,14 +2640,17 @@
         function computeSummary(activeGames, conquestCount, mode) {
             const s = {
                 mode: mode,
-                totals: { playSec: 0, wins: 0, games: activeGames.length, solo: 0, team: 0, conquest: conquestCount || 0 },
+                totals: { playSec: 0, wins: 0, decided: 0, games: activeGames.length, conquest: conquestCount || 0 },
                 reasons: {},
                 factions: {}
             };
             activeGames.forEach(g => {
                 s.totals.playSec += g.currentTime || 0;
-                if (g.isVictory) s.totals.wins++;
-                if (g.isTeamGame) s.totals.team++; else s.totals.solo++;
+                // Only decided games count as wins, so wins can never exceed the
+                // decided denominator used for win rate.
+                const decided = isGameDecided(g);
+                if (decided) s.totals.decided++;
+                if (decided && g.isVictory) s.totals.wins++;
 
                 let reason = 'Abandoned / Incomplete';
                 if (g.endReason && g.endReason.tag) {
@@ -2644,17 +2663,18 @@
                 s.reasons[reason] = (s.reasons[reason] || 0) + 1;
 
                 const f = g.faction || 'Unknown';
-                const fs = s.factions[f] || (s.factions[f] = { played: 0, wins: 0, totalTime: 0, heroes: {}, councilors: {} });
+                const fs = s.factions[f] || (s.factions[f] = { played: 0, wins: 0, decided: 0, totalTime: 0, heroes: {}, councilors: {} });
                 fs.played++;
-                if (g.isVictory) fs.wins++;
+                if (decided) fs.decided++;
+                if (decided && g.isVictory) fs.wins++;
                 fs.totalTime += g.currentTime || 0;
                 if (g.hero) {
-                    const h = fs.heroes[g.hero] || (fs.heroes[g.hero] = { played: 0, wins: 0 });
-                    h.played++; if (g.isVictory) h.wins++;
+                    const h = fs.heroes[g.hero] || (fs.heroes[g.hero] = { played: 0, wins: 0, decided: 0 });
+                    h.played++; if (decided) h.decided++; if (decided && g.isVictory) h.wins++;
                 }
                 (g.councilors || []).forEach(c => {
-                    const cc = fs.councilors[c] || (fs.councilors[c] = { played: 0, wins: 0 });
-                    cc.played++; if (g.isVictory) cc.wins++;
+                    const cc = fs.councilors[c] || (fs.councilors[c] = { played: 0, wins: 0, decided: 0 });
+                    cc.played++; if (decided) cc.decided++; if (decided && g.isVictory) cc.wins++;
                 });
             });
             return s;
@@ -2666,10 +2686,16 @@
             if (conquestCard) conquestCard.style.display = (s.mode === 'multi') ? 'none' : 'flex';
             document.getElementById('val-conquests').innerText = s.totals.conquest;
             document.getElementById('val-playtime').innerText = (s.totals.playSec / 3600).toFixed(1) + "h";
-            document.getElementById('val-total-games').innerText = s.totals.games;
-            const winRate = s.totals.games > 0 ? ((s.totals.wins / s.totals.games) * 100).toFixed(1) : 0;
-            document.getElementById('val-winrate').innerText = winRate + "%";
-            document.getElementById('val-match-type-split').innerText = s.totals.solo + " / " + s.totals.team;
+            // Win rate is over DECIDED games only — abandoned/unfinished games are
+            // neither wins nor losses. (Fall back to total games for older shared
+            // links that predate the `decided` field.)
+            const wins = s.totals.wins || 0;
+            const decided = (s.totals.decided !== undefined) ? s.totals.decided : s.totals.games;
+            const losses = Math.max(0, decided - wins);
+            const incomplete = Math.max(0, s.totals.games - decided);
+            document.getElementById('val-total-games').innerText = decided;
+            document.getElementById('val-winrate').innerText = decided > 0 ? ((wins / decided) * 100).toFixed(1) + "%" : "—";
+            document.getElementById('val-record').innerText = wins + " · " + losses + " · " + incomplete;
         }
 
         // Render Dashboard Stats, Charts, Leaderboard, Table
@@ -2801,7 +2827,10 @@
             const factionStats = {};
             Object.keys(summary.factions).forEach(f => {
                 const fs = summary.factions[f];
-                factionStats[f] = { played: fs.played, wins: fs.wins, losses: fs.played - fs.wins, totalTime: fs.totalTime };
+                // Older shared summaries predate the `decided` field; fall back to
+                // `played` so their win rates render over the games they carry.
+                const dec = (fs.decided !== undefined) ? fs.decided : fs.played;
+                factionStats[f] = { played: fs.played, wins: fs.wins, decided: dec, losses: Math.max(0, dec - fs.wins), totalTime: fs.totalTime };
             });
 
             const leaderboard = document.getElementById('faction-leaderboard');
@@ -2816,7 +2845,10 @@
 
             sortedFactions.forEach(f => {
                 const stats = factionStats[f];
-                const wr = stats.played > 0 ? (stats.wins / stats.played * 100).toFixed(0) : 0;
+                const hasDecided = stats.decided > 0;
+                const wr = hasDecided ? (stats.wins / stats.decided * 100).toFixed(0) : 0;
+                const wrText = hasDecided ? (wr + '% WR') : '— WR';
+                const wrColor = (hasDecided && wr >= 50) ? '#2ecc71' : 'var(--text-muted)';
                 const avgMins = stats.played > 0 ? (stats.totalTime / stats.played / 60).toFixed(0) : 0;
                 const color = getFactionColor(f);
 
@@ -2835,7 +2867,7 @@
                         '<div class="faction-winrate-bar-container">' +
                             '<div class="faction-winrate-bar" style="width: ' + wr + '%; background: ' + color + ';"></div>' +
                         '</div>' +
-                        '<span class="faction-stats-text" style="font-weight: bold; color: ' + (wr >= 50 ? '#2ecc71' : 'var(--text-muted)') + '">' + wr + '% WR</span>' +
+                        '<span class="faction-stats-text" style="font-weight: bold; color: ' + wrColor + '">' + wrText + '</span>' +
                         '<span class="faction-stats-text" style="color: var(--text-main)">' + stats.played + ' matches</span>' +
                         '<i data-lucide="chevron-down" class="expansion-chevron" style="width: 16px; height: 16px; transition: transform 0.3s ease; color: var(--text-muted); margin-left: 8px;"></i>' +
                     '</div>';
@@ -2849,9 +2881,10 @@
                     const hName = getHeroName(heroId, f);
                     if (hName && hName !== '-') {
                         const hm = fSummary.heroes[heroId];
-                        if (!heroStats[hName]) heroStats[hName] = { played: 0, wins: 0, heroId: heroId, faction: f };
+                        if (!heroStats[hName]) heroStats[hName] = { played: 0, wins: 0, decided: 0, heroId: heroId, faction: f };
                         heroStats[hName].played += hm.played;
                         heroStats[hName].wins += hm.wins;
+                        heroStats[hName].decided += (hm.decided !== undefined ? hm.decided : hm.played);
                     }
                 });
 
@@ -2859,9 +2892,10 @@
                     const cName = getCouncilorName(c);
                     if (cName && cName !== '-') {
                         const cm = fSummary.councilors[c];
-                        if (!councilorStats[cName]) councilorStats[cName] = { played: 0, wins: 0 };
+                        if (!councilorStats[cName]) councilorStats[cName] = { played: 0, wins: 0, decided: 0 };
                         councilorStats[cName].played += cm.played;
                         councilorStats[cName].wins += cm.wins;
+                        councilorStats[cName].decided += (cm.decided !== undefined ? cm.decided : cm.played);
                     }
                 });
 
@@ -2874,11 +2908,11 @@
                     heroesHtml = '<div class="expansion-list">' +
                         sortedHeroes.map(h => {
                             const hs = heroStats[h];
-                            const wr = hs.played > 0 ? (hs.wins / hs.played * 100).toFixed(0) : 0;
+                            const wr = hs.decided > 0 ? (hs.wins / hs.decided * 100).toFixed(0) + '% WR' : '— WR';
                             const desc = getHeroDescription(hs.heroId, hs.faction);
                             return '<div class="expansion-item tooltip-cell">' +
                                 '<span class="expansion-item-name">' + h + '</span>' +
-                                '<span class="expansion-item-stats">' + hs.played + ' matches (' + wr + '% WR)</span>' +
+                                '<span class="expansion-item-stats">' + hs.played + ' matches (' + wr + ')</span>' +
                                 (desc ? '<span class="tooltip-text">' + desc + '</span>' : '') +
                             '</div>';
                         }).join('') +
@@ -2894,11 +2928,11 @@
                     councilorsHtml = '<div class="expansion-list">' +
                         sortedCouncilors.map(c => {
                             const cs = councilorStats[c];
-                            const wr = cs.played > 0 ? (cs.wins / cs.played * 100).toFixed(0) : 0;
+                            const wr = cs.decided > 0 ? (cs.wins / cs.decided * 100).toFixed(0) + '% WR' : '— WR';
                             const desc = getCouncillorDescription(c);
                             return '<div class="expansion-item">' +
                                 '<span class="expansion-item-name">' + c + '</span>' +
-                                '<span class="expansion-item-stats">' + cs.played + ' matches (' + wr + '% WR)</span>' +
+                                '<span class="expansion-item-stats">' + cs.played + ' matches (' + wr + ')</span>' +
                                 (desc ? '<span class="tooltip-text">' + desc + '</span>' : '') +
                             '</div>';
                         }).join('') +
@@ -2947,7 +2981,6 @@
             const query = document.getElementById('filter-search').value.toLowerCase();
             const faction = document.getElementById('filter-faction').value;
             const outcome = document.getElementById('filter-outcome').value;
-            const format = document.getElementById('filter-format').value;
 
             const games = currentProfileData.games || [];
             
@@ -2977,16 +3010,9 @@
 
                 const matchesFaction = !faction || g.faction === faction;
 
-                const isVictory = g.isVictory;
-                const matchesOutcome = !outcome ||
-                    (outcome === 'victory' && isVictory) ||
-                    (outcome === 'defeat' && !isVictory);
+                const matchesOutcome = !outcome || getOutcome(g) === outcome;
 
-                const matchesFormat = !format ||
-                    (format === 'team' && g.isTeamGame) ||
-                    (format === 'solo' && !g.isTeamGame);
-
-                return matchesSearch && matchesFaction && matchesOutcome && matchesFormat;
+                return matchesSearch && matchesFaction && matchesOutcome;
             });
 
             // Sort filteredGamesList
@@ -3001,17 +3027,15 @@
                         valA = a.faction || '';
                         valB = b.faction || '';
                         break;
-                    case 'outcome':
-                        valA = a.isVictory ? 1 : 0;
-                        valB = b.isVictory ? 1 : 0;
+                    case 'outcome': {
+                        const rank = { victory: 2, defeat: 1, incomplete: 0 };
+                        valA = rank[getOutcome(a)];
+                        valB = rank[getOutcome(b)];
                         break;
+                    }
                     case 'victoryCondition':
                         valA = getVictoryCondition(a);
                         valB = getVictoryCondition(b);
-                        break;
-                    case 'matchFormat':
-                        valA = a.isTeamGame ? 1 : 0;
-                        valB = b.isTeamGame ? 1 : 0;
                         break;
                     case 'hero':
                         valA = getHeroName(a.hero, a.faction);
@@ -3058,7 +3082,7 @@
         }
 
         function updateSortIndicators() {
-            const columns = ['date', 'faction', 'outcome', 'victoryCondition', 'matchFormat', 'hero', 'duration', 'deaths'];
+            const columns = ['date', 'faction', 'outcome', 'victoryCondition', 'hero', 'duration', 'deaths'];
             columns.forEach(col => {
                 const el = document.getElementById('sort-icon-' + col);
                 if (el) {
@@ -3083,7 +3107,7 @@
             const displayList = filteredGamesList.slice(startIdx, endIdx);
 
             if (displayList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">No games match the current filters.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">No games match the current filters.</td></tr>';
                 document.getElementById('table-showing-info').innerText = 'Showing 0 to 0 of 0 games';
                 renderPagination(0);
                 return;
@@ -3094,14 +3118,14 @@
                 const row = document.createElement('tr');
                 row.addEventListener('click', () => showGameDetails(g));
 
-                const outcomeClass = g.isVictory ? 'outcome-victory' : 'outcome-defeat';
-                const outcomeText = g.isVictory ? 'Victory' : 'Defeat';
+                const oc = getOutcome(g);
+                const outcomeClass = oc === 'victory' ? 'outcome-victory' : (oc === 'defeat' ? 'outcome-defeat' : 'outcome-incomplete');
+                const outcomeText = oc === 'victory' ? 'Victory' : (oc === 'defeat' ? 'Defeat' : 'Incomplete');
 
                 const wormDeaths = g.stats ? (g.stats.DeathByWorm || 0) : 0;
                 const splyDeaths = g.stats ? (g.stats.DeathBySupply || 0) : 0;
 
                 const dateClean = formatDateStr(g.realDateStr);
-                const formatLabel = g.isTeamGame ? 'Team Game' : 'Solo';
 
                 const factionIcon = getFactionIcon(g.faction);
                 const factionColor = getFactionColor(g.faction);
@@ -3125,7 +3149,6 @@
                     '<td>' + factionHtml + '</td>' +
                     '<td><span class="outcome-badge ' + outcomeClass + '">' + outcomeText + '</span></td>' +
                     '<td>' + getVictoryCondition(g) + '</td>' +
-                    '<td>' + formatLabel + '</td>' +
                     '<td>' + heroHtml + '</td>' +
                     '<td>' + formatDuration(g.currentTime) + '</td>' +
                     '<td style="color: var(--text-muted); cursor: help;" title="Deaths breakdown: ' + wormDeaths + ' devoured by Sandworms, ' + splyDeaths + ' lost to dehydration (lack of supply)">' + wormDeaths + ' / ' + splyDeaths + '</td>';
@@ -3206,14 +3229,21 @@
             document.getElementById('modal-title-faction').style.color = getFactionColor(g.faction);
             document.getElementById('modal-title-date').innerText = formatDateStr(g.realDateStr);
 
-            const outcomeText = g.isVictory ? 'Victory' : 'Defeat';
+            const oc = getOutcome(g);
+            const outcomeText = oc === 'victory' ? 'Victory' : (oc === 'defeat' ? 'Defeat' : 'Incomplete');
             const outcomeVal = document.getElementById('modal-val-outcome');
             outcomeVal.innerText = outcomeText;
-            outcomeVal.className = 'detail-value ' + (g.isVictory ? 'outcome-badge outcome-victory' : 'outcome-badge outcome-defeat');
+            outcomeVal.className = 'detail-value outcome-badge ' +
+                (oc === 'victory' ? 'outcome-victory' : (oc === 'defeat' ? 'outcome-defeat' : 'outcome-incomplete'));
 
-            const winnerText = g.isVictory ? 
-                '<span style="font-weight: 600; color: #2ecc71; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="trophy" style="width: 14px; height: 14px;"></i>' + getPlayerName(g.userId) + ' (' + g.faction + ')</span>' : 
-                '<span style="color: var(--text-muted); font-style: italic;">Opponent</span>';
+            let winnerText;
+            if (oc === 'victory') {
+                winnerText = '<span style="font-weight: 600; color: #2ecc71; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="trophy" style="width: 14px; height: 14px;"></i>' + getPlayerName(g.userId) + ' (' + g.faction + ')</span>';
+            } else if (oc === 'defeat') {
+                winnerText = '<span style="color: var(--text-muted); font-style: italic;">Opponent</span>';
+            } else {
+                winnerText = '<span style="color: var(--text-muted); font-style: italic;">No result (abandoned)</span>';
+            }
             document.getElementById('modal-val-winner').innerHTML = winnerText;
 
             let reasonText = 'Abandoned / Incomplete';
