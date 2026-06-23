@@ -23,6 +23,8 @@ static page that runs **100% in your browser**. No account, no upload, no server
   randomizer.
 - **Shareable links** — send your full results or a compact summary to a friend; the
   data rides inside the URL, so there is still no server involved.
+- **CSV export** — download your match history (honoring the active filters and sort) as
+  a spreadsheet for your own analysis.
 - **Private by design** — everything is parsed and rendered locally in your browser.
 
 ---
@@ -103,11 +105,21 @@ councillors, duration, difficulty, death breakdown, and the operations executed 
 
 ![Match detail modal](docs/sec-match-detail.png)
 
+### Export to CSV
+
+Need your match history outside the dashboard? The **Export CSV** button in the header
+downloads the current table as a spreadsheet (`dune-spice-wars-matches-YYYY-MM-DD.csv`),
+honoring whatever search, filters, and sort you've applied — so you can pull, say, just
+your Atreides victories. It carries a slightly richer column set than the on-screen table
+(player, councillors, difficulty, raw duration in seconds, and the operations run that
+game) and, like the share links, it's generated entirely in your browser with nothing
+uploaded.
+
 ### Sharing your results
 
-Two share buttons live in the header:
+The header also holds two share buttons (alongside the Export CSV button above):
 
-![Dashboard header with share buttons](docs/sec-header.png)
+![Dashboard header with share and export buttons](docs/sec-header.png)
 
 - **Share Summary** — copies a short link containing just the aggregates (cards, charts,
   and leaderboard). It stays small no matter how many games you have (a ~600-character
