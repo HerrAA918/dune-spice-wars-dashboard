@@ -116,3 +116,14 @@ Larger builds (high value, plan separately — see roadmap):
 
 - [ ] Armory / Equipment section — ~112 live gear items (filter out ~45 legacy `*_Old`),
       4 slots/unit (Fremen Altar 8), effects via the `trait` join. New "Armory" category.
+
+- [ ] Audit all icons/graphics across the dashboard and add relevant game art — the
+      dashboard and compendium currently lean on external wiki image URLs (WIKI_IMAGES),
+      emoji, and lucide icons. The game pak (`res.compressed.pak`) holds the real art:
+      unit/leader portraits (`unit@images` smallPortrait/bigPortrait/symbol), development
+      icons (`UI/developments/techIcons*.png`), building thumbnails (`building@visuals`),
+      resource/UI icons (`UI/icons/*`), and faction crests. Review every place we show an
+      icon/image, identify mismatches or low-quality/missing art, and source the matching
+      sprite from the pak (each `gfx` entry is a {file, size, x, y} sprite-sheet cell —
+      extract the cell, not the whole sheet). Decide how to host/bundle the art and mind
+      that it's proprietary game art (same caution as not committing raw game data).
