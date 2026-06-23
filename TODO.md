@@ -69,3 +69,42 @@
       existing curated ability prose. The authoritative text lives in the `trait` /
       `equipment` sheets behind the same templated-attribute layer as developments;
       resolve and refresh those lines for accuracy.
+
+## Compendium expansion (from the game-DB gap audit — see docs/compendium-roadmap.md)
+
+Add-content PRs (high value, medium effort):
+
+- [ ] Add a Victory Conditions section — verified 0% covered. Domination, Hegemony
+      (30,000; race at 20,000), Political (hold Dune Governorship 30 days / 25 in Kanly),
+      Economic (50% CHOAM shares; race at 40%), plus the Assassinations toggle. Small.
+
+- [ ] Add the 7 Landsraad Charters (+ Water Subsidies, + "Imperium Summit"/"Land Sales"
+      name fixes) — compendium has 38/46 resolutions and 0 Charters. Include eligibility
+      thresholds + first-election rewards (e.g. Dune Governorship pays 10,000 Solari and
+      drives the Political victory). Source: `resolution` sheet (type=Charter). Medium.
+
+- [ ] Add the 63 draftable pre-match Faction Bonuses — 9/faction (38 beginner-friendly).
+      Source: `bonus` sheet (type=0). New "Faction Bonuses" category/filter. Medium.
+
+- [ ] Operations cleanup (deferred from the quick-win fix) — replace the 14 "Variable"
+      faction-op costs with the tier-fixed values (VeryEasy 100 Intel / Easy 200 Intel +
+      200 Solari / Medium 500 Intel + 500 Solari, verified in `mission`); confirm the
+      Gear Sabotage ↔ Defense Breaches name swap from a tooltip; add ~9 missing spy ops +
+      an Infiltration-fields table.
+
+- [ ] Treaties cleanup (deferred) — add per-treaty costs + the hidden −10% Authority
+      treaty upkeep, and fix the Non-Aggression Pact description (the open-borders / no-
+      supply-drain effect belongs to the separate Land Agreement). Treaty numbers aren't
+      cleanly in the CDB — confirm from in-game tooltips.
+
+- [ ] (Medium, optional) Special Regions (16), Region quirks, and a Hegemony-source
+      ledger (how to earn Hegemony + the 2,500 build-in-main-base milestone).
+
+Larger builds (high value, plan separately — see roadmap):
+
+- [ ] Heroes section — the 14 faction heroes (2/faction) with stats + signature traits,
+      rendered via the existing unit card with a `hero` type/filter; link councilors that
+      deploy as heroes. Roster + schema in docs/compendium-roadmap.md.
+
+- [ ] Armory / Equipment section — ~112 live gear items (filter out ~45 legacy `*_Old`),
+      4 slots/unit (Fremen Altar 8), effects via the `trait` join. New "Armory" category.
