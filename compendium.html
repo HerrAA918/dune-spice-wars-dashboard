@@ -1034,14 +1034,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 50
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "10 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 18 | Armor: 5",
+      "Health: 500 | Power: 14 | Armor: 6",
       "Supply: 100",
       "+ Coordination: Gain 10% Power for each bonus received from an ally unit"
     ],
@@ -1051,16 +1048,13 @@ const UNITS = [
     "name": "Ranger",
     "faction": "Atreides",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 300 | Power: 15 | Armor: 3",
+      "Health: 400 | Power: 17 | Armor: 0",
       "Supply: 100",
       "+ Focus Fire: Ally units attacking the same target gain 5% Power",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -1070,19 +1064,16 @@ const UNITS = [
     "unlock": "None"
   },
   {
-    "name": "Heavy weapons squad",
+    "name": "Heavy Weapon Squad",
     "faction": "Atreides",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 5
+      "manpower": 40
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 7 | Armor: 5",
+      "Health: 400 | Power: 23 | Armor: 0",
       "Supply: 100",
       "+ Disruption: Dealing damage to an enemy applies Disrupted (x5 max) until the end of combat:",
       "+ Demolition Team:",
@@ -1099,15 +1090,14 @@ const UNITS = [
     "name": "Support Drone",
     "faction": "Atreides",
     "type": "drone",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "fuelCells": 4,
-      "commandPoints": 4
+      "solari": 300
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 600 | Power: 8 | Armor: 8",
+      "Health: 300 | Power: 14 | Armor: 4",
+      "Supply: 100",
       "+ Medkits: Nearby ally units gain 20% Health regeneration per day (x1 max)",
       "+ Drone: Does not attract Sandworms"
     ],
@@ -1119,14 +1109,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 600 | Power: 18 | Armor: 8",
+      "Health: 500 | Power: 16 | Armor: 8",
       "Supply: 100",
       "+ Bulwark: Nearby ally units gain +2 Armor (x1 max)"
     ],
@@ -1136,14 +1124,13 @@ const UNITS = [
     "name": "Hawk",
     "faction": "Atreides",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 3,
-      "commandPoints": 3
+      "guildFavor": 9
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 5 | Armor: 4",
+      "Health: 250 | Power: 8 | Armor: 4",
       "+ Weight Shedding:",
       "− Ship:",
       "  + Attacks 5 times faster",
@@ -1159,13 +1146,13 @@ const UNITS = [
     "name": "Kraken",
     "faction": "Atreides",
     "type": "ship",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 50",
     "cost": {
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 12 | Armor: 8",
+      "Health: 2000 | Power: 16 | Armor: 3",
       "+ Troop Carrier:",
       "+ Demolition:",
       "− Frigate:",
@@ -1187,14 +1174,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 19 | Armor: 4",
+      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100",
       "+ Berserkers: Gain up to 50% Power depending on missing Health"
     ],
@@ -1204,16 +1188,13 @@ const UNITS = [
     "name": "Gunner",
     "faction": "Harkonnen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 5
+      "manpower": 30
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 11 | Armor: 3",
+      "Health: 300 | Power: 16 | Armor: 0",
       "Supply: 100",
       "+ Shrapnel Ammunitions:",
       "+ Demolition:",
@@ -1233,32 +1214,28 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 16 | Armor: 2",
+      "Health: 300 | Power: 11 | Armor: 0",
       "Supply: 100",
       "+ Last stand: Upon dying, split in to 3 Unchained Cerberus"
     ],
     "unlock": "Survival Training"
   },
   {
-    "name": "Stealth Probe",
+    "name": "Combat Probe",
     "faction": "Harkonnen",
     "type": "drone",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 100,
-      "fuelCells": 1,
-      "commandPoints": 2
+      "solari": 100
     },
-    "upkeep": "6 Solari",
+    "upkeep": "4 Solari · 1 CP · 2 Fuel Cell",
     "effects": [
-      "Health: 150 | Power: 8 | Armor: 2",
+      "Health: 100 | Power: 10 | Armor: 0",
+      "Supply: 200",
       "+ Fight Analysis: Upon death, nearby ally units in combat gain 10% Power (x5 max)",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
       "  + Only visible from close range"
@@ -1271,14 +1248,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 600 | Power: 18 | Armor: 7",
+      "Health: 500 | Power: 15 | Armor: 5",
       "Supply: 100",
       "+ Head Hunter: While in combat, any nearby unit death grants (x10 max):",
       "  +3% Power",
@@ -1290,14 +1265,13 @@ const UNITS = [
     "name": "Harpy",
     "faction": "Harkonnen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 3,
-      "commandPoints": 3
+      "guildFavor": 9
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 300 | Power: 13 | Armor: 3",
+      "Health: 270 | Power: 10 | Armor: 4",
       "+ Evasion Tactics:",
       "+ Demolition:",
       "− Ship:",
@@ -1315,13 +1289,13 @@ const UNITS = [
     "name": "Overlord",
     "faction": "Harkonnen",
     "type": "ship",
-    "subtitle": "Range: N/A",
+    "subtitle": "Range: 50",
     "cost": {
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 0 | Armor: 8",
+      "Health: 2000 | Power: 0 | Armor: 6",
       "+ Hive:",
       "− Frigate:",
       "  + Can activate Decimiation Protocols: This boosts Sting generation speed and increases damage of nearby drones and Stings but damages them over time",
@@ -1340,14 +1314,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 500 | Power: 17 | Armor: 4",
+      "Health: 400 | Power: 15 | Armor: 2",
       "Supply: 100",
       "+ Scavengers: Gain 5% Health regeneration per day until the end of combat whenever a unit dies nearby (5x max)"
     ],
@@ -1357,16 +1328,13 @@ const UNITS = [
     "name": "Wrecker",
     "faction": "Smugglers",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 6 | Armor: 2",
+      "Health: 300 | Power: 8 | Armor: 0",
       "Supply: 100",
       "+ Chemical Weapons:",
       "+ Demolition Team:",
@@ -1388,14 +1356,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: 50",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 30
     },
-    "upkeep": "8 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 200 | Power: 20 | Armor: 2",
+      "Health: 250 | Power: 21 | Armor: 0",
       "Supply: 100",
       "+ Elimination Shots: Deal +30% damage against non-mechanical units",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1410,15 +1375,13 @@ const UNITS = [
     "name": "Scavenging Drone",
     "faction": "Smugglers",
     "type": "drone",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "fuelCells": 4,
-      "commandPoints": 4
+      "solari": 500
     },
-    "upkeep": "12 Solari",
+    "upkeep": "10 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 600 | Power: 10 | Armor: 6",
+      "Health: 500 | Power: 16 | Armor: 5",
       "Supply: 200",
       "+ Loot Distributor: While in combat, any nearby unit death grants the following bonuses for your allied units(10x max):",
       "+ Drone: Does not attract Sandworms",
@@ -1433,14 +1396,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 20 | Armor: 5",
+      "Health: 500 | Power: 14 | Armor: 2",
       "Supply: 100",
       "+ Sharpen Swords: Gain up to +100% Power depending on the missing Health of the target they're fighting",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1453,14 +1414,13 @@ const UNITS = [
     "name": "Banshee",
     "faction": "Smugglers",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 2,
-      "commandPoints": 2
+      "guildFavor": 15
     },
-    "upkeep": "12 Solari",
+    "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 300 | Power: 10 | Armor: 3",
+      "Health: 360 | Power: 17 | Armor: 4",
       "+ Chemical Weapons:",
       "+ Demolition Team:",
       "+ Stealth: Only visible from close range",
@@ -1480,14 +1440,13 @@ const UNITS = [
     "name": "Wraith",
     "faction": "Smugglers",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 3",
     "cost": {
-      "manpower": 100,
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 3000 | Power: 0 | Armor: 5",
+      "Health: 1600 | Power: 0 | Armor: 4",
       "+ Toxic Gases: Enemy ground units in the area lose 1% max Health and Supply every second",
       "+ Can active Toxic Purge",
       "− Frigate:",
@@ -1504,14 +1463,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 30,
-      "water": 2,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 500 | Power: 18 | Armor: 3",
+      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100",
       "+ Sand Tactics: Enemies engaged in combat with this unit suffer Disoriented (x1) max:",
       "  + -15% Power"
@@ -1522,16 +1478,13 @@ const UNITS = [
     "name": "Skirmisher",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 2,
-      "commandPoints": 4
+      "manpower": 30
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 8 | Armor: 2",
+      "Health: 300 | Power: 5 | Armor: 0",
       "Supply: 100",
       "+ Fremen Opression: For each penalty suffered by the target, gain +1 Power (5x max)",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1551,14 +1504,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 10,
-      "water": 2,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "3 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 200 | Power: 20 | Armor: 0",
+      "Health: 300 | Power: 11 | Armor: 0",
       "Supply: 100",
       "+ Weakness Revealed: First attack in combat inflicts +40 Damage and makes the target take +20% more damage from all sources",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1571,17 +1521,14 @@ const UNITS = [
     "name": "Mobile Turret",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
       "solari": 100,
-      "manpower": 10,
-      "water": 5,
-      "commandPoints": 5
+      "manpower": 40
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 300 | Power: 12 | Armor: 4",
-      "Supply: 300",
+      "Health: 400 | Power: 18 | Armor: 0",
       "+ Mobile Battery: Can set up an anti-air turret:",
       "  + Gain 20 Power",
       "  − Can only attack Flying Units",
@@ -1596,14 +1543,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 6
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 4 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 700 | Power: 22 | Armor: 5",
+      "Health: 400 | Power: 22 | Armor: 5",
       "Supply: 100",
       "+ Against the Odds: For each enemy military unit (x5 max) in combat with this unit, gain:",
       "  + +10% Power",
@@ -1615,13 +1560,13 @@ const UNITS = [
     "name": "Spire",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "commandPoints": 4
+      "scraps": 6
     },
-    "upkeep": "8 Solari",
+    "upkeep": "9 Solari · 2 CP",
     "effects": [
-      "Health: 300 | Power: 16 | Armor: 2",
+      "Health: 150 | Power: 9 | Armor: 3",
       "+ Suppressive Fire: Unit that is targeted by this suffers -10% Power",
       "− Ship:",
       "  − Cannot investigate Discoveries",
@@ -1635,11 +1580,13 @@ const UNITS = [
     "name": "Altar",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 20",
-    "cost": {},
+    "subtitle": "Range: 50",
+    "cost": {
+      "scraps": 100
+    },
     "upkeep": "50 Solari",
     "effects": [
-      "Health: 3000 | Power: 22 | Armor: 4",
+      "Health: 1600 | Power: 22 | Armor: 4",
       "+ Can activate Deploy Sails",
       "+ Has access to on-board enhancements",
       "+ Siege Weapons:",
@@ -1655,38 +1602,32 @@ const UNITS = [
     "unlock": ""
   },
   {
-    "name": "Conscription Swordsman",
+    "name": "Conscript Swordman",
     "faction": "Corrino",
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "3 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 14 | Armor: 4",
+      "Health: 300 | Power: 13 | Armor: 3",
       "Supply: 100",
       "+ Protection Support: Other nearby ally Military Units gain +5% damage reduction while they have at least 1 Armour (5x max)"
     ],
     "unlock": "None"
   },
   {
-    "name": "Conscription Rifleman",
+    "name": "Conscript Rifleman",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "3 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 14 | Armor: 4",
+      "Health: 300 | Power: 14 | Armor: 0",
       "Supply: 100",
       "+ Targeting Support: Gain +30% Power while having at least 3 Armour",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -1699,16 +1640,13 @@ const UNITS = [
     "name": "Incinerator",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "10 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 8 | Armor: 4",
+      "Health: 400 | Power: 7 | Armor: 1",
       "Supply: 100",
       "+ Flamethrowers: Attacks deal damage within a frontal cone and ignore enemy Armor"
     ],
@@ -1720,13 +1658,12 @@ const UNITS = [
     "type": "drone",
     "subtitle": "Range: 80",
     "cost": {
-      "solari": 200,
-      "fuelCells": 6,
-      "commandPoints": 4
+      "solari": 500
     },
-    "upkeep": "12 Solari",
+    "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 20 | Armor: 6",
+      "Health: 400 | Power: 40 | Armor: 2",
+      "Supply: 200",
       "− Siege Engine:",
       "+ Siege Weapons:",
       "+ Drone: Does not attract Sandworms unless deployed on sand",
@@ -1745,14 +1682,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 600 | Power: 18 | Armor: 6",
+      "Health: 500 | Power: 17 | Armor: 5",
       "Supply: 100",
       "+ Executioner:",
       "  + Execute enemies under 20% Health",
@@ -1764,14 +1699,13 @@ const UNITS = [
     "name": "Hammer",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 4,
-      "commandPoints": 4
+      "guildFavor": 12
     },
-    "upkeep": "12 Solari",
+    "upkeep": "16 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
-      "Health: 500 | Power: 8 | Armor: 5",
+      "Health: 340 | Power: 22 | Armor: 5",
       "+ Thick Plating: This unit takes -40% area damage while it has at least 1 Armour",
       "+ Demolition:",
       "− Ship:",
@@ -1788,14 +1722,13 @@ const UNITS = [
     "name": "Cronos",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 50",
     "cost": {
-      "manpower": 100,
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 14 | Armor: 6",
+      "Health: 2400 | Power: 14 | Armor: 4",
       "+ Deck Engineers:",
       "+ Demolition:",
       "− Frigate:",
@@ -1817,12 +1750,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "manpower": 40,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "8 Solari",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 500 | Power: 12 | Armor: 5",
+      "Health: 450 | Power: 10 | Armor: 7",
       "Supply: 100",
       "+ Crusher: Enemy units targeted by the Squire suffer -4 Armour (1x max)"
     ],
@@ -1832,14 +1764,13 @@ const UNITS = [
     "name": "Musketeer",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "manpower": 30,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "8 Solari",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 15 | Armor: 3",
+      "Health: 300 | Power: 21 | Armor: 0",
       "Supply: 100",
       "+ Thunder: Enemy units targeted by the Musketeer suffer +10% damage received (1x max)",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -1854,12 +1785,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "manpower": 30,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "4 Solari",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 11 | Armor: 5",
+      "Health: 300 | Power: 11 | Armor: 1",
       "Supply: 100",
       "+ Deadly Dance: Gain +150% attack speed when no ally units are close",
       "Patch 2.2.3: -40% damage received from target"
@@ -1870,15 +1800,14 @@ const UNITS = [
     "name": "War Banner",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "fuelCells": 3,
-      "commandPoints": 3
+      "solari": 300
     },
-    "upkeep": "15 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 600 | Power: 8 | Armor: 8",
+      "Health: 300 | Power: 16 | Armor: 3",
+      "Supply: 200",
       "+ Inspiring Sight:",
       "+ Demolition:",
       "+ Drone:",
@@ -1899,12 +1828,11 @@ const UNITS = [
     "subtitle": "Range: Melee",
     "cost": {
       "solari": 100,
-      "manpower": 40,
-      "commandPoints": 5
+      "manpower": 50
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 25 | Armor: 3",
+      "Health: 250 | Power: 25 | Armor: 2",
       "Supply: 100",
       "+ Nobility:",
       "  + This unit receives -20% damage per other Ecazi non-mechanical unit nearby",
@@ -1916,14 +1844,13 @@ const UNITS = [
     "name": "Siren",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 3,
-      "commandPoints": 3
+      "guildFavor": 9
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 500 | Power: 12 | Armor: 5",
+      "Health: 230 | Power: 10 | Armor: 4",
       "+ Alluring Song: Mechanical units targeted by the Siren suffer +30% damage received (1x max)",
       "+ Demolition:",
       "− Ship:",
@@ -1942,13 +1869,13 @@ const UNITS = [
     "name": "Monument",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 50",
     "cost": {
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 12 | Armor: 8",
+      "Health: 2000 | Power: 12 | Armor: 6",
       "+ Monument: Broadcasts one of two songs in a large area:",
       "+ Demolition:",
       "− Frigate:",
@@ -1969,13 +1896,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 50,
       "manpower": 10
     },
     "upkeep": "None",
     "effects": [
-      "Health: 400 | Power: 12 | Armor: 2",
-      "Supply: 50",
+      "Health: 300 | Power: 11 | Armor: 4",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "  − -30% Power",
       "  + +3 max Armor"
@@ -1986,15 +1912,14 @@ const UNITS = [
     "name": "Ranged Militia",
     "faction": "Neutral",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 50,
       "manpower": 10
     },
     "upkeep": "None",
     "effects": [
-      "Health: 400 | Power: 16 | Armor: 2",
-      "Supply: 50",
+      "Health: 250 | Power: 12 | Armor: 0",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
       "  − -30% Power",
@@ -2008,15 +1933,14 @@ const UNITS = [
     "name": "Demolition Militia",
     "faction": "Neutral",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 50,
       "manpower": 10
     },
     "upkeep": "None",
     "effects": [
-      "Health: 400 | Power: 8 | Armor: 2",
-      "Supply: 50",
+      "Health: 250 | Power: 6 | Armor: 0",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "+ Demolition Team:",
       "  − -30% Power",
@@ -2035,13 +1959,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 200,
-      "manpower": 20
+      "manpower": 25
     },
     "upkeep": "None",
     "effects": [
-      "Health: 500 | Power: 12 | Armor: 4",
-      "Supply: 50",
+      "Health: 400 | Power: 13 | Armor: 6",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "  − -30% Power",
       "  + +3 max Armor"
@@ -2073,10 +1996,9 @@ const UNITS = [
     "cost": {
       "solari": 300
     },
-    "upkeep": "10 Solari",
+    "upkeep": "5 Solari",
     "effects": [
-      "Health: N/A | Power: N/A | Armor: N/A",
-      "Supply: N/A",
+      "Health: 400 | Armor: 4",
       "+ Has incredible vision range, detects sandworms earlier and stealth units from further away",
       "+ Cannot be targeted by enemy units",
       "+ Can be attached to Harvesters to give Ornithopter Support:",
@@ -2089,14 +2011,13 @@ const UNITS = [
     "name": "Mercenary",
     "faction": "Neutral",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 600,
-      "commandPoints": 2
+      "solari": 800
     },
-    "upkeep": "30 Solari",
+    "upkeep": "3 CP",
     "effects": [
-      "Health: 300 | Power: 14 | Armor: 1",
+      "Health: 300 | Power: 15 | Armor: 0",
       "Supply: 100",
       "+ Hunter: Killing an enemy unit grants (x5 max):",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -2113,12 +2034,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "water": 3,
-      "commandPoints": 3
+      "influence": 25
     },
-    "upkeep": "1 Influence",
+    "upkeep": "20 Solari · 4 CP",
     "effects": [
-      "Health: 700 | Power: 18 | Armor: 6",
+      "Health: 400 | Power: 16 | Armor: 6",
       "Supply: 100",
       "+ Unwavering: This unit is not affected by maluses inflicted by military units"
     ],
@@ -2130,9 +2050,9 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {},
-    "upkeep": "Unknown",
+    "upkeep": "None",
     "effects": [
-      "Health: 600 | Power: 16 | Armor: 3",
+      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100"
     ],
     "unlock": "Desert Command"
@@ -2143,34 +2063,31 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {},
-    "upkeep": "N/A",
+    "upkeep": "None",
     "effects": [
-      "Health: 600 | Power: 21 | Armor: 6",
+      "Health: 500 | Power: 17 | Armor: 5",
       "Supply: 100",
       "+ Executioner: Execute enemies under 20% Health"
     ],
     "unlock": ""
   },
   {
-    "name": "Ixian Soldier",
+    "name": "Fighting Mek",
     "faction": "Vernius",
     "type": "military",
-    "subtitle": "Technologically enhanced trooper",
+    "subtitle": "Range: Melee",
     "health": 400,
     "power": 18,
     "armor": 5,
     "supply": 80,
     "cost": {
-      "solari": 110,
-      "manpower": 20,
-      "water": 3,
-      "cp": 4
+      "solari": 400
     },
-    "upkeep": "9 Solari",
+    "upkeep": "8 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
-      "Standard Vernius frontliner",
-      "Benefits from Knowledge-powered tech upgrades",
-      "Gets stat bonuses from Vault District developments"
+      "Health: 400 | Power: 13 | Armor: 5",
+      "Supply: 100",
+      "Self-learning combat drones using a shifting repertoire of deadly moves."
     ],
     "unlock": "Available from the start"
   },
@@ -2184,13 +2101,11 @@ const UNITS = [
     "armor": 1,
     "supply": 160,
     "cost": {
-      "solari": 35,
-      "manpower": 4,
-      "water": 0,
-      "cp": 1
+      "solari": 300
     },
-    "upkeep": "3 Solari",
+    "upkeep": "None",
     "effects": [
+      "Health: 400 | Armor: 4",
       "Advanced Ix scout drone",
       "Nuwa Cenva boosts drone recruitment speed",
       "Enhanced stealth detection range",
@@ -2199,50 +2114,43 @@ const UNITS = [
     "unlock": "Available from the start"
   },
   {
-    "name": "Ixian Drone",
+    "name": "Resonance Drone",
     "faction": "Vernius",
     "type": "military",
-    "subtitle": "Automated combat drone",
+    "subtitle": "Range: 25",
     "health": 350,
     "power": 22,
     "armor": 3,
     "supply": 100,
     "cost": {
-      "solari": 180,
-      "manpower": 0,
-      "water": 1,
-      "cp": 4
+      "solari": 500
     },
-    "upkeep": "10 Solari + 2 Knowledge",
+    "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "No Manpower cost — uses Knowledge instead",
-      "Nuwa Cenva hero accelerates drone deployment",
-      "Automated unit — no morale/supply issues",
-      "Pairs with C'Tair stealth builds"
+      "Health: 400 | Power: 14 | Armor: 4",
+      "Supply: 100",
+      "The Resonance Drone induces a self-repeating electrical feedback loop in its Holtzman Coil, charging nearby Faraday cages with a powerful electrostatic effect."
     ],
     "unlock": "Ix military development required"
   },
   {
-    "name": "Ixian Elite Guard",
+    "name": "Fight-Engineer",
     "faction": "Vernius",
     "type": "elite",
-    "subtitle": "Armored Ix shock troop",
+    "subtitle": "Range: 25",
     "health": 950,
     "power": 36,
     "armor": 8,
     "supply": 90,
     "cost": {
-      "solari": 380,
-      "manpower": 40,
-      "water": 4,
-      "cp": 8
+      "solari": 80,
+      "manpower": 40
     },
-    "upkeep": "20 Solari",
+    "upkeep": "16 Solari · 4 CP",
     "effects": [
-      "C'Tair Pilru gains stealth near friendly units in Vernius territory",
-      "One-hit kill ability vs. lone enemies inside Vernius territory",
-      "Adds bonus armory slots to military capacity",
-      "Top-tier elite with stealth and execute mechanics"
+      "Health: 400 | Power: 16 | Armor: 2",
+      "Supply: 100",
+      "Fight-Engineers are a caste of Ixian specialists constantly trying to improve the programming of fighting drones."
     ],
     "unlock": "5,000 Hegemony"
   }
@@ -4756,8 +4664,8 @@ function factionColor(f) {
 }
 
 function makeCostChips(cost, upkeep) {
-    const icons = { solari:'🪙', manpower:'⚔️', water:'💧', plascrete:'🧱', cp:'◆', knowledge:'🔬', influence:'🏛' };
-    const labels = { solari:'Solari', manpower:'Manpower', water:'Water', plascrete:'Plascrete', cp:'CP', knowledge:'Knowledge', influence:'Influence' };
+    const icons = { solari:'🪙', manpower:'⚔️', water:'💧', plascrete:'🧱', cp:'◆', commandPoints:'◆', knowledge:'🔬', influence:'🏛', guildFavor:'🚀', spice:'🟠', scraps:'🔩', intel:'🔍', fuelCell:'🔋', fuelCells:'🔋' };
+    const labels = { solari:'Solari', manpower:'Manpower', water:'Water', plascrete:'Plascrete', cp:'CP', commandPoints:'CP', knowledge:'Knowledge', influence:'Influence', guildFavor:'Guild Favor', spice:'Spice', scraps:'Scraps', intel:'Intel', fuelCell:'Fuel Cell', fuelCells:'Fuel Cell' };
     let chips = '';
     for (const [key, val] of Object.entries(cost)) {
         if (!val) continue;
