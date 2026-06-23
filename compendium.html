@@ -407,6 +407,19 @@
         .cost-influence { color: var(--color-corrino); }
         .cost-upkeep { color: var(--text-muted); font-style: italic; }
 
+        /* Victory Conditions */
+        .vc-intro { font-size:0.85rem; color:var(--text-muted); margin:0 0 20px; line-height:1.6; max-width:900px; }
+        .vc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:16px; margin-bottom:28px; }
+        .vc-card { background:var(--bg-card); border:1px solid var(--border-color); border-left:4px solid var(--vc-color,var(--accent-gold)); border-radius:12px; padding:16px 18px; }
+        .vc-head { display:flex; align-items:center; gap:9px; margin-bottom:4px; }
+        .vc-icon { font-size:1.25rem; }
+        .vc-name { font-weight:700; font-size:1.05rem; color:var(--text-main); letter-spacing:0.02em; }
+        .vc-threshold { font-size:1.5rem; font-weight:800; color:var(--vc-color,var(--accent-gold)); line-height:1.1; margin:6px 0 10px; }
+        .vc-desc { font-size:0.82rem; color:var(--text-muted); line-height:1.55; }
+        .vc-modes { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+        .vc-mode { background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:13px 15px; }
+        .vc-mode b { color:var(--text-main); display:block; margin-bottom:5px; }
+
         /* Effect list */
         .effects {
             font-size: 0.78rem;
@@ -965,6 +978,7 @@ ul.mechanics-list li {
         <button class="tab-btn" data-category="Tech Trees">Tech Trees</button>
         <button class="tab-btn" data-category="Landsraad & Politics">Landsraad & Politics</button>
         <button class="tab-btn" data-category="Factions Overview">Factions Overview</button>
+        <button class="tab-btn" data-category="Victory Conditions">Victory Conditions</button>
         <button class="tab-btn" data-category="Operations">Operations</button>
         <button class="tab-btn" data-category="Village Bonuses">Village Bonuses</button>
         <button class="tab-btn" data-category="Match Randomizer">Match Randomizer</button>
@@ -5415,7 +5429,7 @@ function renderAll() {
 }
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
-const CATEGORIES_WITHOUT_SEARCH = ['Tech Trees', 'Landsraad & Politics', 'Factions Overview', 'Operations', 'Match Randomizer', 'Village Bonuses'];
+const CATEGORIES_WITHOUT_SEARCH = ['Tech Trees', 'Landsraad & Politics', 'Factions Overview', 'Operations', 'Match Randomizer', 'Village Bonuses', 'Victory Conditions'];
 
 // Items relevant to the current category, honoring the faction filter (but not the type filter).
 function itemsForCategory() {
@@ -5464,7 +5478,7 @@ function updateFilterBarVisibility() {
     // Faction tabs are meaningless on the randomizer / village bonuses views.
     const factionTabs = document.getElementById('faction-tabs');
     if (factionTabs) factionTabs.style.display =
-        (currentCategory === 'Match Randomizer' || currentCategory === 'Village Bonuses') ? 'none' : '';
+        (currentCategory === 'Match Randomizer' || currentCategory === 'Village Bonuses' || currentCategory === 'Victory Conditions') ? 'none' : '';
 }
 
 function updateContainerWidth() {
@@ -5959,6 +5973,40 @@ renderAll();
             if (window.lucide) window.lucide.createIcons();
         }
 
+        // ─── VICTORY CONDITIONS (verified against the game database, data.cdb) ───
+        const VICTORY_CONDITIONS = [
+            { name:'Domination', icon:'⚔️', color:'var(--color-harkonnen)', threshold:'Last faction standing',
+              desc:'Defeat every other faction — by eliminating their forces and bases or by assassinating their leader. Always active in every game.' },
+            { name:'Hegemony', icon:'👑', color:'var(--accent-gold)', threshold:'30,000 Hegemony',
+              desc:'Be the first to reach 30,000 Hegemony. The end-game race becomes visible to everyone once any faction passes 20,000.' },
+            { name:'Political', icon:'🏛️', color:'var(--color-smugglers)', threshold:'30 days as Governor',
+              desc:'Hold the Dune Governorship Charter for 30 successive in-game days (25 in a Kanly Duel). Win the Charter in the Landsraad, then defend it long enough.' },
+            { name:'Economic', icon:'🪙', color:'var(--tag-economy)', threshold:'50% of CHOAM shares',
+              desc:'Control 50% of all CHOAM shares. The race becomes visible to everyone once any faction passes 40%.' },
+            { name:'Assassination', icon:'🗡️', color:'var(--color-ecaz)', threshold:'Optional (game setup)',
+              desc:'When enabled in the game setup, win by assassinating every rival faction’s leader. Each attempt requires maxing your Infiltration on the target first.' },
+        ];
+        const GAME_MODES = [
+            { name:'Skirmish', desc:'The standard mode — all of the victory conditions above are active.' },
+            { name:'Kanly Duel', desc:'A 1-on-1 duel. Same conditions, except the Political victory needs only 25 days as Governor.' },
+            { name:'Conquest', desc:'A guided mode against the AI: win by completing 2 of several faction-specific objectives (e.g. defeat a chosen rival, own a number of territories, ally the Fremen) instead of the standard conditions.' },
+        ];
+        function renderVictoryConditions() {
+            let html = `<p class="vc-intro">How to win a game of Dune: Spice Wars. In a standard <b>Skirmish</b>, the game ends the moment any faction satisfies one of these conditions. <b>Conquest</b> is a separate, objective-based mode (see below). Thresholds are read from the game database.</p>`;
+            html += `<div class="vc-grid">` + VICTORY_CONDITIONS.map(v => `
+                <div class="vc-card" style="--vc-color:${v.color}">
+                    <div class="vc-head"><span class="vc-icon">${v.icon}</span><span class="vc-name">${v.name}</span></div>
+                    <div class="vc-threshold">${v.threshold}</div>
+                    <div class="vc-desc">${v.desc}</div>
+                </div>`).join('') + `</div>`;
+            html += `<div class="section-label"><i data-lucide="flag" width="16" height="16"></i>&nbsp;Game Modes</div>`;
+            html += `<div class="vc-modes">` + GAME_MODES.map(m => `
+                <div class="vc-mode"><b>${m.name}</b><div class="vc-desc">${m.desc}</div></div>`).join('') + `</div>`;
+            document.getElementById('compendium-content').innerHTML = html;
+            document.getElementById('result-count').textContent = VICTORY_CONDITIONS.length + ' victory conditions';
+            if (window.lucide) window.lucide.createIcons();
+        }
+
         // Remove existing render wrapper if this is re-running
         if (!window.HAS_INJECTED_FACTIONS) {
             window.HAS_INJECTED_FACTIONS = true;
@@ -5973,6 +6021,8 @@ renderAll();
                     rpRender();
                 } else if (cat === "Village Bonuses") {
                     renderVillageBonuses();
+                } else if (cat === "Victory Conditions") {
+                    renderVictoryConditions();
                 } else {
                     origRender();
                 }

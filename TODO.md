@@ -74,9 +74,11 @@
 
 Add-content PRs (high value, medium effort):
 
-- [ ] Add a Victory Conditions section — verified 0% covered. Domination, Hegemony
-      (30,000; race at 20,000), Political (hold Dune Governorship 30 days / 25 in Kanly),
-      Economic (50% CHOAM shares; race at 40%), plus the Assassinations toggle. Small.
+- [x] Add a Victory Conditions section — added a "Victory Conditions" category with the 5
+      win types (Domination, Hegemony 30,000 / race at 20,000, Political 30 days as Governor
+      / 25 in Kanly, Economic 50% CHOAM / race at 40%, optional Assassination) plus the 3
+      game modes (Skirmish / Kanly Duel / Conquest). All thresholds verified against the
+      game database (Game_Victory_* constants, Game_Victory_GovernorDuration values).
 
 - [ ] Add the 7 Landsraad Charters (+ Water Subsidies, + "Imperium Summit"/"Land Sales"
       name fixes) — compendium has 38/46 resolutions and 0 Charters. Include eligibility
