@@ -27,12 +27,12 @@
             --text-muted: #9590a2;
             
             /* Factions */
-            --color-atreides: #4a90e2;
+            --color-atreides: #3faa5a;
             --color-harkonnen: #eb5757;
-            --color-smugglers: #f2994a;
-            --color-fremen: #27ae60;
-            --color-corrino: #f2c94c;
-            --color-ecaz: #d0021b;
+            --color-smugglers: #4a90e2;
+            --color-fremen: #d9a441;
+            --color-corrino: #c3c6cd;
+            --color-ecaz: #df5f97;
             --color-vernius: #9b51e0;
             --color-unknown: #828282;
         }
@@ -268,12 +268,12 @@
         }
 
         .stat-card:nth-child(2) .stat-icon {
-            color: var(--color-atreides);
+            color: #4a90e2;
             background: rgba(74, 144, 226, 0.1);
             border-color: rgba(74, 144, 226, 0.2);
         }
         .stat-card:nth-child(3) .stat-icon {
-            color: var(--color-fremen);
+            color: #27ae60;
             background: rgba(39, 174, 96, 0.1);
             border-color: rgba(39, 174, 96, 0.2);
         }
@@ -1603,12 +1603,12 @@
         // Faction color helper
         function getFactionColor(faction) {
             switch (faction) {
-                case 'Atreides': return '#4a90e2';
+                case 'Atreides': return '#3faa5a';
                 case 'Harkonnen': return '#eb5757';
-                case 'Smugglers': return '#f2994a';
-                case 'Fremen': return '#27ae60';
-                case 'Corrino': return '#f2c94c';
-                case 'Ecaz': return '#d0021b';
+                case 'Smugglers': return '#4a90e2';
+                case 'Fremen': return '#d9a441';
+                case 'Corrino': return '#c3c6cd';
+                case 'Ecaz': return '#df5f97';
                 case 'Vernius': return '#9b51e0';
                 default: return '#828282';
             }
