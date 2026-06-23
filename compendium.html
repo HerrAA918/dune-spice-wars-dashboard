@@ -32,6 +32,7 @@
             --tag-statecraft: #4a90e2;
             --tag-scout: #9b51e0;
             --tag-elite: #f2c94c;
+            --tag-hero: #ffd166;
             --tag-special: #f2994a;
             --tag-drone: #56ccf2;
             --tag-ship: #e07a5f;
@@ -210,6 +211,7 @@
         .filter-pill[data-type="economy"] { border-color: var(--tag-economy); color: var(--tag-economy); }
         .filter-pill[data-type="statecraft"] { border-color: var(--tag-statecraft); color: var(--tag-statecraft); }
         .filter-pill[data-type="elite"] { border-color: var(--tag-elite); color: var(--tag-elite); }
+        .filter-pill[data-type="hero"] { border-color: var(--tag-hero); color: var(--tag-hero); }
         .filter-pill[data-type="scout"] { border-color: var(--tag-scout); color: var(--tag-scout); }
         .filter-pill[data-type="special"] { border-color: var(--tag-special); color: var(--tag-special); }
         .filter-pill.active[data-type="all"] { background: var(--text-muted); color: #050407; }
@@ -217,6 +219,7 @@
         .filter-pill.active[data-type="economy"] { background: var(--tag-economy); color: #fff; }
         .filter-pill.active[data-type="statecraft"] { background: var(--tag-statecraft); color: #fff; }
         .filter-pill.active[data-type="elite"] { background: var(--tag-elite); color: #050407; }
+        .filter-pill.active[data-type="hero"] { background: var(--tag-hero); color: #050407; }
         .filter-pill.active[data-type="scout"] { background: var(--tag-scout); color: #fff; }
         .filter-pill.active[data-type="special"] { background: var(--tag-special); color: #050407; }
         .filter-pill[data-type="drone"] { border-color: var(--tag-drone); color: var(--tag-drone); }
@@ -331,6 +334,7 @@
         .tag-economy { background: rgba(39,174,96,0.2); color: var(--tag-economy); border: 1px solid rgba(39,174,96,0.3); }
         .tag-statecraft { background: rgba(74,144,226,0.2); color: var(--tag-statecraft); border: 1px solid rgba(74,144,226,0.3); }
         .tag-elite { background: rgba(242,201,76,0.2); color: var(--tag-elite); border: 1px solid rgba(242,201,76,0.3); }
+        .tag-hero { background: rgba(255,209,102,0.2); color: var(--tag-hero); border: 1px solid rgba(255,209,102,0.35); }
         .tag-scout { background: rgba(155,81,224,0.2); color: var(--tag-scout); border: 1px solid rgba(155,81,224,0.3); }
         .tag-special { background: rgba(242,153,74,0.2); color: var(--tag-special); border: 1px solid rgba(242,153,74,0.3); }
         .tag-drone { background: rgba(86,204,242,0.2); color: var(--tag-drone); border: 1px solid rgba(86,204,242,0.3); }
@@ -1030,7 +1034,7 @@ const MAX = { health: 2000, power: 50, armor: 10, supply: 200 };
 // Type helpers
 function tagClass(t) {
     const m = { military:'tag-military', economy:'tag-economy', statecraft:'tag-statecraft',
-                elite:'tag-elite', scout:'tag-scout', special:'tag-special', all:'tag-all',
+                elite:'tag-elite', hero:'tag-hero', scout:'tag-scout', special:'tag-special', all:'tag-all',
                 drone:'tag-drone', ship:'tag-ship', main_base:'tag-main_base', village:'tag-village' };
     return m[t] || 'tag-all';
 }
@@ -1039,6 +1043,7 @@ function tagClass(t) {
 const TYPE_META = {
     military:   { label: 'Military',   icon: 'sword' },
     elite:      { label: 'Elite',      icon: 'star' },
+    hero:       { label: 'Hero',       icon: 'crown' },
     scout:      { label: 'Scout',      icon: 'eye' },
     drone:      { label: 'Drone',      icon: 'bot' },
     ship:       { label: 'Ship',       icon: 'sailboat' },
@@ -2177,6 +2182,225 @@ const UNITS = [
       "Fight-Engineers are a caste of Ixian specialists constantly trying to improve the programming of fighting drones."
     ],
     "unlock": "5,000 Hegemony"
+  },
+  {
+    "name": "Duncan",
+    "faction": "Atreides",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 1000 | Power: 20 | Armor: 6",
+      "Supply: 100",
+      "★ Heroic Figure: For each allied unit bonus, gain Duncan Heroism",
+      "★ Upon death, all future Duncans gain: +150 Life"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Gurney",
+    "faction": "Atreides",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 1000 | Power: 18 | Armor: 8",
+      "Supply: 100",
+      "★ Exemplar Teacher: Melee units gain bonuses per Experience level after the first",
+      "★ Ranged units gain bonuses per Experience level after the first",
+      "★ Ally Military Units at Long Range gain +50% Experience"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Wensicia",
+    "faction": "Corrino",
+    "type": "hero",
+    "subtitle": "Hero · Range: 35",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 500 | Power: 16 | Armor: 2",
+      "Supply: 100",
+      "★ Beloved Princess: +1 Training Slot if at least 1 conscript is currently in recruitment",
+      "★ Conscript at Long Range gain +1 Armor or +1 Power",
+      "★ bonuses for each ally Military Unit at Long Range"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Aramsham",
+    "faction": "Corrino",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 1000 | Power: 20 | Armor: 5",
+      "Supply: 100",
+      "★ Hand of the Emperor: Sardaukars cost +80% Manpower",
+      "★ The execution threshold of Sardaukars at Long Range cannot be less than 25%",
+      "★ Aramsham gains Aramsham Buff until the end of combat every time a Sardaukar at Long Range executes an enemy unit"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Whitmore",
+    "faction": "Ecaz",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 1000 | Power: 20 | Armor: 6",
+      "Supply: 100",
+      "★ Legendary Swordmaster: Can name a second Ecaz Champion of a different type",
+      "★ Whitmore is a Ecaz Champion",
+      "★ Every Ecaz Champion gains bonuses per TEcaz Champion Buff Stack"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Ilesa",
+    "faction": "Ecaz",
+    "type": "hero",
+    "subtitle": "Hero · Range: 35",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 600 | Power: 20 | Armor: 2",
+      "Supply: 100",
+      "★ Thorny Rose: Gain 20 Manpower upon building a Masterpiece",
+      "★ Killing Ilesa on Ecaz-adjective territory costs 50 Standing",
+      "★ Ecaz-adjective units at Long Range deal +3% damage per Masterpiece in neighboring Villages"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Chani",
+    "faction": "Fremen",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 600 | Power: 18 | Armor: 4",
+      "Supply: 100",
+      "★ Ghost Army: Fremen-adjective Sneak Trait units that are not currently detected have +40% Speed and do not attract Sandworm",
+      "★ Enemy units at Long Range give 5 Intel on death"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Otheym",
+    "faction": "Fremen",
+    "type": "hero",
+    "subtitle": "Hero · Range: 35",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 600 | Power: 36 | Armor: 3",
+      "Supply: 100",
+      "★ Confusing Assault: Ally ground units with no units of the same kind at Long Range deal +50% damage",
+      "★ Enemy units at Long Range deal +97% damage per enemy units at Long Range",
+      "★ Damaged units suffer bonuses"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Rabban",
+    "faction": "Harkonnen",
+    "type": "hero",
+    "subtitle": "Hero · Range: 10",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 1000 | Power: 15 | Armor: 5",
+      "Supply: 100",
+      "★ Unbridled Order: Every Village get +1 free Heavy Militia",
+      "★ Uncontrolable owned units at Long Range become Rabban Ally Buff",
+      "★ For each Rabban Ally Buff get: bonuses"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Iakin",
+    "faction": "Harkonnen",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 800 | Power: 20 | Armor: 5",
+      "Supply: 100",
+      "★ Survival of The Fittest: When Iakin has no Life, steals the Life of an ally ground unit at Short Range, instead of dying",
+      "★ Any unit death at Short Range grants Iakin Unit Death Buff (xseveral max)"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Drisq",
+    "faction": "Smugglers",
+    "type": "hero",
+    "subtitle": "Hero · Range: 80",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 600 | Power: 40 | Armor: 2",
+      "Supply: 100",
+      "★ Vigilance: Owned ground units without any target receive +70% damage",
+      "★ Detect Sneak Trait units in a Very Long Range",
+      "★ Units in the same region as Drisq get Sneak Trait during Smugglers-adjective operations"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Bannerjee",
+    "faction": "Smugglers",
+    "type": "hero",
+    "subtitle": "Hero · Melee",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 1000 | Power: 20 | Armor: 5",
+      "Supply: 100",
+      "★ Thug Leader: Units can regenerate in Villages with UWHeadquarters that are not in combat",
+      "★ After a successful siege with Bannerjee, all units regain all their Supply",
+      "★ +3 Power and Armor outside of Smugglers-adjective territory"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "Nuwa",
+    "faction": "Vernius",
+    "type": "hero",
+    "subtitle": "Hero · Range: 35",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 800 | Power: 35 | Armor: 2",
+      "Supply: 100",
+      "★ Machine's Mother: +20% drone recruitment speed",
+      "★ Spying operations launched in the region last 2 more days"
+    ],
+    "unlock": "Faction Hero"
+  },
+  {
+    "name": "C'Tair",
+    "faction": "Vernius",
+    "type": "hero",
+    "subtitle": "Hero · Range: 3",
+    "cost": {},
+    "upkeep": "20 Solari",
+    "effects": [
+      "Health: 600 | Power: 18 | Armor: 3",
+      "Supply: 100",
+      "★ Dissident Tinkerer: Unlocks an extra gear slot in the Armory, increasing unit requirements by 1 Fuel Cell when used",
+      "★ Ally non-mechanical units at Short Range are Sneak Trait"
+    ],
+    "unlock": "Faction Hero"
   }
 ];
 
