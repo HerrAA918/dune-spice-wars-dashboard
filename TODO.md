@@ -29,3 +29,9 @@
       Vernius). They render as a faction tech with a blank effect. Source the effect
       text (in-game tooltips) and populate `replacements[faction].effects` in the
       compendium's DEVELOPMENTS data.
+
+- [ ] Add a mouse-over tooltip explaining "Incomplete / Abandoned" — on the
+      Incomplete outcome badge (and the "Abandoned / Incomplete" victory condition)
+      in the match table, clarify that these are games that ended with no recorded
+      result (quit or unfinished), so they are not counted as wins or losses in the
+      win rate.
