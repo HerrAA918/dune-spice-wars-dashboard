@@ -40,3 +40,11 @@
       endings show the raw tag with no spacing in the Victory Condition column. Handle
       concede endings (and/or split unknown camelCase tags) in `getVictoryCondition`
       and the detail-modal reason text, e.g. render "Conceded (Supremacy)".
+
+- [ ] Confirm unit data is on the latest patch — most of the unit details appear
+      outdated. Audit the compendium's unit information (stats, costs, abilities,
+      counters) against the current live patch and update any stale values.
+
+- [ ] Verify the tech tree includes the 1-slot main-base bonuses — confirm that the
+      tech tree data/calculator accounts for the main-base building bonuses that
+      occupy a single base slot, and that they're represented correctly.
