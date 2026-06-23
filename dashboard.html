@@ -160,6 +160,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
@@ -1044,6 +1045,11 @@
                 <button id="share-btn" class="file-upload-btn" onclick="shareLink()">
                     <i data-lucide="link"></i>
                     Share Full Link
+                </button>
+                <button id="export-csv-btn" class="file-upload-btn" onclick="exportCsv()"
+                        title="Download the match table (respecting current filters) as a CSV spreadsheet">
+                    <i data-lucide="download"></i>
+                    Export CSV
                 </button>
                 <button id="reset-btn" class="file-upload-btn" onclick="resetData()">
                     <i data-lucide="refresh-cw"></i>
@@ -2362,6 +2368,96 @@
                 console.error(err);
                 showToast('Could not create a share link in this browser.', true);
             }
+        };
+
+        // Export the current (filtered + sorted) match list as a CSV file. Like the
+        // share links, this is entirely client-side — a Blob download, nothing leaves
+        // the browser.
+        window.exportCsv = function() {
+            if (!(currentProfileData && currentProfileData.games && currentProfileData.games.length)) {
+                showToast('Load a save file first, then export.', true);
+                return;
+            }
+            // filteredGamesList reflects the active mode, search, filters, and sort,
+            // so the CSV matches exactly what the match table is showing.
+            const rows = filteredGamesList;
+            if (!rows || rows.length === 0) {
+                showToast('No games match the current filters.', true);
+                return;
+            }
+
+            const headers = [
+                'Date', 'Player', 'Faction', 'Outcome', 'Victory Condition',
+                'Mode', 'Format', 'Hero', 'Councillors', 'Duration', 'Duration (s)',
+                'Difficulty', 'Worm Deaths', 'Supply Deaths', 'Operations'
+            ];
+
+            // RFC 4180 escaping: always wrap in double quotes and double any embedded
+            // quotes, so commas, quotes, and newlines in names can't break the columns.
+            // Also prefix a guard apostrophe when a value starts with a formula trigger
+            // (= + - @ tab CR) so a modded save's faction/operation name can't be
+            // evaluated as a spreadsheet formula on open.
+            const esc = (val) => {
+                const s = (val === null || val === undefined) ? '' : String(val);
+                const safe = /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
+                return '"' + safe.replace(/"/g, '""') + '"';
+            };
+
+            const lines = [headers.map(esc).join(',')];
+
+            rows.forEach(g => {
+                // ISO date portion (YYYY-MM-DD) sorts correctly in a spreadsheet.
+                const dateClean = (g.realDateStr || '').split(' ')[0] || 'Unknown';
+                const player = getPlayerName(g.userId);
+                const outcome = g.isVictory ? 'Victory' : 'Defeat';
+                const victoryCond = getVictoryCondition(g);
+                const mode = g.isMulti ? 'Multiplayer' : 'Singleplayer';
+                const format = g.isTeamGame ? 'Team' : 'Solo';
+                const hero = getHeroName(g.hero, g.faction);
+                const councillors = (g.councilors || []).map(getCouncilorName).join('; ');
+                const duration = formatDuration(g.currentTime);
+                const durationSecs = Math.round(g.currentTime || 0);
+                const difficulty = getDifficultyLabel(g.difficulty);
+                const wormDeaths = g.stats ? (g.stats.DeathByWorm || 0) : 0;
+                const splyDeaths = g.stats ? (g.stats.DeathBySupply || 0) : 0;
+
+                // Operations with repeat counts, e.g. "Sabotage (x2); Bribe".
+                let opsStr = '';
+                const ops = g.stats ? g.stats.OperationUsed : null;
+                if (ops && ops.length) {
+                    const counts = {};
+                    ops.forEach(op => { counts[op] = (counts[op] || 0) + 1; });
+                    opsStr = Object.keys(counts)
+                        .map(op => counts[op] > 1 ? op + ' (x' + counts[op] + ')' : op)
+                        .join('; ');
+                }
+
+                lines.push([
+                    dateClean, player, g.faction, outcome, victoryCond,
+                    mode, format, hero, councillors, duration, durationSecs,
+                    difficulty, wormDeaths, splyDeaths, opsStr
+                ].map(esc).join(','));
+            });
+
+            // Leading UTF-8 BOM (U+FEFF) so Excel renders accented faction/hero names correctly.
+            const csv = '﻿' + lines.join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const stamp = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+            const filename = 'dune-spice-wars-matches-' + stamp + '.csv';
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('Exported ' + rows.length + ' match' + (rows.length === 1 ? '' : 'es') + ' to ' + filename + '.');
         };
 
         // Active games for the current mode, used when building a summary to share.
