@@ -35,3 +35,8 @@
       in the match table, clarify that these are games that ended with no recorded
       result (quit or unfinished), so they are not counted as wins or losses in the
       win rate.
+
+- [ ] Prettify unrecognized end-reason tags (e.g. "ConcededSupremacy") — concede-type
+      endings show the raw tag with no spacing in the Victory Condition column. Handle
+      concede endings (and/or split unknown camelCase tags) in `getVictoryCondition`
+      and the detail-modal reason text, e.g. render "Conceded (Supremacy)".
