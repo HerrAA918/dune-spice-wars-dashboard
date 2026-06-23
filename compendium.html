@@ -3499,7 +3499,12 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Arrakis Secrets",
-          "effects": []
+          "effects": [
+            "Reveals the position of all Spice Areas",
+            "Deployed Harvesting Teams regain Life and Supply",
+            "When they pack up, Harvesting Teams leave combat immediately and have Sneak Trait for 1 day",
+            "Unlocks the Spice Silos Village building"
+          ]
         },
         "Smugglers": {
           "name": "Tinkerer Teams",
@@ -3602,11 +3607,19 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Freedom Fighters",
-          "effects": []
+          "effects": [
+            "+0.5 Solari production per existing neutral or Fremen Village",
+            "+500 Solari when liberating a Village",
+            "Unlocks the Trade Agreement Treaty"
+          ]
         },
         "Ecaz": {
-          "name": "Artistic Asperations",
-          "effects": []
+          "name": "Artistic Aspirations",
+          "effects": [
+            "Gain 80 Solari upon building a Masterpiece",
+            "+50% cost to add a Village building slot",
+            "Unlocks the Mason Guild Main Base building in your Main Base"
+          ]
         }
       }
     },
@@ -3627,7 +3640,10 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Sand Brotherhood",
-          "effects": []
+          "effects": [
+            "+1% Solari production per ally Sietch",
+            "Unlocks the Bazaar Main Base building in your Main Base"
+          ]
         },
         "Corrino": {
           "name": "Integrated Costs",
@@ -3658,7 +3674,10 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Shared Transcendence",
-          "effects": []
+          "effects": [
+            "Ceremonial Cavess produce +10 Solari",
+            "Ceremonial Cavess produce +1 Knowledge"
+          ]
         },
         "Ecaz": {
           "name": "Cultural Tourism",
@@ -3738,7 +3757,9 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Sky Gazing",
-          "effects": []
+          "effects": [
+            "Unlocks the Mobile Turret unit"
+          ]
         },
         "Smugglers": {
           "name": "Guerilla Tactics",
@@ -3779,12 +3800,15 @@ const DEVELOPMENTS = {
         "+10 Water",
         "Ground units gain +20% Speed in neutral territory",
         "+30% resources from pillaging villages and sietches",
-        "Ecazi units in a large area around the Champion get +10% power"
+        "Ecazi units in a large area around the Champion get +10% power",
+        "Unlocks the Fusion Plant (Main Base building)"
       ],
       "replacements": {
         "Fremen": {
           "name": "Desert Trekkers",
-          "effects": []
+          "effects": [
+            "+10 Water"
+          ]
         },
         "Smugglers": {
           "name": "Organized Looting",
@@ -3823,7 +3847,11 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Stalwart Alliance",
-          "effects": []
+          "effects": [
+            "During the liberation of an enemy Village, neighboring allied Sietches send a supporting raid",
+            "Allied Sietches get effects",
+            "Unlock the second gear slot in the Armory"
+          ]
         },
         "Smugglers": {
           "name": "Industrial Scavenging",
@@ -3870,7 +3898,11 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Iday Alakrab",
-          "effects": []
+          "effects": [
+            "Wormriding is +100% faster",
+            "Wormriding cannot be seen",
+            "On exiting wormriding, units inflict +10 damage on first attack and gain Sneak Trait for a day"
+          ]
         }
       }
     },
@@ -4068,7 +4100,8 @@ const DEVELOPMENTS = {
         "Each allied Sietch grants +1  Influence Production",
         "Unlocks the Al-Gaib Temple Building in Main Base",
         "+2 Influence production per Agents assigned on a faction in Truce",
-        "+2 Intel production per Agents assigned on a faction in Conflict"
+        "+2 Intel production per Agents assigned on a faction in Conflict",
+        "Unlocks the Landsraad Quarters (Main Base building)"
       ],
       "replacements": {
         "Harkonnen": {
@@ -4080,7 +4113,10 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Sand Diplomats",
-          "effects": []
+          "effects": [
+            "Unlocks the Political Agreement Treaty",
+            "Unlocks the Al-Gaib Temple Main Base building in your Main Base"
+          ]
         },
         "Corrino": {
           "name": "Diplomatic Spying",
@@ -4119,7 +4155,9 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Sietch Network",
-          "effects": []
+          "effects": [
+            "+1 Agent slot in Counter-Intel"
+          ]
         },
         "Smugglers": {
           "name": "Security Details",
@@ -4129,8 +4167,10 @@ const DEVELOPMENTS = {
           ]
         },
         "Corrino": {
-          "name": "Imperial Eyes",
-          "effects": []
+          "name": "Emperor Eyes",
+          "effects": [
+            "+50% Military Units cost while victim of a treason"
+          ]
         }
       }
     },
@@ -4192,7 +4232,7 @@ const DEVELOPMENTS = {
       }
     },
     {
-      "name": "Spying Logistics",
+      "name": "Spying Logistic",
       "category": "Statecraft",
       "tier": 2,
       "requires": [
@@ -4221,7 +4261,7 @@ const DEVELOPMENTS = {
       "category": "Statecraft",
       "tier": 3,
       "requires": [
-        "Spying Logistics"
+        "Spying Logistic"
       ],
       "genericEffects": [
         "20% of an operation's Intel cost is refunded when launched in the territory of a faction in Conflict",
@@ -4281,11 +4321,11 @@ const DEVELOPMENTS = {
       }
     },
     {
-      "name": "Nefarious Contracts",
+      "name": "Nefarious Contacts",
       "category": "Statecraft",
       "tier": 3,
       "requires": [
-        "Spying Logistics"
+        "Spying Logistic"
       ],
       "genericEffects": [
         "-50% Assassin recruitment costs",
@@ -4307,7 +4347,9 @@ const DEVELOPMENTS = {
         },
         "Ecaz": {
           "name": "Cosmopolite Elegance",
-          "effects": []
+          "effects": [
+            "Infiltration levels rise and fall 150% faster"
+          ]
         },
         "Vernius": {
           "name": "Holistic Thinking",
@@ -4378,7 +4420,10 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Heir of Arrakis",
-          "effects": []
+          "effects": [
+            "Controlled Deep Deserts grant neighboring Villages: effects",
+            "Unlocks the Investment Office Village building"
+          ]
         },
         "Corrino": {
           "name": "Imperial Researchers",
@@ -4422,7 +4467,11 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Desert Wisdom",
-          "effects": []
+          "effects": [
+            "Windtraps produce effects",
+            "Unlocks the Research Agreement Treaty",
+            "Unlocks the Mason Guild Main Base building in your Main Base"
+          ]
         },
         "Smugglers": {
           "name": "Underground Network",
@@ -4475,7 +4524,9 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Desert Watchers",
-          "effects": []
+          "effects": [
+            "Ally units in Fremen territory and near allied Sietches have Sneak Trait"
+          ]
         },
         "Ecaz": {
           "name": "Prideful Crown",
@@ -4558,12 +4609,15 @@ const DEVELOPMENTS = {
         },
         "Vernius": {
           "name": "Neural Tropism",
-          "effects": []
+          "effects": [
+            "Enemy factions pay +30% Authority to Annex a Village neighboring at least 2 regions connected to the Nodal Network",
+            "Unlocks the Neural Core Main Base building in your Main Base"
+          ]
         }
       }
     },
     {
-      "name": "Output Logistics",
+      "name": "Outpost Logistics",
       "category": "Expansion",
       "tier": 3,
       "requires": [
