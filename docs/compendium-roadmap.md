@@ -47,14 +47,18 @@ larger systems. Each item notes its **data source**, **schema**, **UI placement*
 - **UI:** new sub-section in **Landsraad & Politics**.
 - **Effort:** Medium.
 
-### PR C — Pre-match Faction Bonuses  *(the "what should I draft" reference)*
-- **Why:** an entire draftable system absent from the compendium.
-- **Data:** `bonus` sheet (type=0 → 63 Faction Bonuses, 9 per faction; type=1 → mission rewards).
-  Effects resolvable via the trait join. 38 of 63 are flagged beginner-friendly (`props.lowDifficulty`).
-- **Schema:** `FACTION_BONUSES = {faction: [{name, effect, beginnerFriendly}]}`.
-- **UI:** new **Faction Bonuses** category (filter by faction), or a panel inside Factions Overview /
-  Match Randomizer.
-- **Effort:** Medium.
+### PR C — ~~Pre-match Faction Bonuses~~ → Conquest Campaign Bonuses  *(DE-PRIORITIZED — niche)*
+- **Correction:** the gap audit mislabeled these as a draftable pre-match system. They are
+  **single-player Conquest-campaign content**, NOT a skirmish draft and NOT tied to advisors.
+  Verified: all 126 entries (`bonus` type 0 + type 1) use `UI/conquest/` art, their effect
+  traits are `CB_*` (Conquest Bonus), and props are Conquest-specific (`battlePickChance`,
+  `onlyForConquestOwner`). `faction.conquest` defines a campaign map (pawns, intro speeches);
+  the `battle` sheet holds the scripted scenarios. No structural link to councilors.
+- **Implication:** standard-game faction customization is the **councilors** (already covered in
+  Factions Overview). These bonuses only matter to Conquest-campaign players → low priority.
+- **If built later:** a clearly-labeled **"Conquest Campaign Bonuses"** section — 9 bonuses +
+  mission rewards per faction, beginner-friendly ones tagged. Source: `bonus` sheet (type 0/1).
+- **Effort:** Medium. **Priority:** Low (single-player-campaign only).
 
 ### Also-medium (batch into A–C or a follow-up)
 - **Operations cleanup** (deferred from the quick-win): replace the 14 "Variable" faction-op costs with
@@ -71,7 +75,7 @@ larger systems. Each item notes its **data source**, **schema**, **UI placement*
 
 ## Larger builds (high value, plan separately)
 
-### Build 1 — Heroes section  *(see detailed plan below)*
+### Build 1 — Heroes section  ✅ DONE — see detailed plan below (shipped as a `hero` unit type)
 ### Build 2 — Armory / Equipment
 - **Data:** `equipment` (157 rows; ~112 live, ~45 legacy like `*_Old`), 4 gear slots/unit (Fremen Altar = 8).
   Effects resolve via the `trait` join (e.g. Heavy Armor +2 Armor / −2 Power, Long Rifle +40% range,
@@ -82,7 +86,12 @@ larger systems. Each item notes its **data source**, **schema**, **UI placement*
 
 ---
 
-## Detailed plan: Heroes section
+## Detailed plan: Heroes section  ✅ IMPLEMENTED
+
+> Shipped: all 14 heroes added to `UNITS` with a new `hero` type (TYPE_META + filter pill +
+> `--tag-hero` styling), each card showing stats + the signature trait's effects (the generic
+> combat traits are omitted — their effect text isn't fully resolvable from the CDB). Faction
+> leaders were left out (cosmetic in-game). Original plan retained below for reference.
 
 **Why:** the compendium curates 56 units but **0 of the 14 faction heroes**, even though several
 councilors (FACTIONS_DATA) deploy as these hero units. High player interest.

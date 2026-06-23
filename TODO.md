@@ -87,8 +87,11 @@ Add-content PRs (high value, medium effort):
       first-election reward, all verified against the resolution sheet. Fixed the two
       stale names and added the Water Subsidies global resolution.
 
-- [ ] Add the 63 draftable pre-match Faction Bonuses — 9/faction (38 beginner-friendly).
-      Source: `bonus` sheet (type=0). New "Faction Bonuses" category/filter. Medium.
+- [ ] (LOW PRIORITY) Conquest Campaign Bonuses — the audit's "63 Faction Bonuses" are NOT a
+      pre-match draft and are NOT tied to advisors; they are single-player Conquest-campaign
+      content (CON: `UI/conquest/` art, `CB_*` effect traits, `battlePickChance` /
+      `onlyForConquestOwner` props). Standard-game faction customization is the councilors
+      (already covered). If built: a clearly-labeled "Conquest Campaign Bonuses" section.
 
 - [ ] Operations cleanup (deferred from the quick-win fix) — replace the 14 "Variable"
       faction-op costs with the tier-fixed values (VeryEasy 100 Intel / Easy 200 Intel +
@@ -106,9 +109,21 @@ Add-content PRs (high value, medium effort):
 
 Larger builds (high value, plan separately — see roadmap):
 
-- [ ] Heroes section — the 14 faction heroes (2/faction) with stats + signature traits,
-      rendered via the existing unit card with a `hero` type/filter; link councilors that
-      deploy as heroes. Roster + schema in docs/compendium-roadmap.md.
+- [x] Heroes section — added all 14 faction heroes (2/faction) to UNITS as a new `hero` type
+      (filter pill + tag styling), each card showing stats + the signature trait's effects,
+      verified against the CDB unit/trait sheets. Generic combat traits and faction leaders
+      were omitted (placeholder text / cosmetic respectively).
 
 - [ ] Armory / Equipment section — ~112 live gear items (filter out ~45 legacy `*_Old`),
       4 slots/unit (Fremen Altar 8), effects via the `trait` join. New "Armory" category.
+
+- [ ] Audit all icons/graphics across the dashboard and add relevant game art — the
+      dashboard and compendium currently lean on external wiki image URLs (WIKI_IMAGES),
+      emoji, and lucide icons. The game pak (`res.compressed.pak`) holds the real art:
+      unit/leader portraits (`unit@images` smallPortrait/bigPortrait/symbol), development
+      icons (`UI/developments/techIcons*.png`), building thumbnails (`building@visuals`),
+      resource/UI icons (`UI/icons/*`), and faction crests. Review every place we show an
+      icon/image, identify mismatches or low-quality/missing art, and source the matching
+      sprite from the pak (each `gfx` entry is a {file, size, x, y} sprite-sheet cell —
+      extract the cell, not the whole sheet). Decide how to host/bundle the art and mind
+      that it's proprietary game art (same caution as not committing raw game data).
