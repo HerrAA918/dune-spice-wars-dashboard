@@ -745,6 +745,21 @@
     font-weight: bold;
 }
 
+/* Vernius Patent & Obfuscate calculator (tech tree, Vernius only) */
+.vernius-ability-panel {
+    width: 100%;
+    background: rgba(20, 20, 25, 0.95);
+    border: 1px solid var(--color-vernius);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+}
+.vernius-ability-panel .calc-title { color: var(--color-vernius); border-bottom-color: rgba(155,81,224,0.4); }
+.vernius-ability-panel .calc-input-row input { width: 80px; }
+.vn-unlocked { color: #2ecc71; font-weight: bold; }
+.vn-locked { color: #aaa; }
+
 
 <style>
 .landsraad-container {
@@ -3558,10 +3573,9 @@ const DEVELOPMENTS = {
     {
       "name": "Modular Parts",
       "category": "Economic",
-      "tier": 8,
+      "tier": 2,
       "requires": [
-        "Composite Materials",
-        "CHOAM Integration"
+        "Composite Materials"
       ],
       "genericEffects": [
         "+1 Maximum Crew in Harvesters",
@@ -3600,7 +3614,7 @@ const DEVELOPMENTS = {
     {
       "name": "CHOAM Integration",
       "category": "Economic",
-      "tier": 9,
+      "tier": 3,
       "requires": [
         "Modular Parts"
       ],
@@ -3614,7 +3628,7 @@ const DEVELOPMENTS = {
     {
       "name": "Crew Training Program",
       "category": "Economic",
-      "tier": 10,
+      "tier": 4,
       "requires": [
         "CHOAM Integration"
       ],
@@ -4974,7 +4988,30 @@ function renderTechTree() {
     
     html += '</div>';
     
-    // Side panels: Landsraad Vote Timer on top, Research Calculator below
+    // Side panels: Landsraad Vote Timer, the Vernius ability calculator (shown only
+    // when viewing the Vernius tech tree), and the Research Calculator.
+    const verniusPanel = currentFaction === 'Vernius' ? `
+        <div class="vernius-ability-panel" id="vernius-ability-panel">
+            <div class="calc-title"><span><i data-lucide="cpu" style="width:16px;height:16px;vertical-align:-2px;"></i> Vernius &mdash; Patent &amp; Obfuscate</span></div>
+            <div class="calc-input-row" style="margin-top:8px;">
+                <span>Current Hegemony:</span>
+                <input type="number" id="vn-hegemony" value="0" min="0" step="100" oninput="updateVerniusCalc()">
+            </div>
+            <div class="calc-input-row">
+                <span>Hegemony / day:</span>
+                <input type="number" id="vn-hpd" value="50" min="0" oninput="updateVerniusCalc()">
+            </div>
+            <div class="calc-row" style="margin-top:12px;"><span><i data-lucide="file-text" style="width:14px;height:14px;vertical-align:-2px;"></i> Patent (5,000 Heg):</span><span id="vn-patent-status">&mdash;</span></div>
+            <div class="calc-row req" id="vn-patent-eta" style="display:none;"></div>
+            <div class="calc-row"><span><i data-lucide="eye-off" style="width:14px;height:14px;vertical-align:-2px;"></i> Obfuscate (10,000 Heg):</span><span id="vn-obfuscate-status">&mdash;</span></div>
+            <div class="calc-row req" id="vn-obfuscate-eta" style="display:none;"></div>
+            <div class="calc-input-row" style="margin-top:10px;">
+                <span>Patents to file:</span>
+                <input type="number" id="vn-patents" value="1" min="0" oninput="updateVerniusCalc()">
+            </div>
+            <div class="calc-total"><span>Patent cost:</span><span id="vn-patent-cost">1,000 Solari</span></div>
+        </div>` : '';
+
     html += `
     <div class="tech-panels">
         <div class="landsraad-timer-panel" id="landsraad-timer-panel">
@@ -4991,6 +5028,7 @@ function renderTechTree() {
             <div class="calc-time" id="lr-days-until" style="color:#2ecc71;">— Days</div>
             <div class="calc-row req" id="lr-research-note" style="display:none; margin-top:8px;"></div>
         </div>
+        ${verniusPanel}
         <div class="tech-calculator-panel" id="tech-calc-panel">
             <div class="calc-title"><span>Research Calculator</span><i data-lucide="x" class="calc-close" onclick="closeCalc()"></i></div>
             <div id="calc-content"></div>
@@ -5007,6 +5045,7 @@ function renderTechTree() {
     document.getElementById('result-count').textContent = 'Viewing Tech Tree';
     lucide.createIcons();
     updateLandsraadTimer();
+    updateVerniusCalc();
 
     // Draw SVG lines after DOM settles
     setTimeout(drawTechLines, 100);
@@ -5051,6 +5090,43 @@ function updateLandsraadTimer() {
     } else if (noteEl) {
         noteEl.style.display = 'none';
     }
+}
+
+// House Vernius unique abilities. Patent unlocks at 5,000 Hegemony (1,000 Solari to
+// file; rivals must then pay to unlock the patented development). Obfuscate unlocks
+// at 10,000 Hegemony (permanently disables a development for everyone). This planner
+// reports milestone progress (and an ETA from Hegemony/day) plus the Solari to file
+// N patents. No-ops unless the Vernius panel is on screen.
+function updateVerniusCalc() {
+    const hEl = document.getElementById('vn-hegemony');
+    if (!hEl) return;
+    const heg = Math.max(0, parseInt(hEl.value, 10) || 0);
+    const hpd = Math.max(0, parseFloat(document.getElementById('vn-hpd').value) || 0);
+    const patents = Math.max(0, parseInt(document.getElementById('vn-patents').value, 10) || 0);
+    const PATENT_AT = 5000, OBFUSCATE_AT = 10000, PATENT_COST = 1000;
+
+    const milestone = (statusId, etaId, threshold, label) => {
+        const s = document.getElementById(statusId);
+        const eta = document.getElementById(etaId);
+        if (heg >= threshold) {
+            s.textContent = 'Unlocked';
+            s.className = 'vn-unlocked';
+            eta.style.display = 'none';
+        } else {
+            const remain = threshold - heg;
+            s.textContent = remain.toLocaleString() + ' to go';
+            s.className = 'vn-locked';
+            if (hpd > 0) {
+                eta.style.display = 'flex';
+                eta.innerHTML = '<span>~ days to ' + label + ':</span><span>' + Math.ceil(remain / hpd) + '</span>';
+            } else {
+                eta.style.display = 'none';
+            }
+        }
+    };
+    milestone('vn-patent-status', 'vn-patent-eta', PATENT_AT, 'Patent');
+    milestone('vn-obfuscate-status', 'vn-obfuscate-eta', OBFUSCATE_AT, 'Obfuscate');
+    document.getElementById('vn-patent-cost').textContent = (patents * PATENT_COST).toLocaleString() + ' Solari';
 }
 
 function drawTechLines() {
