@@ -34,7 +34,6 @@
             --color-corrino: #c3c6cd;
             --color-ecaz: #df5f97;
             --color-vernius: #9b51e0;
-            --color-neutral: #828282; /* neutral/unknown fallback — mirror this in getFactionColor()'s default */
         }
 
         * {
@@ -1610,7 +1609,7 @@
                 case 'Corrino': return '#c3c6cd';
                 case 'Ecaz': return '#df5f97';
                 case 'Vernius': return '#9b51e0';
-                default: return '#828282'; // neutral fallback — keep in sync with --color-neutral (literal required for Chart.js canvas)
+                default: return '#828282'; // neutral/unknown fallback (matches compendium's --color-neutral; literal required for Chart.js canvas)
             }
         }
 
