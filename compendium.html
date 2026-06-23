@@ -1034,14 +1034,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 50
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "10 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 18 | Armor: 5",
+      "Health: 500 | Power: 14 | Armor: 6",
       "Supply: 100",
       "+ Coordination: Gain 10% Power for each bonus received from an ally unit"
     ],
@@ -1051,16 +1048,13 @@ const UNITS = [
     "name": "Ranger",
     "faction": "Atreides",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 300 | Power: 15 | Armor: 3",
+      "Health: 400 | Power: 17 | Armor: 0",
       "Supply: 100",
       "+ Focus Fire: Ally units attacking the same target gain 5% Power",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -1070,19 +1064,16 @@ const UNITS = [
     "unlock": "None"
   },
   {
-    "name": "Heavy weapons squad",
+    "name": "Heavy Weapon Squad",
     "faction": "Atreides",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 5
+      "manpower": 40
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 7 | Armor: 5",
+      "Health: 400 | Power: 23 | Armor: 0",
       "Supply: 100",
       "+ Disruption: Dealing damage to an enemy applies Disrupted (x5 max) until the end of combat:",
       "+ Demolition Team:",
@@ -1099,15 +1090,14 @@ const UNITS = [
     "name": "Support Drone",
     "faction": "Atreides",
     "type": "drone",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "fuelCells": 4,
-      "commandPoints": 4
+      "solari": 300
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 600 | Power: 8 | Armor: 8",
+      "Health: 300 | Power: 14 | Armor: 4",
+      "Supply: 100",
       "+ Medkits: Nearby ally units gain 20% Health regeneration per day (x1 max)",
       "+ Drone: Does not attract Sandworms"
     ],
@@ -1119,14 +1109,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 600 | Power: 18 | Armor: 8",
+      "Health: 500 | Power: 16 | Armor: 8",
       "Supply: 100",
       "+ Bulwark: Nearby ally units gain +2 Armor (x1 max)"
     ],
@@ -1136,14 +1124,13 @@ const UNITS = [
     "name": "Hawk",
     "faction": "Atreides",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 3,
-      "commandPoints": 3
+      "guildFavor": 9
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 5 | Armor: 4",
+      "Health: 250 | Power: 8 | Armor: 4",
       "+ Weight Shedding:",
       "− Ship:",
       "  + Attacks 5 times faster",
@@ -1159,13 +1146,13 @@ const UNITS = [
     "name": "Kraken",
     "faction": "Atreides",
     "type": "ship",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 50",
     "cost": {
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 12 | Armor: 8",
+      "Health: 2000 | Power: 16 | Armor: 3",
       "+ Troop Carrier:",
       "+ Demolition:",
       "− Frigate:",
@@ -1187,14 +1174,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 19 | Armor: 4",
+      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100",
       "+ Berserkers: Gain up to 50% Power depending on missing Health"
     ],
@@ -1204,16 +1188,13 @@ const UNITS = [
     "name": "Gunner",
     "faction": "Harkonnen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 5
+      "manpower": 30
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 11 | Armor: 3",
+      "Health: 300 | Power: 16 | Armor: 0",
       "Supply: 100",
       "+ Shrapnel Ammunitions:",
       "+ Demolition:",
@@ -1233,32 +1214,28 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 16 | Armor: 2",
+      "Health: 300 | Power: 11 | Armor: 0",
       "Supply: 100",
       "+ Last stand: Upon dying, split in to 3 Unchained Cerberus"
     ],
     "unlock": "Survival Training"
   },
   {
-    "name": "Stealth Probe",
+    "name": "Combat Probe",
     "faction": "Harkonnen",
     "type": "drone",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 100,
-      "fuelCells": 1,
-      "commandPoints": 2
+      "solari": 100
     },
-    "upkeep": "6 Solari",
+    "upkeep": "4 Solari · 1 CP · 2 Fuel Cell",
     "effects": [
-      "Health: 150 | Power: 8 | Armor: 2",
+      "Health: 100 | Power: 10 | Armor: 0",
+      "Supply: 200",
       "+ Fight Analysis: Upon death, nearby ally units in combat gain 10% Power (x5 max)",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
       "  + Only visible from close range"
@@ -1271,14 +1248,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 600 | Power: 18 | Armor: 7",
+      "Health: 500 | Power: 15 | Armor: 5",
       "Supply: 100",
       "+ Head Hunter: While in combat, any nearby unit death grants (x10 max):",
       "  +3% Power",
@@ -1290,14 +1265,13 @@ const UNITS = [
     "name": "Harpy",
     "faction": "Harkonnen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 3,
-      "commandPoints": 3
+      "guildFavor": 9
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 300 | Power: 13 | Armor: 3",
+      "Health: 270 | Power: 10 | Armor: 4",
       "+ Evasion Tactics:",
       "+ Demolition:",
       "− Ship:",
@@ -1315,13 +1289,13 @@ const UNITS = [
     "name": "Overlord",
     "faction": "Harkonnen",
     "type": "ship",
-    "subtitle": "Range: N/A",
+    "subtitle": "Range: 50",
     "cost": {
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 0 | Armor: 8",
+      "Health: 2000 | Power: 0 | Armor: 6",
       "+ Hive:",
       "− Frigate:",
       "  + Can activate Decimiation Protocols: This boosts Sting generation speed and increases damage of nearby drones and Stings but damages them over time",
@@ -1340,14 +1314,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 500 | Power: 17 | Armor: 4",
+      "Health: 400 | Power: 15 | Armor: 2",
       "Supply: 100",
       "+ Scavengers: Gain 5% Health regeneration per day until the end of combat whenever a unit dies nearby (5x max)"
     ],
@@ -1357,16 +1328,13 @@ const UNITS = [
     "name": "Wrecker",
     "faction": "Smugglers",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "6 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 6 | Armor: 2",
+      "Health: 300 | Power: 8 | Armor: 0",
       "Supply: 100",
       "+ Chemical Weapons:",
       "+ Demolition Team:",
@@ -1388,14 +1356,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: 50",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 4
+      "manpower": 30
     },
-    "upkeep": "8 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 200 | Power: 20 | Armor: 2",
+      "Health: 250 | Power: 21 | Armor: 0",
       "Supply: 100",
       "+ Elimination Shots: Deal +30% damage against non-mechanical units",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1410,15 +1375,13 @@ const UNITS = [
     "name": "Scavenging Drone",
     "faction": "Smugglers",
     "type": "drone",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "fuelCells": 4,
-      "commandPoints": 4
+      "solari": 500
     },
-    "upkeep": "12 Solari",
+    "upkeep": "10 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 600 | Power: 10 | Armor: 6",
+      "Health: 500 | Power: 16 | Armor: 5",
       "Supply: 200",
       "+ Loot Distributor: While in combat, any nearby unit death grants the following bonuses for your allied units(10x max):",
       "+ Drone: Does not attract Sandworms",
@@ -1433,14 +1396,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 20 | Armor: 5",
+      "Health: 500 | Power: 14 | Armor: 2",
       "Supply: 100",
       "+ Sharpen Swords: Gain up to +100% Power depending on the missing Health of the target they're fighting",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1453,14 +1414,13 @@ const UNITS = [
     "name": "Banshee",
     "faction": "Smugglers",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 2,
-      "commandPoints": 2
+      "guildFavor": 15
     },
-    "upkeep": "12 Solari",
+    "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 300 | Power: 10 | Armor: 3",
+      "Health: 360 | Power: 17 | Armor: 4",
       "+ Chemical Weapons:",
       "+ Demolition Team:",
       "+ Stealth: Only visible from close range",
@@ -1480,14 +1440,13 @@ const UNITS = [
     "name": "Wraith",
     "faction": "Smugglers",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 3",
     "cost": {
-      "manpower": 100,
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 3000 | Power: 0 | Armor: 5",
+      "Health: 1600 | Power: 0 | Armor: 4",
       "+ Toxic Gases: Enemy ground units in the area lose 1% max Health and Supply every second",
       "+ Can active Toxic Purge",
       "− Frigate:",
@@ -1504,14 +1463,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 30,
-      "water": 2,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 500 | Power: 18 | Armor: 3",
+      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100",
       "+ Sand Tactics: Enemies engaged in combat with this unit suffer Disoriented (x1) max:",
       "  + -15% Power"
@@ -1522,16 +1478,13 @@ const UNITS = [
     "name": "Skirmisher",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 2,
-      "commandPoints": 4
+      "manpower": 30
     },
-    "upkeep": "4 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 8 | Armor: 2",
+      "Health: 300 | Power: 5 | Armor: 0",
       "Supply: 100",
       "+ Fremen Opression: For each penalty suffered by the target, gain +1 Power (5x max)",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1551,14 +1504,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 10,
-      "water": 2,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "3 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 200 | Power: 20 | Armor: 0",
+      "Health: 300 | Power: 11 | Armor: 0",
       "Supply: 100",
       "+ Weakness Revealed: First attack in combat inflicts +40 Damage and makes the target take +20% more damage from all sources",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1571,17 +1521,14 @@ const UNITS = [
     "name": "Mobile Turret",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
       "solari": 100,
-      "manpower": 10,
-      "water": 5,
-      "commandPoints": 5
+      "manpower": 40
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 300 | Power: 12 | Armor: 4",
-      "Supply: 300",
+      "Health: 400 | Power: 18 | Armor: 0",
       "+ Mobile Battery: Can set up an anti-air turret:",
       "  + Gain 20 Power",
       "  − Can only attack Flying Units",
@@ -1596,14 +1543,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 6
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 4 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 700 | Power: 22 | Armor: 5",
+      "Health: 400 | Power: 22 | Armor: 5",
       "Supply: 100",
       "+ Against the Odds: For each enemy military unit (x5 max) in combat with this unit, gain:",
       "  + +10% Power",
@@ -1615,13 +1560,13 @@ const UNITS = [
     "name": "Spire",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "commandPoints": 4
+      "scraps": 6
     },
-    "upkeep": "8 Solari",
+    "upkeep": "9 Solari · 2 CP",
     "effects": [
-      "Health: 300 | Power: 16 | Armor: 2",
+      "Health: 150 | Power: 9 | Armor: 3",
       "+ Suppressive Fire: Unit that is targeted by this suffers -10% Power",
       "− Ship:",
       "  − Cannot investigate Discoveries",
@@ -1635,11 +1580,13 @@ const UNITS = [
     "name": "Altar",
     "faction": "Fremen",
     "type": "military",
-    "subtitle": "Range: 20",
-    "cost": {},
+    "subtitle": "Range: 50",
+    "cost": {
+      "scraps": 100
+    },
     "upkeep": "50 Solari",
     "effects": [
-      "Health: 3000 | Power: 22 | Armor: 4",
+      "Health: 1600 | Power: 22 | Armor: 4",
       "+ Can activate Deploy Sails",
       "+ Has access to on-board enhancements",
       "+ Siege Weapons:",
@@ -1655,38 +1602,32 @@ const UNITS = [
     "unlock": ""
   },
   {
-    "name": "Conscription Swordsman",
+    "name": "Conscript Swordman",
     "faction": "Corrino",
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "3 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 14 | Armor: 4",
+      "Health: 300 | Power: 13 | Armor: 3",
       "Supply: 100",
       "+ Protection Support: Other nearby ally Military Units gain +5% damage reduction while they have at least 1 Armour (5x max)"
     ],
     "unlock": "None"
   },
   {
-    "name": "Conscription Rifleman",
+    "name": "Conscript Rifleman",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 100,
-      "manpower": 20,
-      "water": 3,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "3 Solari | 3 Manpower",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 14 | Armor: 4",
+      "Health: 300 | Power: 14 | Armor: 0",
       "Supply: 100",
       "+ Targeting Support: Gain +30% Power while having at least 3 Armour",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -1699,16 +1640,13 @@ const UNITS = [
     "name": "Incinerator",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "10 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 8 | Armor: 4",
+      "Health: 400 | Power: 7 | Armor: 1",
       "Supply: 100",
       "+ Flamethrowers: Attacks deal damage within a frontal cone and ignore enemy Armor"
     ],
@@ -1720,13 +1658,12 @@ const UNITS = [
     "type": "drone",
     "subtitle": "Range: 80",
     "cost": {
-      "solari": 200,
-      "fuelCells": 6,
-      "commandPoints": 4
+      "solari": 500
     },
-    "upkeep": "12 Solari",
+    "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 20 | Armor: 6",
+      "Health: 400 | Power: 40 | Armor: 2",
+      "Supply: 200",
       "− Siege Engine:",
       "+ Siege Weapons:",
       "+ Drone: Does not attract Sandworms unless deployed on sand",
@@ -1745,14 +1682,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 300,
-      "manpower": 20,
-      "water": 5,
-      "commandPoints": 5
+      "solari": 100,
+      "manpower": 50
     },
-    "upkeep": "10 Solari | 5 Manpower",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 600 | Power: 18 | Armor: 6",
+      "Health: 500 | Power: 17 | Armor: 5",
       "Supply: 100",
       "+ Executioner:",
       "  + Execute enemies under 20% Health",
@@ -1764,14 +1699,13 @@ const UNITS = [
     "name": "Hammer",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 4,
-      "commandPoints": 4
+      "guildFavor": 12
     },
-    "upkeep": "12 Solari",
+    "upkeep": "16 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
-      "Health: 500 | Power: 8 | Armor: 5",
+      "Health: 340 | Power: 22 | Armor: 5",
       "+ Thick Plating: This unit takes -40% area damage while it has at least 1 Armour",
       "+ Demolition:",
       "− Ship:",
@@ -1788,14 +1722,13 @@ const UNITS = [
     "name": "Cronos",
     "faction": "Corrino",
     "type": "military",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 50",
     "cost": {
-      "manpower": 100,
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 14 | Armor: 6",
+      "Health: 2400 | Power: 14 | Armor: 4",
       "+ Deck Engineers:",
       "+ Demolition:",
       "− Frigate:",
@@ -1817,12 +1750,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "manpower": 40,
-      "commandPoints": 4
+      "manpower": 40
     },
-    "upkeep": "8 Solari",
+    "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 500 | Power: 12 | Armor: 5",
+      "Health: 450 | Power: 10 | Armor: 7",
       "Supply: 100",
       "+ Crusher: Enemy units targeted by the Squire suffer -4 Armour (1x max)"
     ],
@@ -1832,14 +1764,13 @@ const UNITS = [
     "name": "Musketeer",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "manpower": 30,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "8 Solari",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 15 | Armor: 3",
+      "Health: 300 | Power: 21 | Armor: 0",
       "Supply: 100",
       "+ Thunder: Enemy units targeted by the Musketeer suffer +10% damage received (1x max)",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -1854,12 +1785,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "manpower": 30,
-      "commandPoints": 3
+      "manpower": 30
     },
-    "upkeep": "4 Solari",
+    "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 400 | Power: 11 | Armor: 5",
+      "Health: 300 | Power: 11 | Armor: 1",
       "Supply: 100",
       "+ Deadly Dance: Gain +150% attack speed when no ally units are close",
       "Patch 2.2.3: -40% damage received from target"
@@ -1870,15 +1800,14 @@ const UNITS = [
     "name": "War Banner",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 200,
-      "fuelCells": 3,
-      "commandPoints": 3
+      "solari": 300
     },
-    "upkeep": "15 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 600 | Power: 8 | Armor: 8",
+      "Health: 300 | Power: 16 | Armor: 3",
+      "Supply: 200",
       "+ Inspiring Sight:",
       "+ Demolition:",
       "+ Drone:",
@@ -1899,12 +1828,11 @@ const UNITS = [
     "subtitle": "Range: Melee",
     "cost": {
       "solari": 100,
-      "manpower": 40,
-      "commandPoints": 5
+      "manpower": 50
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 25 | Armor: 3",
+      "Health: 250 | Power: 25 | Armor: 2",
       "Supply: 100",
       "+ Nobility:",
       "  + This unit receives -20% damage per other Ecazi non-mechanical unit nearby",
@@ -1916,14 +1844,13 @@ const UNITS = [
     "name": "Siren",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 35",
     "cost": {
-      "fuelCells": 3,
-      "commandPoints": 3
+      "guildFavor": 9
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 500 | Power: 12 | Armor: 5",
+      "Health: 230 | Power: 10 | Armor: 4",
       "+ Alluring Song: Mechanical units targeted by the Siren suffer +30% damage received (1x max)",
       "+ Demolition:",
       "− Ship:",
@@ -1942,13 +1869,13 @@ const UNITS = [
     "name": "Monument",
     "faction": "Ecaz",
     "type": "military",
-    "subtitle": "Range: 10",
+    "subtitle": "Range: 50",
     "cost": {
-      "fuelCells": 10
+      "guildFavor": 100
     },
-    "upkeep": "50 Solari",
+    "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
-      "Health: 4000 | Power: 12 | Armor: 8",
+      "Health: 2000 | Power: 12 | Armor: 6",
       "+ Monument: Broadcasts one of two songs in a large area:",
       "+ Demolition:",
       "− Frigate:",
@@ -1969,13 +1896,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 50,
       "manpower": 10
     },
     "upkeep": "None",
     "effects": [
-      "Health: 400 | Power: 12 | Armor: 2",
-      "Supply: 50",
+      "Health: 300 | Power: 11 | Armor: 4",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "  − -30% Power",
       "  + +3 max Armor"
@@ -1986,15 +1912,14 @@ const UNITS = [
     "name": "Ranged Militia",
     "faction": "Neutral",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 50,
       "manpower": 10
     },
     "upkeep": "None",
     "effects": [
-      "Health: 400 | Power: 16 | Armor: 2",
-      "Supply: 50",
+      "Health: 250 | Power: 12 | Armor: 0",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
       "  − -30% Power",
@@ -2008,15 +1933,14 @@ const UNITS = [
     "name": "Demolition Militia",
     "faction": "Neutral",
     "type": "military",
-    "subtitle": "Range: 20",
+    "subtitle": "Range: 25",
     "cost": {
-      "solari": 50,
       "manpower": 10
     },
     "upkeep": "None",
     "effects": [
-      "Health: 400 | Power: 8 | Armor: 2",
-      "Supply: 50",
+      "Health: 250 | Power: 6 | Armor: 0",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "+ Demolition Team:",
       "  − -30% Power",
@@ -2035,13 +1959,12 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "solari": 200,
-      "manpower": 20
+      "manpower": 25
     },
     "upkeep": "None",
     "effects": [
-      "Health: 500 | Power: 12 | Armor: 4",
-      "Supply: 50",
+      "Health: 400 | Power: 13 | Armor: 6",
+      "Supply: 150",
       "+ Armed civilians: Suffers Panic under 50% Health:",
       "  − -30% Power",
       "  + +3 max Armor"
@@ -2073,10 +1996,9 @@ const UNITS = [
     "cost": {
       "solari": 300
     },
-    "upkeep": "10 Solari",
+    "upkeep": "5 Solari",
     "effects": [
-      "Health: N/A | Power: N/A | Armor: N/A",
-      "Supply: N/A",
+      "Health: 400 | Armor: 4",
       "+ Has incredible vision range, detects sandworms earlier and stealth units from further away",
       "+ Cannot be targeted by enemy units",
       "+ Can be attached to Harvesters to give Ornithopter Support:",
@@ -2089,14 +2011,13 @@ const UNITS = [
     "name": "Mercenary",
     "faction": "Neutral",
     "type": "military",
-    "subtitle": "Range: 30",
+    "subtitle": "Range: 35",
     "cost": {
-      "solari": 600,
-      "commandPoints": 2
+      "solari": 800
     },
-    "upkeep": "30 Solari",
+    "upkeep": "3 CP",
     "effects": [
-      "Health: 300 | Power: 14 | Armor: 1",
+      "Health: 300 | Power: 15 | Armor: 0",
       "Supply: 100",
       "+ Hunter: Killing an enemy unit grants (x5 max):",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
@@ -2113,12 +2034,11 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {
-      "water": 3,
-      "commandPoints": 3
+      "influence": 25
     },
-    "upkeep": "1 Influence",
+    "upkeep": "20 Solari · 4 CP",
     "effects": [
-      "Health: 700 | Power: 18 | Armor: 6",
+      "Health: 400 | Power: 16 | Armor: 6",
       "Supply: 100",
       "+ Unwavering: This unit is not affected by maluses inflicted by military units"
     ],
@@ -2130,9 +2050,9 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {},
-    "upkeep": "Unknown",
+    "upkeep": "None",
     "effects": [
-      "Health: 600 | Power: 16 | Armor: 3",
+      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100"
     ],
     "unlock": "Desert Command"
@@ -2143,34 +2063,31 @@ const UNITS = [
     "type": "military",
     "subtitle": "Range: Melee",
     "cost": {},
-    "upkeep": "N/A",
+    "upkeep": "None",
     "effects": [
-      "Health: 600 | Power: 21 | Armor: 6",
+      "Health: 500 | Power: 17 | Armor: 5",
       "Supply: 100",
       "+ Executioner: Execute enemies under 20% Health"
     ],
     "unlock": ""
   },
   {
-    "name": "Ixian Soldier",
+    "name": "Fighting Mek",
     "faction": "Vernius",
     "type": "military",
-    "subtitle": "Technologically enhanced trooper",
+    "subtitle": "Range: Melee",
     "health": 400,
     "power": 18,
     "armor": 5,
     "supply": 80,
     "cost": {
-      "solari": 110,
-      "manpower": 20,
-      "water": 3,
-      "cp": 4
+      "solari": 400
     },
-    "upkeep": "9 Solari",
+    "upkeep": "8 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
-      "Standard Vernius frontliner",
-      "Benefits from Knowledge-powered tech upgrades",
-      "Gets stat bonuses from Vault District developments"
+      "Health: 400 | Power: 13 | Armor: 5",
+      "Supply: 100",
+      "Self-learning combat drones using a shifting repertoire of deadly moves."
     ],
     "unlock": "Available from the start"
   },
@@ -2184,13 +2101,11 @@ const UNITS = [
     "armor": 1,
     "supply": 160,
     "cost": {
-      "solari": 35,
-      "manpower": 4,
-      "water": 0,
-      "cp": 1
+      "solari": 300
     },
-    "upkeep": "3 Solari",
+    "upkeep": "None",
     "effects": [
+      "Health: 400 | Armor: 4",
       "Advanced Ix scout drone",
       "Nuwa Cenva boosts drone recruitment speed",
       "Enhanced stealth detection range",
@@ -2199,50 +2114,43 @@ const UNITS = [
     "unlock": "Available from the start"
   },
   {
-    "name": "Ixian Drone",
+    "name": "Resonance Drone",
     "faction": "Vernius",
     "type": "military",
-    "subtitle": "Automated combat drone",
+    "subtitle": "Range: 25",
     "health": 350,
     "power": 22,
     "armor": 3,
     "supply": 100,
     "cost": {
-      "solari": 180,
-      "manpower": 0,
-      "water": 1,
-      "cp": 4
+      "solari": 500
     },
-    "upkeep": "10 Solari + 2 Knowledge",
+    "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "No Manpower cost — uses Knowledge instead",
-      "Nuwa Cenva hero accelerates drone deployment",
-      "Automated unit — no morale/supply issues",
-      "Pairs with C'Tair stealth builds"
+      "Health: 400 | Power: 14 | Armor: 4",
+      "Supply: 100",
+      "The Resonance Drone induces a self-repeating electrical feedback loop in its Holtzman Coil, charging nearby Faraday cages with a powerful electrostatic effect."
     ],
     "unlock": "Ix military development required"
   },
   {
-    "name": "Ixian Elite Guard",
+    "name": "Fight-Engineer",
     "faction": "Vernius",
     "type": "elite",
-    "subtitle": "Armored Ix shock troop",
+    "subtitle": "Range: 25",
     "health": 950,
     "power": 36,
     "armor": 8,
     "supply": 90,
     "cost": {
-      "solari": 380,
-      "manpower": 40,
-      "water": 4,
-      "cp": 8
+      "solari": 80,
+      "manpower": 40
     },
-    "upkeep": "20 Solari",
+    "upkeep": "16 Solari · 4 CP",
     "effects": [
-      "C'Tair Pilru gains stealth near friendly units in Vernius territory",
-      "One-hit kill ability vs. lone enemies inside Vernius territory",
-      "Adds bonus armory slots to military capacity",
-      "Top-tier elite with stealth and execute mechanics"
+      "Health: 400 | Power: 16 | Armor: 2",
+      "Supply: 100",
+      "Fight-Engineers are a caste of Ixian specialists constantly trying to improve the programming of fighting drones."
     ],
     "unlock": "5,000 Hegemony"
   }
@@ -3454,78 +3362,72 @@ const BUILDINGS = [
     "unlock": ""
   },
   {
-    "name": "Vault District",
+    "name": "Spice Laboratory",
     "faction": "Vernius",
     "type": "economy",
-    "subtitle": "Ixian technology store",
+    "subtitle": "Main Base building",
     "cost": {
-      "plascrete": 200,
-      "solari": 160
+      "solari": 1000,
+      "plascrete": 500
     },
-    "upkeep": "9 Solari",
+    "upkeep": "0",
     "effects": [
-      "+3 Knowledge per day (per vault)",
-      "Bolig Avati allows multiple simultaneous constructions",
-      "Adjacent vaults stack +1 Knowledge per pair",
-      "+10% all Research speeds when vault network active"
+      "+2 Knowledge per exploited Spice Field",
+      "-2 Fuel Cell requirement for Combine Harvester Drones"
     ],
-    "unlock": "Vernius main base required"
+    "unlock": "Entropic Engineering (Vernius)"
   },
   {
-    "name": "Drone Assembly Plant",
+    "name": "Neural Core",
     "faction": "Vernius",
-    "type": "military",
-    "subtitle": "Automated unit production",
+    "type": "economy",
+    "subtitle": "Main Base building",
     "cost": {
-      "plascrete": 240,
-      "solari": 200
+      "solari": 1000,
+      "plascrete": 500
     },
-    "upkeep": "12 Solari",
+    "upkeep": "0",
     "effects": [
-      "Produces Ixian Drone units using Knowledge instead of Manpower",
-      "Nuwa Cenva hero speeds drone recruitment",
-      "Repair Stations deployed by Labthopters heal units here",
-      "-15% Drone production cost passively"
+      "Connected Neural Nodes each produce +1 Fuel Cell",
+      "+2% Knowledge per connected Neural Node"
     ],
-    "unlock": "Vernius military development"
+    "unlock": "Neural Tropism (Vernius)"
   },
   {
-    "name": "Analytical Node",
+    "name": "Neural Node",
     "faction": "Vernius",
-    "type": "statecraft",
-    "subtitle": "Ixian intelligence network",
+    "type": "economy",
+    "subtitle": "Nodal Network",
     "cost": {
-      "plascrete": 160,
-      "solari": 130
+      "plascrete": 50,
+      "standing": 3
     },
-    "upkeep": "7 Solari",
+    "upkeep": "0",
     "effects": [
-      "Expands spy network coverage (Tessia Vernius effect)",
-      "+3 Intel per day per node",
-      "Improves counter-intelligence: enemy ops on this region cost +50% more",
-      "Cammar Pilru: garrisoned units here gain bonus Defense"
+      "Connects the region to the Vernius Nodal Network",
+      "Can only be built in a Village where exactly one neighbor is already connected to the network"
     ],
-    "unlock": "Tessia or Cammar Pilru councilor"
+    "unlock": "House Vernius (Nodal Network)"
   }
 ];
 
 // ─── SIETCHES DATA ──────────────────────────────────────────────────────────────
 const SIETCHES = [
     { name:'Sietch Alliance: Military', faction:'Neutral', type:'special', subtitle:'Fremen rebels',
-      cost:{ water:5 }, upkeep:'0',
-      effects:['Requires 100 Relationship to ally','Tier 4 Elite Units cost 1 less Command Point','Allows Fremen to build Main Base buildings at 10k Hegemony'],
+      cost:{ water:4 }, upkeep:'0',
+      effects:['Requires 100 Relationship to ally','Tier 4 Elite Units cost 1 less Command Point'],
       unlock:'Trade Water and station an Agent' },
     { name:'Sietch Alliance: Militia', faction:'Neutral', type:'special', subtitle:'Fremen rebels',
-      cost:{ water:5 }, upkeep:'0',
-      effects:['Requires 100 Relationship to ally','Militia gain +2 Power and +20% Health globally','Greatly improves village defense'],
+      cost:{ water:4 }, upkeep:'0',
+      effects:['Requires 100 Relationship to ally','Militia gain +2 Power and +20% Health globally'],
       unlock:'Trade Water and station an Agent' },
     { name:'Sietch Alliance: Economy', faction:'Neutral', type:'special', subtitle:'Fremen rebels',
-      cost:{ water:5 }, upkeep:'0',
-      effects:['Requires 100 Relationship to ally','+20% Solari production globally','Massive late-game economic boost'],
+      cost:{ water:4 }, upkeep:'0',
+      effects:['Requires 100 Relationship to ally','+20% Solari production globally'],
       unlock:'Trade Water and station an Agent' },
     { name:'Sietch Alliance: Manpower', faction:'Neutral', type:'special', subtitle:'Fremen rebels',
-      cost:{ water:5 }, upkeep:'0',
-      effects:['Requires 100 Relationship to ally','+20% Manpower production globally','Allows massive army recruitment and village garrisoning'],
+      cost:{ water:4 }, upkeep:'0',
+      effects:['Requires 100 Relationship to ally','+20% Manpower production globally'],
       unlock:'Trade Water and station an Agent' }
 ];
 const DEVELOPMENTS = {
@@ -3591,7 +3493,12 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Arrakis Secrets",
-          "effects": []
+          "effects": [
+            "Reveals the position of all Spice Areas",
+            "Deployed Harvesting Teams regain Life and Supply",
+            "When they pack up, Harvesting Teams leave combat immediately and have Sneak Trait for 1 day",
+            "Unlocks the Spice Silos Village building"
+          ]
         },
         "Smugglers": {
           "name": "Tinkerer Teams",
@@ -3694,11 +3601,19 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Freedom Fighters",
-          "effects": []
+          "effects": [
+            "+0.5 Solari production per existing neutral or Fremen Village",
+            "+500 Solari when liberating a Village",
+            "Unlocks the Trade Agreement Treaty"
+          ]
         },
         "Ecaz": {
-          "name": "Artistic Asperations",
-          "effects": []
+          "name": "Artistic Aspirations",
+          "effects": [
+            "Gain 80 Solari upon building a Masterpiece",
+            "+50% cost to add a Village building slot",
+            "Unlocks the Mason Guild Main Base building in your Main Base"
+          ]
         }
       }
     },
@@ -3719,7 +3634,10 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Sand Brotherhood",
-          "effects": []
+          "effects": [
+            "+1% Solari production per ally Sietch",
+            "Unlocks the Bazaar Main Base building in your Main Base"
+          ]
         },
         "Corrino": {
           "name": "Integrated Costs",
@@ -3750,7 +3668,10 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Shared Transcendence",
-          "effects": []
+          "effects": [
+            "Ceremonial Cavess produce +10 Solari",
+            "Ceremonial Cavess produce +1 Knowledge"
+          ]
         },
         "Ecaz": {
           "name": "Cultural Tourism",
@@ -3830,7 +3751,9 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Sky Gazing",
-          "effects": []
+          "effects": [
+            "Unlocks the Mobile Turret unit"
+          ]
         },
         "Smugglers": {
           "name": "Guerilla Tactics",
@@ -3871,12 +3794,15 @@ const DEVELOPMENTS = {
         "+10 Water",
         "Ground units gain +20% Speed in neutral territory",
         "+30% resources from pillaging villages and sietches",
-        "Ecazi units in a large area around the Champion get +10% power"
+        "Ecazi units in a large area around the Champion get +10% power",
+        "Unlocks the Fusion Plant (Main Base building)"
       ],
       "replacements": {
         "Fremen": {
           "name": "Desert Trekkers",
-          "effects": []
+          "effects": [
+            "+10 Water"
+          ]
         },
         "Smugglers": {
           "name": "Organized Looting",
@@ -3915,7 +3841,11 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Stalwart Alliance",
-          "effects": []
+          "effects": [
+            "During the liberation of an enemy Village, neighboring allied Sietches send a supporting raid",
+            "Allied Sietches get effects",
+            "Unlock the second gear slot in the Armory"
+          ]
         },
         "Smugglers": {
           "name": "Industrial Scavenging",
@@ -3962,7 +3892,11 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Iday Alakrab",
-          "effects": []
+          "effects": [
+            "Wormriding is +100% faster",
+            "Wormriding cannot be seen",
+            "On exiting wormriding, units inflict +10 damage on first attack and gain Sneak Trait for a day"
+          ]
         }
       }
     },
@@ -4160,7 +4094,8 @@ const DEVELOPMENTS = {
         "Each allied Sietch grants +1  Influence Production",
         "Unlocks the Al-Gaib Temple Building in Main Base",
         "+2 Influence production per Agents assigned on a faction in Truce",
-        "+2 Intel production per Agents assigned on a faction in Conflict"
+        "+2 Intel production per Agents assigned on a faction in Conflict",
+        "Unlocks the Landsraad Quarters (Main Base building)"
       ],
       "replacements": {
         "Harkonnen": {
@@ -4172,7 +4107,10 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Sand Diplomats",
-          "effects": []
+          "effects": [
+            "Unlocks the Political Agreement Treaty",
+            "Unlocks the Al-Gaib Temple Main Base building in your Main Base"
+          ]
         },
         "Corrino": {
           "name": "Diplomatic Spying",
@@ -4211,7 +4149,9 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Sietch Network",
-          "effects": []
+          "effects": [
+            "+1 Agent slot in Counter-Intel"
+          ]
         },
         "Smugglers": {
           "name": "Security Details",
@@ -4221,8 +4161,10 @@ const DEVELOPMENTS = {
           ]
         },
         "Corrino": {
-          "name": "Imperial Eyes",
-          "effects": []
+          "name": "Emperor Eyes",
+          "effects": [
+            "+50% Military Units cost while victim of a treason"
+          ]
         }
       }
     },
@@ -4284,7 +4226,7 @@ const DEVELOPMENTS = {
       }
     },
     {
-      "name": "Spying Logistics",
+      "name": "Spying Logistic",
       "category": "Statecraft",
       "tier": 2,
       "requires": [
@@ -4313,7 +4255,7 @@ const DEVELOPMENTS = {
       "category": "Statecraft",
       "tier": 3,
       "requires": [
-        "Spying Logistics"
+        "Spying Logistic"
       ],
       "genericEffects": [
         "20% of an operation's Intel cost is refunded when launched in the territory of a faction in Conflict",
@@ -4373,11 +4315,11 @@ const DEVELOPMENTS = {
       }
     },
     {
-      "name": "Nefarious Contracts",
+      "name": "Nefarious Contacts",
       "category": "Statecraft",
       "tier": 3,
       "requires": [
-        "Spying Logistics"
+        "Spying Logistic"
       ],
       "genericEffects": [
         "-50% Assassin recruitment costs",
@@ -4399,7 +4341,9 @@ const DEVELOPMENTS = {
         },
         "Ecaz": {
           "name": "Cosmopolite Elegance",
-          "effects": []
+          "effects": [
+            "Infiltration levels rise and fall 150% faster"
+          ]
         },
         "Vernius": {
           "name": "Holistic Thinking",
@@ -4470,7 +4414,10 @@ const DEVELOPMENTS = {
       "replacements": {
         "Fremen": {
           "name": "Heir of Arrakis",
-          "effects": []
+          "effects": [
+            "Controlled Deep Deserts grant neighboring Villages: effects",
+            "Unlocks the Investment Office Village building"
+          ]
         },
         "Corrino": {
           "name": "Imperial Researchers",
@@ -4514,7 +4461,11 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Desert Wisdom",
-          "effects": []
+          "effects": [
+            "Windtraps produce effects",
+            "Unlocks the Research Agreement Treaty",
+            "Unlocks the Mason Guild Main Base building in your Main Base"
+          ]
         },
         "Smugglers": {
           "name": "Underground Network",
@@ -4567,7 +4518,9 @@ const DEVELOPMENTS = {
         },
         "Fremen": {
           "name": "Desert Watchers",
-          "effects": []
+          "effects": [
+            "Ally units in Fremen territory and near allied Sietches have Sneak Trait"
+          ]
         },
         "Ecaz": {
           "name": "Prideful Crown",
@@ -4650,12 +4603,15 @@ const DEVELOPMENTS = {
         },
         "Vernius": {
           "name": "Neural Tropism",
-          "effects": []
+          "effects": [
+            "Enemy factions pay +30% Authority to Annex a Village neighboring at least 2 regions connected to the Nodal Network",
+            "Unlocks the Neural Core Main Base building in your Main Base"
+          ]
         }
       }
     },
     {
-      "name": "Output Logistics",
+      "name": "Outpost Logistics",
       "category": "Expansion",
       "tier": 3,
       "requires": [
@@ -4756,8 +4712,8 @@ function factionColor(f) {
 }
 
 function makeCostChips(cost, upkeep) {
-    const icons = { solari:'🪙', manpower:'⚔️', water:'💧', plascrete:'🧱', cp:'◆', knowledge:'🔬', influence:'🏛' };
-    const labels = { solari:'Solari', manpower:'Manpower', water:'Water', plascrete:'Plascrete', cp:'CP', knowledge:'Knowledge', influence:'Influence' };
+    const icons = { solari:'🪙', manpower:'⚔️', water:'💧', plascrete:'🧱', cp:'◆', commandPoints:'◆', knowledge:'🔬', influence:'🏛', guildFavor:'🚀', spice:'🟠', scraps:'🔩', intel:'🔍', fuelCell:'🔋', fuelCells:'🔋', standing:'⚖️' };
+    const labels = { solari:'Solari', manpower:'Manpower', water:'Water', plascrete:'Plascrete', cp:'CP', commandPoints:'CP', knowledge:'Knowledge', influence:'Influence', guildFavor:'Guild Favor', spice:'Spice', scraps:'Scraps', intel:'Intel', fuelCell:'Fuel Cell', fuelCells:'Fuel Cell', standing:'Standing' };
     let chips = '';
     for (const [key, val] of Object.entries(cost)) {
         if (!val) continue;
@@ -5632,8 +5588,8 @@ renderAll();
 
     
     <script id="factions-data">
-        const FACTIONS_DATA = {"atreides":{"name":"House Atreides","quote":"\"The stellar reputation of House Atreides owes a lot to its leader’s commanding style: firm yet honorable and fair. By imperial decree, the Atreides have just inherited the stewardship of Arrakis and have a lot of work to do to take over from the Harkonnens.\"","bonuses":["Can use the Peaceful Annexation Ability","Other factions lose no Authority from treaties with you","Other factions lose 100% more Landsraad Standing when breaking a Truce with you","− Cannot pillage neutral Villages"],"hegemony5k":["While under the effect of a positive Resolution, gain +10% Solari","While under the effects of a negative Resolution, gain +10% unit Power"],"hegemony10k":["You can ignore Charters prerequisites except for the necessary Landsraad Standing","Permanently gain +2% resource production upon being elected for a positive Resolution (x10 max)"],"councilors":[{"name":"Thufir Hawat","effects":["Agents have 1 additional trait","Can Hasten mission progress and construction of Village Buildings at the cost of Solari","Increases Building construction speed","Increases Mission progress speed"]},{"name":"Dr. Wellington Yueh","effects":["Produce +2 Knowledge","Non-mechanical Military Units have +15% max Health","Non-mechanical Military Units have +30% regeneration speed"]},{"name":"Lady Jessica","effects":["Can spend Influence to force Truce with another faction","Non-mechanical units in the same region get +15% Power"]},{"name":"Paul Atreides","effects":["Peaceful Annexations are performed instantly","Destroyed Villages are repaired instantly"]}]},"harkonnen":{"name":"House Harkonnen","quote":"\"House Harkonnen shares its chilling reputation with its leader, Baron Vladimir Harkonnen. They have been called despotic, merciless, scheming and devious. And those are only their finer qualities.\"","bonuses":["Can use the Oppression Ability on Harkonnen Villages","Gain 50 Intel when you pillage a Village","Villages gain +5% resource production per active Militia","− Villages suffer -10% resource production"],"hegemony5k":["Can sacrifice an Agent to reduce a Mission's cost and preparation time.","Killing an enemy military unit gives a 5% chance to receive a Brainwashed Agent"],"hegemony10k":["Sacrificed Agents give a chance to not consume an operation on use","Grants +1 additional Agent slot in each non-faction field"],"councilors":[{"name":"Cron Vatia","effects":["Villages under Oppression construct Buildings 200% faster","On Village Oppression, gain 2 Manpower for each empty and potential building slot","Gain 50 Solari upon killing Rebels"]},{"name":"Umman Kudu","effects":["Produce +2 Manpower","Units take -30% time to recruit","Units in a region with an active Harkonnen operation gain +1 Armor"]},{"name":"Feyd-Rautha Harkonnen","effects":["Can use Corruption on Landsraad resolutions","Gain +1% Hegemony per unit trained","Units have +10% damage when pillageing"]},{"name":"Piter De Vries","effects":["Agents produce +1 Intel","Agent traits present only once on an Information field apply their effects twice"]}]},"smugglers":{"name":"Smugglers","quote":"\"There’s a fine line between smugglers and full-fledged bandits, and Esmar Tuek is adept at walking that line.  Smugglers can provide anything to anyone, provided they put the price… and do not look at the specifics too closely.\"","bonuses":["Can install Underworld Headquarters in opponent’s Villages","Gain +30% resources from pillaging a Village","Authority cost to Annex a Village is not increased by distance from your Main Base","− Authority cost to Annex a Village is increased 100% more by owner Villages"],"hegemony5k":["Can place a Bounty on Landsraad Resolutions","Join the Landsraad Council with 50 Votes"],"hegemony10k":["Smuggler's Villages under siege do not resupply the occupant","Automatically installs a Major Underworld Headquarters in every enemy Main Base"],"councilors":[{"name":"Staban Tuek","effects":["Underworld Headquarters have +1 Extension slots"]},{"name":"Lingar Bewt","effects":["Produces 12 Water","Unlocks the Water Network and Water Seller Extensions in Underworld Headquarters"]},{"name":"Lashon Hara","effects":["Every time a trade successfully goes through with a faction, gain 1 Information level in this faction","Faction Information levels reduce 50% slower","Each faction Information level gives +15 Solari production and +1 Influence production"]},{"name":"Esmar Tuek","effects":["Starting Influence and Intel production +5","Pillageing Villages generates +1 Authority"]}]},"fremen":{"name":"Fremen","quote":"\"Fremen are the only people native to Arrakis and will do anything to protect their way against the offworlders.  While their leader, Liet-Kynes, doesn’t originally come from Dune, she is every bit as determined and attached to the planet as the next Fremen.\"","bonuses":["Spice Fields in neutral and controlled regions are harvested by Harvesting Teams, a mobile unit","Can form alliances with Sietches outside of your territory","May use Thumpers for Wormriding","− Villages have -1 maximum Building slot"],"hegemony5k":["Surrounding a Deep Desert region grants control over it","Thumpers are generated passively and attract larger Sandworms that can travel further"],"hegemony10k":["Grants knowledge of enemy alliances with Sietches","Every allied Sietch automatically has a Settlement on it, allowing you to build unique Sietch Buildings"],"councilors":[{"name":"Shimoom","effects":["Each Village producing at least 12 Water gives -4% Solari Upkeep globally","Each Village producing at least 12 Water gives +4 Plascrete production","Villages produce 1 Water on empty and potential Building slots"]},{"name":"Jamis","effects":["Gain 70 Authority upon liberating an enemy Village","Military Units outside of Fremen territory inflict +10% damage","Trade 10 Authority for 30 Manpower in the top bar"]},{"name":"Mother Ramallo","effects":["Can use Incite Rebellion on Landsraad resolutions","Gain +3 Influence when another faction loses a Village","Martyrs spawned by incited Rebellions have +50% Health"]},{"name":"Stilgar","effects":["Sietches produce +20% Water","Non-mechanical units in allied Sietch territory have Stealth"]}]},"corrino":{"name":"House Corrino","quote":"\"Imperial House Corrino has ruled the galaxy for ten millenia, and Shaddam IV intends to keep it that way. The situation on Arrakis calls for the direct intervention of the Padishah Emperor, who will use all His wit and the might of His administration to turn the war to His benefit.\"","bonuses":["Can use Imperial Edict on Landsraad Resolutions to switch their scope","Villages have +1  Building slots","Units from any faction that recently betrayed a Truce receive +10% damage from Corrino","− +100% Authority cost to annex Villages due to the distance from Main Base"],"hegemony5k":["Can use Main Base Deployment on Corrino and neutral Villages once","Can offer Imperial Mandate, which gives Sardaukar to another faction, as part of a trade"],"hegemony10k":["Military Units gain +5% Power per faction with less CHOAM Shares","Gain +1 Guild Favour production per faction with less CHOAM Shares"],"councilors":[{"name":"Princess Irulan","effects":["Every building can be constructed one more time anywhere on the map"]},{"name":"Zum Garon","effects":["Military Units have +15% Power per faction in Truce","Proposing an Imperial Mandate has no cost"]},{"name":"Gaius Helen Mohaim","effects":["Every Corrino vote placed on a resolution affected by an Imperial Edict counts double","Support to increase Charter Priority counts double"]},{"name":"Hasimir Fenring","effects":["Each Agent produces +1 Influence","Trade 5 Influence for 10 Manpower"]}]},"ecaz":{"name":"House Ecaz","quote":"\"House Ecaz is known for it's touristic resorts, it's recreational drugs, and it's patronage for the Art. But behind this enticing exterior, the refined house and it's no less refined ruler, Archduchess Armanda, are ruthless and efficient defenders of their interests.\"","bonuses":["Surrounded neutral Villages become Sanctuaries that cannot be attacked by other factions","Gain 1 Authority production per Sanctuary","Villages adjacent to a Sanctuary gain +1 instance of the Village's traits","− Cannot betray a faction in Truce"],"hegemony5k":["A single Ecazi Village can be turned into a Garden Resort","A single Ecazi non-mechanical unit can be named Champion, who raises Hegemony by killing other factions' units"],"hegemony10k":["Turn 0.2% of your Hegemony in to Solari production","The first 50 votes placed on each Resolution are free"],"councilors":[{"name":"Sanya Ecaz","effects":["For each Sanctuary on the map, gain +15 Solari production","For each Sanctuary on the map, gain -40% Masterpiece construction costs"]},{"name":"Rivvy Dinari","effects":["Military units at max level have no Solari upkeep","Military units start with 1 more Experience level"]},{"name":"Ibbo Vipp","effects":["Can use Landsraad Immunity on a resolution to become ineligible","Gain 2 Landsraad Standing upon building a Masterpiece"]},{"name":"Mesa Ecaz","effects":["Abandoning a Village grants 100 Influence","Can trade 30 Influence for 1 Masterpiece"]}]},"vernius":{"name":"House Vernius","quote":"\"House Vernius of the Ixian confederacy is the main provider of spacefolding ships in the galaxy. Their obsession with technological progress clashes with the prohibition on thinking machines imposed by the Butlerian Jihad.\"","bonuses":["Spice Fields in neutral and controlled regions can be harvested by Tethered Combine Harvester Drones","Factions in Truce get the effects of unresearched developments that have been researched by House Vernius","Mixed S-Vault districts are split to give district bonuses","− Villages not connected to the Nodal Network through Neural Nodes suffer -50% resource production"],"hegemony5k":["Can File Patent on researched developments that no other faction has researched","Can research 1 development without having researched its requirements"],"hegemony10k":["Can Obfuscate a single researched development","Each Knowledge point increases the production of all other resources by +0.2%"],"councilors":[{"name":"Bolig Avati","effects":["Can build multiple Buildings at the same time in the same district of S-Vault","Removed Buildings in S-Vault are reimbursed fully","Gain 1 Knowledge per district bonus"]},{"name":"Bronso Vernius","effects":["Villages neighboring a single Vernius region cost -20% Authority to Annex","The furthest connected Neural Node generates an Airfield"]},{"name":"Cammar Pilru","effects":["Maximum Influence increases by 5 per Knowledge","Immediately gain 200 Influence when entering Conflict with another faction","Receive 30 Landsraad Standing when an opponent imposes conflict in any way"]},{"name":"Tessia Vernius","effects":["Information levels required for spying missions are lowered by 1","While no development is in progress, 50% of Knowledge is turned into Intel and Solari"]}]}};
-        const OPERATIONS_DATA = [{"name":"Probe Setup","cost":"50 Intel","difficulty":"Easy","description":"Removes Fog of War in the targeted region for 3 days.","faction":"Generic"},{"name":"Supply Drop","cost":"100 Intel","difficulty":"Easy","description":"Military units in the targeted region gain +100% Supply and suffer no Supply drain for 1 day.","faction":"Generic"},{"name":"Defense Breaches","cost":"100 Intel","difficulty":"Easy","description":"Villages in the targeted region lose 20% Health per day and Missile Batteries stop firing for 1 day.","faction":"Generic"},{"name":"Leave Order","cost":"100 Intel","difficulty":"Easy","description":"All non-mechanical enemy units in the targeted region must immediately retreat to their nearest base.","faction":"Generic"},{"name":"Gear Sabotage","cost":"200 Intel, 100 Solari","difficulty":"Medium","description":"Enemy units in the targeted region suffer -20% Power and +20% damage received for 1 day.","faction":"Generic"},{"name":"Treachery","cost":"300 Intel, 200 Solari","difficulty":"Hard","description":"Immediately disband a targeted enemy military unit or cause a rebellion in an enemy Village.","faction":"Generic"},{"name":"Assassination","cost":"Varies","difficulty":"Epic","description":"Requires max Infiltration of the target faction. Initiates an assassination attempt against the enemy leader. If successful, the faction is instantly defeated.","faction":"Generic"},{"name":"Support Intelligence","cost":"Variable","difficulty":"Faction","description":"Any operations launched on the zone apply -5% damage received to ally units.","faction":"Atreides"},{"name":"Arrakis Diplomacy","cost":"Variable","difficulty":"Faction","description":"Disband all rebellions and raids; +200% relation gain and resources from Sietch trades.","faction":"Atreides"},{"name":"Cease Fire","cost":"Variable","difficulty":"Faction","description":"Interrupts and prevents battles.","faction":"Atreides"},{"name":"Combat Drugs","cost":"Variable","difficulty":"Faction","description":"Ally non-mechanical units: -10% Health/day, +10% Speed, +30% attack damage.","faction":"Harkonnen"},{"name":"Sleeper Agent","cost":"Variable","difficulty":"Faction","description":"50% chance for non-temporary non-mechanical units to spawn Sleeper Agent on death.","faction":"Harkonnen"},{"name":"Toxic Vapors","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units: no health regeneration, -30% Health per day.","faction":"Harkonnen"},{"name":"Poison the Reserves","cost":"Variable","difficulty":"Faction","description":"Enemies losing supply: -20% Speed, -5% Health per day.","faction":"Smugglers"},{"name":"Extraction Network","cost":"Variable","difficulty":"Faction","description":"Instantly extract all units around village to Sietch Tuek for duration.","faction":"Smugglers"},{"name":"Communication Jamming","cost":"Variable","difficulty":"Faction","description":"Blocks all operations on the Region.","faction":"Smugglers"},{"name":"Hiding Tracks","cost":"Variable","difficulty":"Faction","description":"Ally units get Stealth; enemy units get -10% Speed in region and neighbors.","faction":"Fremen"},{"name":"Hidden Thumpers","cost":"Variable","difficulty":"Faction","description":"Sandworm riding doesn't consume Thumpers; military units gain Stealth.","faction":"Fremen"},{"name":"Awake the People","cost":"Variable","difficulty":"Faction","description":"Start a rebellion in the village.","faction":"Fremen"},{"name":"Consolidation","cost":"Variable","difficulty":"Faction","description":"Apply to Allies: +2 Armor to mechanical units and structures.","faction":"Corrino"},{"name":"Interdiction Zone","cost":"Variable","difficulty":"Faction","description":"Apply to Enemies: disable Carryalls and Airfields.","faction":"Corrino"},{"name":"Orbital Strike","cost":"Variable","difficulty":"Faction","description":"Missile strike dealing 40 Power to all ground units, villages, and bases in area.","faction":"Corrino"},{"name":"Epic Quest","cost":"Variable","difficulty":"Faction","description":"Strongest military unit's attacks deal +100% damage.","faction":"Ecaz"},{"name":"Live Performance","cost":"Variable","difficulty":"Faction","description":"+5 Influence per enemy kill; -5 Influence per unit death/departure.","faction":"Ecaz"},{"name":"Elacca Fog","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units cannot be controlled in combat.","faction":"Ecaz"},{"name":"Ambient Connection","cost":"Variable","difficulty":"Faction","description":"Ally mechanical units are Tethered remotely.","faction":"Vernius"},{"name":"Empirical Data","cost":"Variable","difficulty":"Faction","description":"+1 Knowledge per unit of any faction in combat in region.","faction":"Vernius"},{"name":"Hidden Backdoor","cost":"Variable","difficulty":"Faction","description":"Enemy mechanical units cannot be controlled and attack their allies.","faction":"Vernius"}];
+        const FACTIONS_DATA = {"atreides":{"name":"House Atreides","quote":"\"The stellar reputation of House Atreides owes a lot to its leader’s commanding style: firm yet honorable and fair. By imperial decree, the Atreides have just inherited the stewardship of Arrakis and have a lot of work to do to take over from the Harkonnens.\"","bonuses":["Can use the Peaceful Annexation Ability","Other factions lose no Authority from treaties with you","Other factions lose 100% more Landsraad Standing when breaking a Truce with you","− Cannot pillage neutral Villages"],"hegemony5k":["While under the effect of a positive Resolution, gain +10% Solari","While under the effects of a negative Resolution, gain +10% unit Power"],"hegemony10k":["You can ignore Charters prerequisites except for the necessary Landsraad Standing","Permanently gain +2% resource production upon being elected for a positive Resolution (x10 max)"],"councilors":[{"name":"Thufir Hawat","effects":["Agents have 1 additional trait","Can Hasten mission progress and construction of Village Buildings at the cost of Solari","Increases Building construction speed","Increases Mission progress speed"]},{"name":"Dr. Wellington Yueh","effects":["Produce +2 Knowledge","Non-mechanical Military Units have +15% max Health","Non-mechanical Military Units have +30% regeneration speed"]},{"name":"Lady Jessica","effects":["Can spend Influence to force Peace with another faction","Atreides Treaties have no Authority upkeep","A faction that betrays a Peace with Atreides loses an additional 50 Landsraad Standing"]},{"name":"Paul Atreides","effects":["Peaceful Annexations are performed instantly","Destroyed Villages are repaired instantly"]}]},"harkonnen":{"name":"House Harkonnen","quote":"\"House Harkonnen shares its chilling reputation with its leader, Baron Vladimir Harkonnen. They have been called despotic, merciless, scheming and devious. And those are only their finer qualities.\"","bonuses":["Can use the Oppression Ability on Harkonnen Villages","Gain 50 Intel when you pillage a Village","Villages gain +5% resource production per active Militia","− Villages suffer -10% resource production"],"hegemony5k":["Gain 50 Intel when you pillage a Village","Receive a free Brainwashed Agent after killing 20 non-mechanical enemy units"],"hegemony10k":["Sacrificed Agents give a chance to not consume an operation on use","Grants +1 additional Agent slot in each non-faction field"],"councilors":[{"name":"Cron Vatia","effects":["Villages under Oppression construct Buildings 200% faster","On Village Oppression, gain 2 Manpower for each empty and potential building slot","Gain 50 Solari upon killing Rebels"]},{"name":"Umman Kudu","effects":["Produce +2 Manpower","Units take -30% time to recruit","Units in a region with an active Harkonnen operation gain +1 Armor"]},{"name":"Feyd-Rautha Harkonnen","effects":["Can use Corruption on Landsraad resolutions","Gain +1% Hegemony per unit trained","Units have +10% damage when pillageing"]},{"name":"Piter De Vries","effects":["Agents produce +1 Intel","Agent traits present only once on an Information field apply their effects twice"]}]},"smugglers":{"name":"Smugglers","quote":"\"There’s a fine line between smugglers and full-fledged bandits, and Esmar Tuek is adept at walking that line.  Smugglers can provide anything to anyone, provided they put the price… and do not look at the specifics too closely.\"","bonuses":["Can install Underworld Headquarters in opponent’s Villages","Gain +30% resources from pillaging a Village","Authority cost to Annex a Village is not increased by distance from your Main Base","− Authority cost to Annex a Village is increased 100% more by owner Villages"],"hegemony5k":["Can place a Bounty on Landsraad Resolutions","Join the Landsraad Council with 50 Votes"],"hegemony10k":["Automatically installs a Major Underworld Headquarters in every enemy Main Base","Gain +50% resources from pillaging a Village"],"councilors":[{"name":"Staban Tuek","effects":["Underworld Headquarters have +1 Extension slots"]},{"name":"Lingar Bewt","effects":["Produces 12 Water","Unlocks the Water Network and Water Seller Extensions in Underworld Headquarters"]},{"name":"Lashon Hara","effects":["Every time a trade successfully goes through with a faction, gain 1 Information level in this faction","Faction Information levels reduce 50% slower","Each faction Information level gives +15 Solari production and +1 Influence production"]},{"name":"Stakkanov","effects":["Villages with no neighboring Smuggler-controlled regions gain bonus resource production","Refund 50% of the Authority capture cost when a Village is lost"]}]},"fremen":{"name":"Fremen","quote":"\"Fremen are the only people native to Arrakis and will do anything to protect their way against the offworlders.  While their leader, Liet-Kynes, doesn’t originally come from Dune, she is every bit as determined and attached to the planet as the next Fremen.\"","bonuses":["Spice Fields in neutral and controlled regions are harvested by Harvesting Teams, a mobile unit","Can form alliances with Sietches outside of your territory","May use Thumpers for Wormriding","− Villages have -1 maximum Building slot"],"hegemony5k":["Surrounding a Deep Desert region grants control over it","Thumpers are generated passively and attract larger Sandworms that can travel further"],"hegemony10k":["Grants knowledge of enemy alliances with Sietches","Every allied Sietch automatically has a Settlement on it, allowing you to build unique Sietch Buildings"],"councilors":[{"name":"Shimoom","effects":["Each Village producing at least 12 Water gives -4% Solari Upkeep globally","Each Village producing at least 12 Water gives +4 Plascrete production","Villages produce 1 Water on empty and potential Building slots"]},{"name":"Jamis","effects":["Gain 70 Authority upon liberating an enemy Village","Military Units outside of Fremen territory inflict +10% damage","Trade 10 Authority for 30 Manpower in the top bar"]},{"name":"Mother Ramallo","effects":["Can use Incite Rebellion on Landsraad resolutions, causing rebellions in enemy Villages if it passes","Gain +3 Intel production per deployed Harvesting Team","Gain +0.5 Authority production per deployed Harvesting Team"]},{"name":"Stilgar","effects":["Reveal all Sietches at the start of the game","Produce +1 Authority"]}]},"corrino":{"name":"House Corrino","quote":"\"Imperial House Corrino has ruled the galaxy for ten millenia, and Shaddam IV intends to keep it that way. The situation on Arrakis calls for the direct intervention of the Padishah Emperor, who will use all His wit and the might of His administration to turn the war to His benefit.\"","bonuses":["Can use Imperial Edict on Landsraad Resolutions to switch their scope","Villages have +1  Building slots","Units from any faction that recently betrayed a Truce receive +10% damage from Corrino","− +100% Authority cost to annex Villages due to the distance from Main Base"],"hegemony5k":["Can use Main Base Deployment on Corrino and neutral Villages once","Can offer Imperial Mandate, which gives Sardaukar to another faction, as part of a trade"],"hegemony10k":["Destroying the Main Base of a faction at War with you for 50+ days grants a second use of Main Base Deployment","Gain 15 Influence for every kill on the territory of a faction at Peace with you"],"councilors":[{"name":"Princess Irulan","effects":["Every building can be constructed one more time anywhere on the map"]},{"name":"Zum Garon","effects":["Military Units have +15% Power per faction in Truce","Proposing an Imperial Mandate has no cost"]},{"name":"Gaius Helen Mohiam","effects":["Every Corrino vote placed on a resolution affected by an Imperial Edict counts double","Support to increase Charter Priority counts double"]},{"name":"Hasimir Fenring","effects":["Can investigate Discoveries quickly anywhere, regardless of how many Agents are on the Infiltration field","Resolving a Discovery this way progresses Agent recruitment by 1 day"]}]},"ecaz":{"name":"House Ecaz","quote":"\"House Ecaz is known for it's touristic resorts, it's recreational drugs, and it's patronage for the Art. But behind this enticing exterior, the refined house and it's no less refined ruler, Archduchess Armanda, are ruthless and efficient defenders of their interests.\"","bonuses":["Surrounded neutral Villages become Sanctuaries that cannot be attacked by other factions","Gain 1 Authority production per Sanctuary","Villages adjacent to a Sanctuary gain +1 instance of the Village's traits","− Cannot betray a faction in Truce"],"hegemony5k":["A single Ecazi Village can be turned into a Garden Resort","A single Ecazi non-mechanical unit can be named Champion, who raises Hegemony by killing other factions' units"],"hegemony10k":["Turn 0.2% of your Hegemony in to Solari production","The first 50 votes placed on each Resolution are free"],"councilors":[{"name":"Sanya Ecaz","effects":["For each Sanctuary on the map, gain +15 Solari production","For each Sanctuary on the map, gain -40% Masterpiece construction costs"]},{"name":"Rivvy Dinari","effects":["Military units at max level have no Solari upkeep","Military units start with 1 more Experience level"]},{"name":"Ibbo Vipp","effects":["Can use Landsraad Immunity on a resolution to become ineligible","Gain 2 Landsraad Standing upon building a Masterpiece"]},{"name":"Mesa Ecaz","effects":["Abandoning a Village grants 100 Influence","Can trade 30 Influence for 1 Masterpiece"]}]},"vernius":{"name":"House Vernius","quote":"\"House Vernius of the Ixian confederacy is the main provider of spacefolding ships in the galaxy. Their obsession with technological progress clashes with the prohibition on thinking machines imposed by the Butlerian Jihad.\"","bonuses":["Spice Fields in neutral and controlled regions can be harvested by Tethered Combine Harvester Drones","Factions in Truce get the effects of unresearched developments that have been researched by House Vernius","Mixed S-Vault districts are split to give district bonuses","− Villages not connected to the Nodal Network through Neural Nodes suffer -50% resource production"],"hegemony5k":["Can File Patent on researched developments that no other faction has researched","Can research 1 development without having researched its requirements"],"hegemony10k":["Can Obfuscate a single researched development","Each Knowledge point increases the production of all other resources by +0.2%"],"councilors":[{"name":"Bolig Avati","effects":["Can build multiple Buildings at the same time in the same district of S-Vault","Removed Buildings in S-Vault are reimbursed fully","Gain 1 Knowledge per district bonus"]},{"name":"Bronso Vernius","effects":["Villages neighboring a single Vernius region cost +80% Authority to Annex","The furthest connected Neural Node generates an Airfield"]},{"name":"Cammar Pilru","effects":["Maximum Influence increases by 5 per Knowledge","Immediately gain 200 Influence when entering Conflict with another faction","Receive 30 Landsraad Standing when an opponent imposes conflict in any way"]},{"name":"Tessia Vernius","effects":["Information levels required for spying missions are lowered by 1","While no development is in progress, 50% of Knowledge is turned into Intel and Solari"]}]}};
+        const OPERATIONS_DATA = [{"name":"Probe Setup","cost":"50 Intel","difficulty":"Easy","description":"Removes Fog of War in the targeted region for 3 days.","faction":"Generic"},{"name":"Supply Drop","cost":"100 Intel","difficulty":"Easy","description":"Military units in the targeted region gain +100% Supply and suffer no Supply drain for 1 day.","faction":"Generic"},{"name":"Defense Breaches","cost":"100 Intel","difficulty":"Easy","description":"Villages in the targeted region lose 20% Health per day and Missile Batteries stop firing for 1 day.","faction":"Generic"},{"name":"Leave Order","cost":"100 Intel","difficulty":"Easy","description":"All non-mechanical enemy units in the targeted region must immediately retreat to their nearest base.","faction":"Generic"},{"name":"Gear Sabotage","cost":"200 Intel, 100 Solari","difficulty":"Medium","description":"Enemy units in the targeted region suffer -20% Power and +20% damage received for 1 day.","faction":"Generic"},{"name":"Assassination","cost":"Varies","difficulty":"Epic","description":"Requires max Infiltration of the target faction. Initiates an assassination attempt against the enemy leader. If successful, the faction is instantly defeated.","faction":"Generic"},{"name":"Support Intelligence","cost":"Variable","difficulty":"Faction","description":"Any operations launched on the zone apply -5% damage received to ally units.","faction":"Atreides"},{"name":"Arrakis Diplomacy","cost":"Variable","difficulty":"Faction","description":"Disband all rebellions and raids; +200% relation gain and resources from Sietch trades.","faction":"Atreides"},{"name":"Cease Fire","cost":"Variable","difficulty":"Faction","description":"Interrupts and prevents battles.","faction":"Atreides"},{"name":"Combat Drugs","cost":"Variable","difficulty":"Faction","description":"Ally non-mechanical units: -10% Health/day, +10% Speed, +30% attack damage.","faction":"Harkonnen"},{"name":"Sleeper Agent","cost":"Variable","difficulty":"Faction","description":"50% chance for non-temporary non-mechanical units to spawn Sleeper Agent on death.","faction":"Harkonnen"},{"name":"Toxic Vapors","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units: no health regeneration, -30% Health per day.","faction":"Harkonnen"},{"name":"Poison the Reserves","cost":"Variable","difficulty":"Faction","description":"Enemies losing supply: -20% Speed, -5% Health per day.","faction":"Smugglers"},{"name":"Extraction Network","cost":"Variable","difficulty":"Faction","description":"Instantly extract all units around village to Sietch Tuek for duration.","faction":"Smugglers"},{"name":"Communication Jamming","cost":"Variable","difficulty":"Faction","description":"Blocks all operations on the Region.","faction":"Smugglers"},{"name":"Hiding Tracks","cost":"Variable","difficulty":"Faction","description":"Ally units get Stealth; enemy units get -10% Speed in region and neighbors.","faction":"Fremen"},{"name":"Hidden Thumpers","cost":"Variable","difficulty":"Faction","description":"Sandworm riding doesn't consume Thumpers; military units gain Stealth.","faction":"Fremen"},{"name":"Awake the People","cost":"Variable","difficulty":"Faction","description":"Start a rebellion in the village.","faction":"Fremen"},{"name":"Consolidation","cost":"Variable","difficulty":"Faction","description":"Apply to Allies: +2 Armor to mechanical units and structures.","faction":"Corrino"},{"name":"Interdiction Zone","cost":"Variable","difficulty":"Faction","description":"Apply to Enemies: disable Carryalls and Airfields.","faction":"Corrino"},{"name":"Orbital Strike","cost":"Variable","difficulty":"Faction","description":"Missile strike dealing 40 Power to all ground units, villages, and bases in area.","faction":"Corrino"},{"name":"Epic Quest","cost":"Variable","difficulty":"Faction","description":"Strongest military unit's attacks deal +100% damage.","faction":"Ecaz"},{"name":"Live Performance","cost":"Variable","difficulty":"Faction","description":"+5 Influence per enemy kill; -5 Influence per unit death/departure.","faction":"Ecaz"},{"name":"Elacca Fog","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units cannot be controlled in combat.","faction":"Ecaz"},{"name":"Ambient Connection","cost":"Variable","difficulty":"Faction","description":"Ally mechanical units are Tethered remotely.","faction":"Vernius"},{"name":"Empirical Data","cost":"Variable","difficulty":"Faction","description":"+1 Knowledge per unit of any faction in combat in region.","faction":"Vernius"},{"name":"Hidden Backdoor","cost":"Variable","difficulty":"Faction","description":"Enemy mechanical units cannot be controlled and attack their allies.","faction":"Vernius"}];
         
         // Build the overview block (traits + hegemony + councilors) for a single faction.
         function factionOverviewBlock(key) {
