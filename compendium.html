@@ -420,6 +420,16 @@
         .vc-mode { background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:13px 15px; }
         .vc-mode b { color:var(--text-main); display:block; margin-bottom:5px; }
 
+        /* Charters */
+        .charter-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:14px; }
+        .charter-card { background:var(--bg-card); border:1px solid var(--border-color); border-left:4px solid var(--accent-gold); border-radius:10px; padding:14px 16px; }
+        .charter-card h4 { margin:0 0 8px; color:var(--text-main); font-size:1rem; }
+        .charter-card ul { margin:0 0 10px; padding-left:18px; color:var(--text-muted); font-size:0.82rem; line-height:1.5; }
+        .charter-meta { font-size:0.78rem; color:var(--text-muted); margin-top:4px; }
+        .charter-meta b { color:var(--accent-gold); }
+        .charter-reward { font-size:0.78rem; color:var(--accent-spice); margin-top:8px; }
+        .charter-note { font-size:0.74rem; color:var(--text-muted); font-style:italic; margin-top:8px; }
+
         /* Effect list */
         .effects {
             font-size: 0.78rem;
@@ -5266,9 +5276,10 @@ const GLOBAL_RESOLUTIONS = [
     { name: "Diplomatic Committee", effect: "Statecraft development completion speed increases by 50%." },
     { name: "Economic Investigations", effect: "Economy development completion speed decreases by 50%." },
     { name: "Imperial Intelligence", effect: "Factions cannot be targeted by new Infiltration Cells and can use Cell Search at reduced cost." },
-    { name: "Imperial Summit", effect: "Ongoing assassinations are cancelled and new ones cannot be started." },
+    { name: "Imperium Summit", effect: "Ongoing assassinations are cancelled and new ones cannot be started." },
     { name: "Labor Rights", effect: "Military unit Solari upkeep doubles." },
-    { name: "Land Sale", effect: "Abandoning villages grants 10,000 Solari per location." },
+    { name: "Land Sales", effect: "Abandoning villages grants 10,000 Solari per location." },
+    { name: "Water Subsidies", effect: "Grants +20 Water production and makes Polar Sink regions cost no Authority to capture." },
     { name: "Landsraad Examination", effect: "Factions lose 20 Landsraad Standing but gain +100% standing gains until the next council." },
     { name: "Landsraad Investigation", effect: "Easy and Medium operations require no Information Level." },
     { name: "Loss of Rights", effect: "All active Charters are revoked (except those awarded during the same council)." },
@@ -5304,6 +5315,40 @@ const TARGETED_RESOLUTIONS = [
 
 function renderResolutionItem(r, type) {
     return `<div class="resolution-item ${type}"><h4>${r.name}</h4><p>${r.effect}</p></div>`;
+}
+
+// Charters — permanent Landsraad offices granted to one faction. Verified against the
+// game database (resolution sheet type=Charter; effects, eligibilityConds, firstElectionEffects).
+const CHARTERS = [
+    { name: 'Speaker of the Council', effects: ['Replace 1 Resolution at the start of each Council'],
+      requirement: '250 Landsraad Standing + 600 Influence spent on Landsraad votes', fremen: 'Not available to Fremen',
+      firstElection: '+2,000 Solari, +20 Landsraad Standing' },
+    { name: 'Judge of the Council', effects: ['Allows training Landsraad Guards and Landsraad Judges'],
+      requirement: '250 Landsraad Standing + 2,000 Military Experience gained', fremen: 'Not available to Fremen',
+      firstElection: '+2,000 Solari, +20 Landsraad Standing' },
+    { name: 'Dune Governorship', effects: ['Hold it long enough to win a Political Victory', '+300 maximum Influence', '+3 Influence production'],
+      requirement: '450 Landsraad Standing + already hold 1 Charter', fremen: 'own 20% of the map’s regions + befriend all non-devastated Sietches',
+      firstElection: '+10,000 Solari', note: 'In Conquest mode this office is the “[Territory] Consul”.' },
+    { name: 'Council Representative', effects: ['Treaties cost no Authority and have no upkeep', '+100 maximum Influence'],
+      requirement: '350 Landsraad Standing + already hold 1 Charter', fremen: 'Not available to Fremen',
+      firstElection: '+2,000 Solari, +20 Landsraad Standing' },
+    { name: 'Water Seller’s Union', effects: ['+2 Solari per point of positive Water'],
+      requirement: '250 Landsraad Standing + 70 Water production', fremen: 'Not available to Fremen',
+      firstElection: '+2,000 Solari, +20 Landsraad Standing' },
+    { name: 'Eye of the Council', effects: ['Gain 2 extra Agents that carry a special Council trait'],
+      requirement: '250 Landsraad Standing + 7 Agents assigned to one slot', fremen: 'Not available to Fremen',
+      firstElection: '+2,000 Solari, +20 Landsraad Standing' },
+];
+
+function renderCharter(c) {
+    return `<div class="charter-card">
+        <h4>${c.name}</h4>
+        <ul>${c.effects.map(e => `<li>${e}</li>`).join('')}</ul>
+        <div class="charter-meta"><b>Requires:</b> ${c.requirement}</div>
+        ${c.fremen ? `<div class="charter-meta"><b>Fremen:</b> ${c.fremen}</div>` : ''}
+        <div class="charter-reward">🏛 First election: ${c.firstElection}</div>
+        ${c.note ? `<div class="charter-note">${c.note}</div>` : ''}
+    </div>`;
 }
 
 function renderLandsraad() {
@@ -5360,6 +5405,12 @@ function renderLandsraad() {
                     <li><strong>Targeted Charters:</strong> The Landsraad votes to grant a specific faction a powerful permanent bonus or office (e.g. Judge of the Council, granting control over certain military actions).</li>
                     <li><strong>Sanctions:</strong> Targeted penalties aimed at crippling a specific faction. Highly useful against a faction approaching victory.</li>
                 </ul>
+            </div>
+
+            <div class="landsraad-card full-width">
+                <h2><i data-lucide="award"></i> Charters (${CHARTERS.length})</h2>
+                <p>Charters are permanent offices the Landsraad grants to a single faction once it meets the requirements. They occupy a Council slot, persist until revoked (a Loss of Rights resolution) or won by a rival, and pay a one-time reward on first election.</p>
+                <div class="charter-grid">${CHARTERS.map(renderCharter).join('')}</div>
             </div>
 
             <div class="landsraad-card full-width">

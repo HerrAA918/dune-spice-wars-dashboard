@@ -80,10 +80,12 @@ Add-content PRs (high value, medium effort):
       game modes (Skirmish / Kanly Duel / Conquest). All thresholds verified against the
       game database (Game_Victory_* constants, Game_Victory_GovernorDuration values).
 
-- [ ] Add the 7 Landsraad Charters (+ Water Subsidies, + "Imperium Summit"/"Land Sales"
-      name fixes) — compendium has 38/46 resolutions and 0 Charters. Include eligibility
-      thresholds + first-election rewards (e.g. Dune Governorship pays 10,000 Solari and
-      drives the Political victory). Source: `resolution` sheet (type=Charter). Medium.
+- [x] Add the 7 Landsraad Charters (+ Water Subsidies, + "Imperium Summit"/"Land Sales"
+      name fixes) — added a Charters section to the Landsraad & Politics view with all 6
+      distinct charters (Consul is the Conquest-mode name for the Governorship), each with
+      effect, eligibility (general + Fremen path / "not available to Fremen"), and
+      first-election reward, all verified against the resolution sheet. Fixed the two
+      stale names and added the Water Subsidies global resolution.
 
 - [ ] Add the 63 draftable pre-match Faction Bonuses — 9/faction (38 beginner-friendly).
       Source: `bonus` sheet (type=0). New "Faction Bonuses" category/filter. Medium.
