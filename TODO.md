@@ -14,6 +14,26 @@
       Chain confirmed against the wiki; re-verified fully clean (e.g. Crew Training
       Program path now totals 1000, was 400).
 
+- [ ] Deep-dive the tech trees — the calculator STILL doesn't look right (user-reported,
+      2026-06-23). **Symptom:** the unlock *time* for an initial tech is off. **Root cause found:**
+      the compendium fabricates tech cost with a flat per-tier table —
+      `getBaseCost(tier)` returns 100/200/300/400 (default 100) — which is NOT the game's model. The
+      game DB stores `Development_BaseCost = 10`, `Development_ScalePerStep = 1.036`,
+      `Development_StepsPerTier = [2,3,4,5]`, and a handful of developments carry an explicit `costs`
+      value (e.g. **Intelligence Network**, a tier-0 *initial* tech, = **20**; Lay of the Land = 80;
+      Valuable Trinkets = 40). So a real initial-tech cost ≈ 20 but the compendium shows 100 → the
+      `cost ÷ knowledge-per-day` time in `updateCalcTime()` is ~5× too high.
+      **Cost magnitude fixed** (this PR): `getBaseCost` now returns the CDB formula's per-tier base
+      (10/11/12/14) and a `TECH_COST_OVERRIDES` map applies the explicit DB costs (Intelligence
+      Network 20, Lay of the Land 80, Valuable Trinkets 40, Wonders of the Desert 80); the calc time
+      is now grounded in real data. **Caveat to validate:** non-explicit costs use the formula
+      default (~10–14, a deliberately flat curve) and the static view can't show the runtime
+      per-step scaling — sanity-check a few nodes against in-game tooltips and recalibrate if needed.
+      Still open — finish the broader audit: (1) `requires` chains + cumulative cost totals vs an
+      independent CDB recompute; (2) faction replacements — does each faction's *effective* tree
+      compute the right unlocks/costs?; (3) the Vernius Patent/Obfuscate calc; (4) the 2 known-missing
+      generic techs (CHOAM Support, Siege Incentives) + any other missing/mis-tiered nodes.
+
 - [x] Verify the sietch information — verified against the game database (data.cdb,
       extracted from the install). Confirmed: 4 alliance specialty types and the
       100-relationship requirement (`Sietch_AtbRelationThreshold = 100`). Fixed:
