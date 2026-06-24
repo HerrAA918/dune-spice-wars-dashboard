@@ -68,8 +68,11 @@ larger systems. Each item notes its **data source**, **schema**, **UI placement*
 - **Treaties** (deferred): add the per-treaty costs + the hidden −10% Authority treaty upkeep, and fix the
   Non-Aggression Pact description (the "open borders / no supply drain" effect belongs to the separate
   *Land Agreement*). Treaty *numbers* aren't cleanly in `data.cdb` — confirm from tooltips.
-- **Special Regions** (16), **Region quirks**, **Hegemony-source ledger** (how to earn Hegemony + the
-  2,500 build-in-main-base milestone) — all `partial`/`missing`, medium effort.
+- **Special Regions / Region Specializations** ✅ DONE — the old "Village Bonuses" page (which duplicated
+  Buildings) is now the **Regions** tab: 6 CDB-verified Region Specializations (resource nodes) + 15 Special
+  Regions (landmarks that grant Hegemony + a unique bonus). Still open: the **Hegemony-source ledger** (how to
+  earn Hegemony + the 2,500 build-in-main-base milestone) and the exact per-region Hegemony/day rate (uniform in
+  the data but not cleanly convertible — confirm from a tooltip).
 
 ---
 
