@@ -5600,6 +5600,26 @@ const DEVELOPMENTS = {
       }
     },
     {
+      "name": "CHOAM Support",
+      "category": "Economic",
+      "tier": 4,
+      "requires": [
+        "CHOAM Integration"
+      ],
+      "genericEffects": [
+        "−15% CHOAM Share buying price",
+        "+0.1 Spice exchange rate per 5% of CHOAM Shares owned"
+      ],
+      "replacements": {
+        "Corrino": {
+          "name": "CHOAM Manipulation",
+          "effects": [
+            "Each 1% of CHOAM Shares owned grants +0.5% Army Power and +1% chance to detect enemy operations (stacks up to 100%)"
+          ]
+        }
+      }
+    },
+    {
       "name": "Advanced Engineering",
       "category": "Economic",
       "tier": 2,
@@ -5782,7 +5802,7 @@ const DEVELOPMENTS = {
           ]
         },
         "Smugglers": {
-          "name": "Guerilla Tactics",
+          "name": "Guerrilla Tactics",
           "effects": [
             "+15 Water",
             "At night, Military Units gain:",
@@ -6046,6 +6066,27 @@ const DEVELOPMENTS = {
           ]
         }
       }
+    },
+    {
+      "name": "Siege Incentives",
+      "category": "Military",
+      "tier": 4,
+      "requires": [
+        "Parallel Training"
+      ],
+      "genericEffects": [
+        "Military units deal +50% damage against Main Bases",
+        "Military units gain 0.1 Solari per damage dealt to a Main Base"
+      ],
+      "replacements": {
+        "Atreides": {
+          "name": "Proud Liberator",
+          "effects": [
+            "Non-mechanical units gain +1% max Health per 20 Standing",
+            "Units liberating or annexing a Village from a lower-Standing faction heal 50% of their Health for free"
+          ]
+        }
+      }
     }
   ],
   "Statecraft": [
@@ -6081,7 +6122,7 @@ const DEVELOPMENTS = {
           "effects": []
         },
         "Smugglers": {
-          "name": "Foot in the Door",
+          "name": "Foot In the Door",
           "effects": [
             "-20% Underworld Headquarters installation costs within territories of faction in Truce",
             "1 Influence and Intel production per faction hosting at least one Underworld Headquarters",
@@ -6300,7 +6341,7 @@ const DEVELOPMENTS = {
           ]
         },
         "Harkonnen": {
-          "name": "Enhanced Questioning",
+          "name": "Enhanced Questionning",
           "effects": [
             "Oppressed Villages grant +1 Intel production",
             "Unlocks the Interrogation Center Building in Carthag"
@@ -6918,26 +6959,33 @@ var selectedTech = null;
 var techNodeMap = {};
 
 // Research (Knowledge) cost per development, derived from the game DB rather than guessed.
-// The game's curve is deliberately flat — Development_BaseCost=10 scaled by
-// Development_ScalePerStep=1.036 per "step" (StepsPerTier=[2,3,4,5]) — so per-tier base costs
-// are ~10–14; tier progression is gated by tier-unlock requirements, not escalating cost.
-// A handful of developments carry an explicit higher cost in the DB (overrides below).
+// Game formula: cost = BaseCost(10) · ScalePerStep(1.036)^TotalStepResearched
+//                       · (ScalePerStep^stepsForDev − 1) / (ScalePerStep − 1),
+// where a development is worth StepsPerTier=[2,3,4,5] "steps" by tier. The third factor is
+// a geometric sum over the dev's own steps; the second scales with how much you've ALREADY
+// researched (a runtime quantity, so it can't be shown statically — see the calculator note).
+// These are the early-game (TotalStepResearched=0) base costs — i.e. the cost if you research
+// that development first. They come straight from the formula: 10·(1.036^s−1)/0.036 for s∈{2,3,4,5}:
+//   tier 1 (s=2) ≈ 20, tier 2 (s=3) ≈ 31, tier 3 (s=4) ≈ 42, tier 4 (s=5) ≈ 54.
+// A handful of developments carry an explicit cost in the DB that overrides the formula (below).
 function getBaseCost(tier) {
     switch(tier) {
-        case 1: return 10;
-        case 2: return 11;
-        case 3: return 12;
-        case 4: return 14;
-        default: return 10;
+        case 1: return 20;
+        case 2: return 31;
+        case 3: return 42;
+        case 4: return 54;
+        default: return 20;
     }
 }
 
-// Explicit per-tech Knowledge costs from the game DB (development `costs` field).
+// Explicit per-tech Knowledge costs from the game DB (development `costs` field) — all 6.
 const TECH_COST_OVERRIDES = {
     "Intelligence Network": 20,
+    "CHOAM Support": 40,
     "Lay of the Land": 80,
     "Valuable Trinkets": 40,
     "Wonders of the Desert": 80,
+    "Siege Incentives": 80,
 };
 
 // Cost for a development node: explicit DB override if present, else the per-tier base.
@@ -7065,11 +7113,13 @@ function renderTechTree() {
             <div class="calc-row req" id="vn-patent-eta" style="display:none;"></div>
             <div class="calc-row"><span><i data-lucide="eye-off" style="width:14px;height:14px;vertical-align:-2px;"></i> Obfuscate (10,000 Heg):</span><span id="vn-obfuscate-status">&mdash;</span></div>
             <div class="calc-row req" id="vn-obfuscate-eta" style="display:none;"></div>
+            <div class="calc-row req"><span>Obfuscate cost:</span><span>20 Standing · single use</span></div>
             <div class="calc-input-row" style="margin-top:10px;">
                 <span>Patents to file:</span>
                 <input type="number" id="vn-patents" value="1" min="0" oninput="updateVerniusCalc()">
             </div>
-            <div class="calc-total"><span>Patent cost:</span><span id="vn-patent-cost">1,000 Solari</span></div>
+            <div class="calc-total"><span>Patent cost:</span><span id="vn-patent-cost">600 Solari</span></div>
+            <div class="calc-row req"><span>Each rival pays you to research a patented dev:</span><span>500 Solari</span></div>
         </div>` : '';
 
     html += `
@@ -7097,6 +7147,7 @@ function renderTechTree() {
                 <input type="number" id="calc-kpd" value="10" min="1" onchange="updateCalcTime()">
             </div>
             <div class="calc-time" id="calc-time-display">0 Days</div>
+            <div class="calc-row req" style="margin-top:8px; font-style:italic; line-height:1.4;">Early-game base costs. In‑game, each development costs ~3.6% more per development "step" you've already researched (×1.036), so the same tech costs more later in a game.</div>
         </div>
     </div>
     `;
@@ -7152,18 +7203,21 @@ function updateLandsraadTimer() {
     }
 }
 
-// House Vernius unique abilities. Patent unlocks at 5,000 Hegemony (1,000 Solari to
-// file; rivals must then pay to unlock the patented development). Obfuscate unlocks
-// at 10,000 Hegemony (permanently disables a development for everyone). This planner
-// reports milestone progress (and an ETA from Hegemony/day) plus the Solari to file
-// N patents. No-ops unless the Vernius panel is on screen.
+// House Vernius unique abilities, verified against the game DB.
+//  • Patent (File Patent) unlocks at 5,000 Hegemony (Game_HegemonyBonuses_Tiers bonus 1).
+//    Filing costs 600 Solari (PatentDev ability cost); every rival must then pay Vernius
+//    500 Solari (Development_PatentedResearchCost) to research that patented development.
+//  • Obfuscate (Blackout) unlocks at 10,000 Hegemony (bonus 2): 20 Standing, single use,
+//    permanently nullifies a researched development for everyone.
+// This planner reports milestone progress (and an ETA from Hegemony/day) plus the Solari
+// to file N patents. No-ops unless the Vernius panel is on screen.
 function updateVerniusCalc() {
     const hEl = document.getElementById('vn-hegemony');
     if (!hEl) return;
     const heg = Math.max(0, parseInt(hEl.value, 10) || 0);
     const hpd = Math.max(0, parseFloat(document.getElementById('vn-hpd').value) || 0);
     const patents = Math.max(0, parseInt(document.getElementById('vn-patents').value, 10) || 0);
-    const PATENT_AT = 5000, OBFUSCATE_AT = 10000, PATENT_COST = 1000;
+    const PATENT_AT = 5000, OBFUSCATE_AT = 10000, PATENT_COST = 600;
 
     const milestone = (statusId, etaId, threshold, label) => {
         const s = document.getElementById(statusId);
