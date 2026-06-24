@@ -3,5 +3,6 @@ node_modules/
 *.log
 *.sav
 scratch/
+notes/
 src_scripts/
 src_scripts/node_modules/
