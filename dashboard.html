@@ -1986,6 +1986,21 @@
             return labels[difficulty] || ('Level ' + difficulty);
         }
 
+        // Human-readable label for end-reason tags we don't have an explicit name for.
+        // Concede endings arrive as e.g. "ConcededSupremacy" -> "Conceded (Supremacy)"; any other
+        // unknown camelCase tag is spaced out ("FooBar" -> "Foo Bar") instead of shown raw.
+        function prettifyEndTag(tag) {
+            if (!tag) return tag;
+            const splitCamel = s => s
+                .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+                .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+            const m = /^Conceded(.+)$/.exec(tag);
+            return m ? 'Conceded (' + splitCamel(m[1]) + ')' : splitCamel(tag);
+        }
+
+        // Tooltip shown on Incomplete outcome badges and the "Abandoned / Incomplete" victory condition.
+        const INCOMPLETE_TIP = 'This game ended with no recorded result (quit or never finished), so it is not counted as a win or a loss in the win rate.';
+
         // Victory condition helper
         function getVictoryCondition(g) {
             if (!g || !g.endReason) return 'Abandoned / Incomplete';
@@ -1995,7 +2010,7 @@
             if (tag === 'Economy') return 'Economy (CHOAM)';
             if (tag === 'Political') return 'Political (Governor)';
             if (tag === 'Objective') return 'Scenario Objective';
-            return tag;
+            return prettifyEndTag(tag);
         }
 
         // A game only reached a result if it has an endReason. Games with no
@@ -2658,7 +2673,7 @@
                     if (tag === 'Economy') reason = 'Economy (CHOAM)';
                     else if (tag === 'Political') reason = 'Political (Governor)';
                     else if (tag === 'Objective') reason = 'Scenario Objective';
-                    else reason = tag;
+                    else reason = prettifyEndTag(tag);
                 }
                 s.reasons[reason] = (s.reasons[reason] || 0) + 1;
 
@@ -3144,11 +3159,15 @@
                         (heroDesc ? '<span class="tooltip-text">' + heroDesc + '</span>' : '') +
                     '</div>';
 
+                const incompleteAttr = oc === 'incomplete' ? ' title="' + INCOMPLETE_TIP + '" style="cursor: help;"' : '';
+                const vc = getVictoryCondition(g);
+                const vcAttr = vc === 'Abandoned / Incomplete' ? ' title="' + INCOMPLETE_TIP + '" style="color: var(--text-muted); cursor: help;"' : '';
+
                 row.innerHTML =
                     '<td>' + dateClean + '</td>' +
                     '<td>' + factionHtml + '</td>' +
-                    '<td><span class="outcome-badge ' + outcomeClass + '">' + outcomeText + '</span></td>' +
-                    '<td>' + getVictoryCondition(g) + '</td>' +
+                    '<td><span class="outcome-badge ' + outcomeClass + '"' + incompleteAttr + '>' + outcomeText + '</span></td>' +
+                    '<td' + vcAttr + '>' + vc + '</td>' +
                     '<td>' + heroHtml + '</td>' +
                     '<td>' + formatDuration(g.currentTime) + '</td>' +
                     '<td style="color: var(--text-muted); cursor: help;" title="Deaths breakdown: ' + wormDeaths + ' devoured by Sandworms, ' + splyDeaths + ' lost to dehydration (lack of supply)">' + wormDeaths + ' / ' + splyDeaths + '</td>';
@@ -3235,6 +3254,8 @@
             outcomeVal.innerText = outcomeText;
             outcomeVal.className = 'detail-value outcome-badge ' +
                 (oc === 'victory' ? 'outcome-victory' : (oc === 'defeat' ? 'outcome-defeat' : 'outcome-incomplete'));
+            outcomeVal.title = oc === 'incomplete' ? INCOMPLETE_TIP : '';
+            outcomeVal.style.cursor = oc === 'incomplete' ? 'help' : '';
 
             let winnerText;
             if (oc === 'victory') {
@@ -3254,7 +3275,7 @@
                 else if (tag === 'Economy') reasonText = 'Economy (CHOAM) Victory';
                 else if (tag === 'Political') reasonText = 'Political (Governor) Victory';
                 else if (tag === 'Objective') reasonText = 'Scenario Objective Completed';
-                else reasonText = tag;
+                else reasonText = prettifyEndTag(tag);
             }
             document.getElementById('modal-val-reason').innerText = reasonText;
             
