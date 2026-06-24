@@ -14,25 +14,25 @@
       Chain confirmed against the wiki; re-verified fully clean (e.g. Crew Training
       Program path now totals 1000, was 400).
 
-- [ ] Deep-dive the tech trees — the calculator STILL doesn't look right (user-reported,
-      2026-06-23). **Symptom:** the unlock *time* for an initial tech is off. **Root cause found:**
-      the compendium fabricates tech cost with a flat per-tier table —
-      `getBaseCost(tier)` returns 100/200/300/400 (default 100) — which is NOT the game's model. The
-      game DB stores `Development_BaseCost = 10`, `Development_ScalePerStep = 1.036`,
-      `Development_StepsPerTier = [2,3,4,5]`, and a handful of developments carry an explicit `costs`
-      value (e.g. **Intelligence Network**, a tier-0 *initial* tech, = **20**; Lay of the Land = 80;
-      Valuable Trinkets = 40). So a real initial-tech cost ≈ 20 but the compendium shows 100 → the
-      `cost ÷ knowledge-per-day` time in `updateCalcTime()` is ~5× too high.
-      **Cost magnitude fixed** (this PR): `getBaseCost` now returns the CDB formula's per-tier base
-      (10/11/12/14) and a `TECH_COST_OVERRIDES` map applies the explicit DB costs (Intelligence
-      Network 20, Lay of the Land 80, Valuable Trinkets 40, Wonders of the Desert 80); the calc time
-      is now grounded in real data. **Caveat to validate:** non-explicit costs use the formula
-      default (~10–14, a deliberately flat curve) and the static view can't show the runtime
-      per-step scaling — sanity-check a few nodes against in-game tooltips and recalibrate if needed.
-      Still open — finish the broader audit: (1) `requires` chains + cumulative cost totals vs an
-      independent CDB recompute; (2) faction replacements — does each faction's *effective* tree
-      compute the right unlocks/costs?; (3) the Vernius Patent/Obfuscate calc; (4) the 2 known-missing
-      generic techs (CHOAM Support, Siege Incentives) + any other missing/mis-tiered nodes.
+- [x] Deep-dive the tech trees — the calculator "still didn't look right" (user-reported,
+      2026-06-23; symptom: initial-tech unlock *time* off). **Root cause (now fully resolved):**
+      `getBaseCost` dropped the cost formula's step-sum factor. The real game formula (CDB
+      `constant` sheet) is `cost = BaseCost(10) · ScalePerStep(1.036)^TotalStepResearched ·
+      (ScalePerStep^stepsForDev − 1)/(ScalePerStep − 1)`, with a dev worth `StepsPerTier=[2,3,4,5]`
+      steps by tier. At game start (TotalStepResearched=0) a tier-1 dev costs `10·(1.036²−1)/0.036 ≈
+      20`, **not** the 10 the earlier focused fix used (which itself had corrected a worse 100).
+      **Fixed:** per-tier base is now the formula's R=0 cost **20 / 31 / 42 / 54** (was 10/11/12/14),
+      `TECH_COST_OVERRIDES` now carries all **6** explicit DB costs (added CHOAM Support 40, Siege
+      Incentives 80), and the calculator shows a caveat that real costs rise ~3.6% per development
+      step already researched (the `^TotalStepResearched` term can't be shown statically).
+      **Audit (vs an independent CDB recompute, src_scripts/_techaudit.js) is fully clean:** 36/36
+      generics, 0 tier/category/requires mismatches, no fabricated multi-requires; requires-chain
+      cumulative totals are correct (e.g. Siege Incentives path = 80+42+31+20 = 173). Faction
+      replacements: 85/85 names match after 3 in-game-spelling fixes (Guerrilla Tactics, Foot In the
+      Door, Enhanced Questionning). **Vernius Patent/Obfuscate calc fixed:** filing cost 1000→**600
+      Solari** (PatentDev ability cost), surfaced the rival-pays **500 Solari** and Obfuscate's **20
+      Standing / single use**; the 5,000 / 10,000 Hegemony thresholds were already correct.
+      Verified headless (Playwright) with 0 console errors.
 
 - [x] Verify the sietch information — verified against the game database (data.cdb,
       extracted from the install). Confirmed: 4 alliance specialty types and the
@@ -80,10 +80,12 @@
       Maneuvers → Landsraad Quarters. Faction-specific Main Base unlocks were filled as
       part of the faction-effects task above.
 
-- [ ] Add the two generic techs missing from the tree — the game has 36 generic
-      developments; the compendium has 34. "CHOAM Support" (Economic, tier 4) and
-      "Siege Incentives" (Military, tier 4) are absent. Adding them touches tree layout
-      (tier/requires/gridX/gridY), so it was deferred from the data-refresh pass.
+- [x] Add the two generic techs missing from the tree — added **CHOAM Support** (Economic,
+      tier 4, requires CHOAM Integration, cost 40) and **Siege Incentives** (Military, tier 4,
+      requires Parallel Training, cost 80) so the compendium now has all 36 generic developments.
+      Effects + faction replacements (Corrino "CHOAM Manipulation"; Atreides "Proud Liberator")
+      resolved from the CDB. The tree is requires-driven (no gridX/gridY needed); both render as
+      children of the correct parent. Done as part of the tech-tree deep-dive above.
 
 - [ ] Re-derive unit ability/trait text from the CDB — the stat/cost refresh kept the
       existing curated ability prose. The authoritative text lives in the `trait` /
