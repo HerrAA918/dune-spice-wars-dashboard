@@ -4135,8 +4135,8 @@ const BUILDINGS = [
       "water": 2
     },
     "upkeep": "8 Solari",
+    "stale": "No buildable counterpart in the current game files — its CDB entry (SpiceCollectors) is an empty placeholder marked obsolete, unlocked by nothing. The stats below reflect an earlier version of the game.",
     "effects": [
-      "⚠ Stale — cut content: no buildable counterpart in the current game files (the matching entry SpiceCollectors is an empty placeholder explicitly marked 'Obsolete', unlocked by nothing). Details below reflect an earlier version.",
       "Allows deployment of a Harvesting Team to a Spice Field within the same region"
     ],
     "unlock": "None"
@@ -4943,8 +4943,8 @@ const BUILDINGS = [
       "solari": 200
     },
     "upkeep": "5 Solari",
+    "stale": "No buildable counterpart in the current game files — its CDB entry (ClandestineScouts) is an empty placeholder with no stats, unlocked by nothing. The stats below reflect an earlier version of the game.",
     "effects": [
-      "⚠ Stale — likely cut content: no buildable counterpart in the current game files (the matching entry ClandestineScouts is an empty placeholder with no stats, unlocked by nothing). Details below reflect an earlier version.",
       "Ally military units in the Region gain +10% Power"
     ],
     "unlock": ""
@@ -6875,14 +6875,15 @@ var techNodeMap = {};
 // researched (a runtime quantity, so it can't be shown statically — see the calculator note).
 // These are the early-game (TotalStepResearched=0) base costs — i.e. the cost if you research
 // that development first. They come straight from the formula: 10·(1.036^s−1)/0.036 for s∈{2,3,4,5}:
-//   tier 1 (s=2) ≈ 20, tier 2 (s=3) ≈ 31, tier 3 (s=4) ≈ 42, tier 4 (s=5) ≈ 54.
+//   tier 1 (s=2) → 20, tier 2 (s=3) → 31, tier 3 (s=4) → 42, tier 4 (s=5) → 53.
+//   (Game floors the result: math_floor(53.73)=53, not 54.)
 // A handful of developments carry an explicit cost in the DB that overrides the formula (below).
 function getBaseCost(tier) {
     switch(tier) {
         case 1: return 20;
         case 2: return 31;
         case 3: return 42;
-        case 4: return 54;
+        case 4: return 53;
         default: return 20;
     }
 }
@@ -8034,7 +8035,7 @@ renderAll();
         // you hold it, plus the listed unique bonus. Effect-less named terrain is omitted.
         const SPECIAL_REGIONS = [
             { name:'Shield Wall', icon:'🛡️', color:'#4a90e2', hegemony:true,
-              effects:['The map’s great natural fortress — its Hegemony income is the draw.'] },
+              effects:['The map’s great natural fortress — the +1000 Hegemony (like every landmark) is the draw.'] },
             { name:'Observatory Mountain', icon:'🔭', color:'#2f80ed', hegemony:true,
               effects:['Unlocks the Data Center and Listening Post','+50% Data Center output','+50% Listening Post output'] },
             { name:'Well of Riches', icon:'💰', color:'#f2c94c', hegemony:true,
@@ -8069,7 +8070,7 @@ renderAll();
             let html = `<p class="vb-disclaimer">Two different things decide what a region is worth.
                 <b>Region Specializations</b> are natural-resource nodes that let a Village build — or supercharge — a specific
                 resource building; several of each are scattered across the map. <b>Special Regions</b> are unique, named
-                landmarks: holding one grants a steady stream of <b>Hegemony</b> (the resource behind the Hegemony victory),
+                landmarks: holding one grants a flat <b>+1000 Hegemony</b> (the resource behind the Hegemony victory),
                 marked&nbsp;👑, plus a powerful one-off bonus. Everyday Village buildings live in the Buildings section.
                 Figures are taken from the game database.</p>`;
 
@@ -8096,8 +8097,10 @@ renderAll();
                         : ''}
                 </div>`).join('') + `</div>`;
 
-            html += `<p class="vb-disclaimer" style="margin-top:18px;">👑 Every landmark grants the same flat Hegemony income while held;
-                the precise per-day figure isn’t exposed cleanly in the game files. A handful of named terrain regions
+            html += `<p class="vb-disclaimer" style="margin-top:18px;">👑 Every landmark grants the same <b>+1000 Hegemony</b> while held
+                (the game stores this as <code>Region_HegemonyProd_Flat = 1000</code> and applies it 1:1 — no scaling — toward the
+                30,000 Hegemony needed to win). It is a flat contribution that persists while you control the region, not a per-day rate.
+                A handful of named terrain regions
                 (Deep Desert, the Kamriets, Lower Erg, Red Chasm, Shuloch, the Desolation) carry no special bonus and are omitted.</p>`;
 
             document.getElementById('compendium-content').innerHTML = html;
