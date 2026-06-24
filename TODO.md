@@ -124,8 +124,16 @@ Add-content PRs (high value, medium effort):
       supply-drain effect belongs to the separate Land Agreement). Treaty numbers aren't
       cleanly in the CDB — confirm from in-game tooltips.
 
-- [ ] (Medium, optional) Special Regions (16), Region quirks, and a Hegemony-source
-      ledger (how to earn Hegemony + the 2,500 build-in-main-base milestone).
+- [x] Special Regions & Region Specializations — reworked the old "Village Bonuses" page
+      (which duplicated the Buildings section) into the **Regions** tab with two CDB-verified
+      sections: **6 Region Specializations** (natural-resource nodes — Spice Field, Geothermal,
+      Rare Elements, Minerals, Research Station, wind strength) and **15 Special Regions**
+      (named landmarks that each grant a flat Hegemony income + a unique bonus). 7 effect-less
+      named-terrain regions omitted. Hegemony per-day magnitude is intentionally *not* stamped
+      as a number — `Region_HegemonyProd_Flat` is uniform across landmarks but its data-scale→
+      per-day conversion isn't cleanly exposed; confirm the exact rate from an in-game tooltip.
+      Still open: the **2,500-Hegemony build-in-main-base milestone** and a fuller Hegemony-source
+      ledger (these are a separate Hegemony-mechanics writeup, not region data).
 
 Larger builds (high value, plan separately — see roadmap):
 

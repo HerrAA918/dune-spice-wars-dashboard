@@ -972,7 +972,7 @@ ul.mechanics-list li {
                          color: var(--color-harkonnen); text-decoration: line-through; }
 .rp-empty { color:#eb5757; font-size:13px; font-style:italic; }
 
-/* ─── Village Bonuses ────────────────────────────────────────────────────── */
+/* ─── Regions (Specializations & Special Regions) ─────────────────────────── */
 .vb-disclaimer { color:#8a8a8a; font-size:12.5px; font-style:italic; margin:0 0 18px; line-height:1.5; }
 .vb-card { background: var(--bg-card); border:1px solid rgba(255,255,255,0.08);
            border-left:3px solid var(--vb-color, var(--accent-gold)); border-radius:12px; padding:16px;
@@ -985,9 +985,13 @@ ul.mechanics-list li {
 .vb-meta b { color:#ddd; font-weight:600; }
 .vb-req { display:inline-block; width:fit-content; font-size:11px; padding:3px 9px; border-radius:6px;
           background:rgba(201,138,65,0.14); color:var(--accent-gold); border:1px solid rgba(201,138,65,0.3); }
-.vb-faction-badge { margin-left:auto; font-size:10px; font-weight:700; text-transform:uppercase;
-                    letter-spacing:.05em; padding:3px 9px; border-radius:999px; }
 .vb-notes { font-size:12px; color:#b9b9b9; line-height:1.45; }
+.vb-badge-heg { margin-left:auto; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+                padding:3px 9px; border-radius:999px; white-space:nowrap;
+                background:rgba(242,201,76,0.14); color:var(--accent-gold); border:1px solid rgba(242,201,76,0.35); }
+.vb-effects { margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px;
+              font-size:13px; color:#cfcfcf; line-height:1.45; }
+.vb-effects li { list-style:disc; }
 </style>
 
 </style>
@@ -1019,7 +1023,7 @@ ul.mechanics-list li {
         <button class="tab-btn" data-category="Factions Overview">Factions Overview</button>
         <button class="tab-btn" data-category="Victory Conditions">Victory Conditions</button>
         <button class="tab-btn" data-category="Operations">Operations</button>
-        <button class="tab-btn" data-category="Village Bonuses">Village Bonuses</button>
+        <button class="tab-btn" data-category="Regions">Regions</button>
         <button class="tab-btn" data-category="Match Randomizer">Match Randomizer</button>
     </div>
 
@@ -7556,7 +7560,7 @@ function renderAll() {
 }
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
-const CATEGORIES_WITHOUT_SEARCH = ['Tech Trees', 'Landsraad & Politics', 'Factions Overview', 'Operations', 'Match Randomizer', 'Village Bonuses', 'Victory Conditions'];
+const CATEGORIES_WITHOUT_SEARCH = ['Tech Trees', 'Landsraad & Politics', 'Factions Overview', 'Operations', 'Match Randomizer', 'Regions', 'Victory Conditions'];
 
 // Items relevant to the current category, honoring the faction filter (but not the type filter).
 function itemsForCategory() {
@@ -7602,10 +7606,10 @@ function updateFilterBarVisibility() {
     document.querySelector('.filter-pills').style.display = hide ? 'none' : '';
     document.getElementById('search-input').placeholder =
         SEARCH_PLACEHOLDERS[currentCategory] || 'Search units & buildings…';
-    // Faction tabs are meaningless on the randomizer / village bonuses views.
+    // Faction tabs are meaningless on the randomizer / regions / victory views.
     const factionTabs = document.getElementById('faction-tabs');
     if (factionTabs) factionTabs.style.display =
-        (currentCategory === 'Match Randomizer' || currentCategory === 'Village Bonuses' || currentCategory === 'Victory Conditions') ? 'none' : '';
+        (currentCategory === 'Match Randomizer' || currentCategory === 'Regions' || currentCategory === 'Victory Conditions') ? 'none' : '';
 }
 
 function updateContainerWidth() {
@@ -8012,11 +8016,15 @@ renderAll();
             if (window.lucide) window.lucide.createIcons();
         }
 
-        // ─── Village Bonuses ─────────────────────────────────────────────────
-        // Every resource specialisation / bonus a Village can provide. Production
-        // figures are taken from the verified Village building data in this file;
-        // the region-gating (Spice Field, Geothermal, Rare Elements, Polar Sink,
-        // wind strength) reflects the in-game specialisations. Hand-compiled.
+        // ─── Regions: Specializations & Special (Landmark) Regions ────────────
+        // Two distinct concepts, verified against the game database (data.cdb):
+        //  • Region Specializations — repeatable natural-resource nodes that
+        //    authorise or buff a specific Village building (Spice Field,
+        //    Geothermal, Rare Elements, Minerals, Research Station, wind strength).
+        //  • Special Regions — unique, named landmark regions that grant a steady
+        //    Hegemony income plus a powerful one-off bonus.
+        // The everyday Village buildings that used to live here are covered in the
+        // Buildings section, so they were removed to avoid duplication.
         const VB_META = {
             water:    { icon: '💧', color: '#56ccf2' },
             manpower: { icon: '⚔️', color: '#f2994a' },
@@ -8024,88 +8032,102 @@ renderAll();
             solari:   { icon: '🪙', color: '#f2c94c' },
             spice:    { icon: '🌶️', color: '#eb5757' },
             fuel:     { icon: '⚡', color: '#9b51e0' },
-            boost:    { icon: '📈', color: '#27ae60' },
-            military: { icon: '🛡️', color: '#4a90e2' },
+            knowledge:{ icon: '📘', color: '#2f80ed' },
         };
-        const VB_CAT_ICON = {
-            'Region Specializations': 'mountain',
-            'Standard Production': 'factory',
-            'Economy Boosts': 'trending-up',
-            'Military & Utility': 'shield',
-        };
-        const VILLAGE_BONUSES = [
-            // Region-gated specialisations
-            { cat:'Region Specializations', resource:'spice', name:'Spice Field', value:'Spice Harvesting',
-              building:'Refinery · Spice Collectors (Fremen)', req:'Region containing a Spice Field',
-              notes:'Deploy a Harvester (Harvesting Team for Fremen) onto the field to mine Spice. Pair with Spice Silos for +20% Spice nearby.' },
-            { cat:'Region Specializations', resource:'fuel', name:'Geothermal Energy', value:'+10 Fuel Cells',
-              building:'Fuel Cell Factory', req:'Geothermal region (or the Great Volcano)',
-              notes:'Not buildable by Fremen.' },
-            { cat:'Region Specializations', resource:'solari', name:'Rare Elements', value:'+20 Solari',
-              building:'Processing Plant', req:'Region with Rare Elements (or the Well of Riches)',
-              notes:'The highest flat Solari yield available to a Village.' },
-            { cat:'Region Specializations', resource:'water', name:'Polar Sink', value:'+20 Water',
-              building:'Water Extractor', req:'Unique region: the Polar Sink only',
-              notes:'Not buildable by Fremen.' },
-            { cat:'Region Specializations', resource:'water', name:'Wind Strength', value:'+2 Water / wind level',
-              building:'Windtrap', req:'Scales with the region’s wind strength',
-              notes:'High-wind regions yield far more Water than a Dew Collector.' },
-            // Standard production (any village)
-            { cat:'Standard Production', resource:'water', name:'Dew Collection', value:'+3 Water',
-              building:'Dew Collector', req:'Any Village', notes:'' },
-            { cat:'Standard Production', resource:'manpower', name:'Recruitment', value:'+3 Manpower',
-              building:'Recruitment Office', req:'Any Village', notes:'' },
-            { cat:'Standard Production', resource:'plascrete', name:'Plascrete', value:'+10 Plascrete',
-              building:'Plascrete Factory', req:'Any Village', notes:'' },
-            { cat:'Standard Production', resource:'solari', name:'Trade', value:'+4 Solari',
-              building:'Wholesale Market', req:'Any Village', notes:'' },
-            // Economy boosts
-            { cat:'Economy Boosts', resource:'boost', name:'Spice Silos', value:'+20% Spice',
-              building:'Spice Silos', req:'Region & neighbours (x1)', notes:'' },
-            { cat:'Economy Boosts', resource:'boost', name:'Maintenance Center', value:'−25% Solari upkeep',
-              building:'Maintenance Center', req:'Region & neighbours (x1)', notes:'' },
-            { cat:'Economy Boosts', resource:'boost', name:'Experimental Furnace', value:'+30% Economy output',
-              building:'Experimental Furnace', req:'Region & neighbours · Major',
-              notes:'Requires 5k Hegemony. One per faction.' },
-            { cat:'Economy Boosts', resource:'boost', name:'Shai-Hulud Temple', value:'+20% Village output',
-              building:'Shai-Hulud Temple', req:'Region & neighbours · Major', faction:'Fremen',
-              notes:'One per faction.' },
-            // Military & utility
-            { cat:'Military & Utility', resource:'military', name:'Military Base', value:'+20% Unit Power',
-              building:'Military Base', req:'Region & neighbours (x1)', notes:'' },
-            { cat:'Military & Utility', resource:'military', name:'Missile Battery', value:'Automatic Defense',
-              building:'Missile Battery', req:'Any Village', notes:'Fires on enemies in range; silent while the Village is under siege.' },
-            { cat:'Military & Utility', resource:'military', name:'Airfield', value:'Shuttle Transport',
-              building:'Airfield', req:'Any Village', notes:'Embark units to travel between Airfields. Not buildable by Fremen; your Main Base counts as one.' },
-            { cat:'Military & Utility', resource:'military', name:'Military Factory', value:'+15% Power & Health',
-              building:'Military Factory', req:'Major', notes:'Requires 5k Hegemony. One per faction.' },
+
+        const REGION_SPECIALIZATIONS = [
+            { resource:'spice', name:'Spice Field', value:'Harvest Spice', building:'Refinery',
+              req:'Region containing a Spice Field',
+              notes:'Deploy a Harvester onto the field to mine Spice (+100% harvester output). Build 400 Plascrete; upkeep 12 Solari + 2 Water. The Refinery is unavailable to Fremen and Vernius, who collect Spice through their own buildings.' },
+            { resource:'fuel', name:'Energy Sources', value:'+10 Fuel Cells', building:'Fuel Cell Factory · Ceremonial Caves (Fremen)',
+              req:'Region with a Geothermal node',
+              notes:'Build 150 Plascrete; upkeep 6 Solari + 2 Water. Also unlocked by the Great Volcano landmark, which adds +100% output.' },
+            { resource:'solari', name:'Rare Elements', value:'+20 Solari', building:'Processing Plant',
+              req:'Region with Rare Elements',
+              notes:'The highest flat Solari yield a Village can earn. Build 150 Plascrete; upkeep 4 Solari + 2 Water. Also unlocked by the Well of Riches landmark, which adds +100% output.' },
+            { resource:'plascrete', name:'Minerals', value:'+100% Plascrete Factory', building:'Plascrete Factory',
+              req:'Region with a Minerals node',
+              notes:'A buff node: it doubles your (always-buildable) Plascrete Factory rather than unlocking a new building. The factory itself yields +10 Plascrete.' },
+            { resource:'knowledge', name:'Research Station', value:'+20 Solari / Research Hub', building:'Research Hub',
+              req:'Region with a Research Station node',
+              notes:'A buff node that rewards stacking several Research Hubs in the same region.' },
+            { resource:'water', name:'Wind Strength', value:'+1 Water / wind level', building:'Dew Collector · Windtrap (Fremen)',
+              req:'Scales with the region’s wind strength',
+              notes:'Not a discrete node — high-wind regions simply yield far more Water. The Fremen Windtrap earns +2 Water per wind level instead of +1.' },
         ];
 
-        function renderVillageBonuses() {
-            const order = ['Region Specializations', 'Standard Production', 'Economy Boosts', 'Military & Utility'];
-            let html = `<p class="vb-disclaimer">Every resource specialisation and bonus a Village can provide. The region-gated
-                specialisations (Spice Field, Geothermal Energy, Rare Elements, Polar Sink, wind strength) depend on the region;
-                everything under Standard Production can be built in any Village. Figures come from the Buildings data.</p>`;
-            order.forEach(cat => {
-                const items = VILLAGE_BONUSES.filter(v => v.cat === cat);
-                if (!items.length) return;
-                html += `<div class="section-label"><i data-lucide="${VB_CAT_ICON[cat] || 'home'}" width="16" height="16"></i>&nbsp;${cat} (${items.length})</div>`;
-                html += `<div class="card-grid">` + items.map(v => {
-                    const m = VB_META[v.resource] || { icon:'•', color:'var(--accent-gold)' };
-                    const badge = (v.faction && v.faction !== 'All')
-                        ? `<span class="vb-faction-badge faction-${v.faction}">${v.faction}</span>` : '';
-                    return `
-                    <div class="vb-card" style="--vb-color:${m.color}">
-                        <div class="vb-head"><span class="vb-icon">${m.icon}</span><span class="vb-name">${v.name}</span>${badge}</div>
-                        <div class="vb-value">${v.value}</div>
-                        <div class="vb-meta"><b>Via:</b> ${v.building}</div>
-                        ${v.req ? `<span class="vb-req">${v.req}</span>` : ''}
-                        ${v.notes ? `<div class="vb-notes">${v.notes}</div>` : ''}
-                    </div>`;
-                }).join('') + `</div>`;
-            });
+        // Special / landmark regions. Each grants a flat Hegemony income (👑) while
+        // you hold it, plus the listed unique bonus. Effect-less named terrain is omitted.
+        const SPECIAL_REGIONS = [
+            { name:'Shield Wall', icon:'🛡️', color:'#4a90e2', hegemony:true,
+              effects:['The map’s great natural fortress — its Hegemony income is the draw.'] },
+            { name:'Observatory Mountain', icon:'🔭', color:'#2f80ed', hegemony:true,
+              effects:['Unlocks the Data Center and Listening Post','+50% Data Center output','+50% Listening Post output'] },
+            { name:'Well of Riches', icon:'💰', color:'#f2c94c', hegemony:true,
+              effects:['Unlocks the Processing Plant','+100% Processing Plant output'] },
+            { name:'Great Volcano', icon:'🌋', color:'#9b51e0', hegemony:true,
+              effects:['Unlocks the Fuel Cell Factory (Fremen: Ceremonial Caves)','+100% Fuel Cell Factory output'] },
+            { name:'Mount Idaho', icon:'⛰️', color:'#c98a41', hegemony:true,
+              effects:['+200% Plascrete Factory output'] },
+            { name:'Acid Lakes', icon:'🧪', color:'#27ae60', hegemony:true,
+              effects:['+100% Research Hub output'] },
+            { name:'White Rift', icon:'💎', color:'#bb6bd9', hegemony:true,
+              effects:['+100% Crafts Workshop output'] },
+            { name:'Black Rift', icon:'🔮', color:'#9b51e0', hegemony:true,
+              effects:['+100% Crafts Workshop output'] },
+            { name:'Crescent Ridge', icon:'💧', color:'#56ccf2', hegemony:true,
+              effects:['+100% Water production'] },
+            { name:'Imperial Basin', icon:'🏛️', color:'#f2994a', hegemony:true,
+              effects:['+100% Recruitment Office output'] },
+            { name:'Worm Nest', icon:'🐛', color:'#eb5757', hegemony:true,
+              effects:['+25% Spice in the region'] },
+            { name:'Polar Sink', icon:'❄️', color:'#56ccf2', hegemony:true,
+              effects:['Unlocks the Water Extractor (+25 Water)','Unavailable to Fremen'] },
+            { name:'Sand Fall', icon:'⏳', color:'#2f80ed', hegemony:true,
+              effects:['Gain 6% of your Village Solari upkeep back as Knowledge'] },
+            { name:'Moon Dew Vale', icon:'🌙', color:'#56ccf2', hegemony:true,
+              effects:['Village buildings consume no Water','Ground units lose Supply 50% slower'] },
+            { name:'Space Cruiser Wreck', icon:'🛸', color:'#f2c94c', hegemony:true,
+              effects:['Space Cruiser Scraps appear periodically','+1 Guild Favor with any Spacing Guild Branch','+1 Scraps with any Recycling Plant'] },
+        ];
+
+        function renderRegions() {
+            let html = `<p class="vb-disclaimer">Two different things decide what a region is worth.
+                <b>Region Specializations</b> are natural-resource nodes that let a Village build — or supercharge — a specific
+                resource building; several of each are scattered across the map. <b>Special Regions</b> are unique, named
+                landmarks: holding one grants a steady stream of <b>Hegemony</b> (the resource behind the Hegemony victory),
+                marked&nbsp;👑, plus a powerful one-off bonus. Everyday Village buildings live in the Buildings section.
+                Figures are taken from the game database.</p>`;
+
+            html += `<div class="section-label"><i data-lucide="mountain" width="16" height="16"></i>&nbsp;Region Specializations (${REGION_SPECIALIZATIONS.length})</div>`;
+            html += `<div class="card-grid">` + REGION_SPECIALIZATIONS.map(v => {
+                const m = VB_META[v.resource] || { icon:'•', color:'var(--accent-gold)' };
+                return `
+                <div class="vb-card" style="--vb-color:${m.color}">
+                    <div class="vb-head"><span class="vb-icon">${m.icon}</span><span class="vb-name">${v.name}</span></div>
+                    <div class="vb-value">${v.value}</div>
+                    <div class="vb-meta"><b>Via:</b> ${v.building}</div>
+                    ${v.req ? `<span class="vb-req">${v.req}</span>` : ''}
+                    ${v.notes ? `<div class="vb-notes">${v.notes}</div>` : ''}
+                </div>`;
+            }).join('') + `</div>`;
+
+            html += `<div class="section-label"><i data-lucide="sparkles" width="16" height="16"></i>&nbsp;Special Regions (${SPECIAL_REGIONS.length})</div>`;
+            html += `<div class="card-grid">` + SPECIAL_REGIONS.map(r => `
+                <div class="vb-card" style="--vb-color:${r.color}">
+                    <div class="vb-head"><span class="vb-icon">${r.icon}</span><span class="vb-name">${r.name}</span>
+                        ${r.hegemony ? `<span class="vb-badge-heg" title="Grants Hegemony while you control this region">👑 Hegemony</span>` : ''}</div>
+                    ${r.effects && r.effects.length
+                        ? `<ul class="vb-effects">${r.effects.map(e => `<li>${e}</li>`).join('')}</ul>`
+                        : ''}
+                </div>`).join('') + `</div>`;
+
+            html += `<p class="vb-disclaimer" style="margin-top:18px;">👑 Every landmark grants the same flat Hegemony income while held;
+                the precise per-day figure isn’t exposed cleanly in the game files. A handful of named terrain regions
+                (Deep Desert, the Kamriets, Lower Erg, Red Chasm, Shuloch, the Desolation) carry no special bonus and are omitted.</p>`;
+
             document.getElementById('compendium-content').innerHTML = html;
-            document.getElementById('result-count').textContent = VILLAGE_BONUSES.length + ' bonuses';
+            document.getElementById('result-count').textContent = `${REGION_SPECIALIZATIONS.length} specializations · ${SPECIAL_REGIONS.length} special regions`;
             if (window.lucide) window.lucide.createIcons();
         }
 
@@ -8155,8 +8177,8 @@ renderAll();
                     renderOperations();
                 } else if (cat === "Match Randomizer") {
                     rpRender();
-                } else if (cat === "Village Bonuses") {
-                    renderVillageBonuses();
+                } else if (cat === "Regions") {
+                    renderRegions();
                 } else if (cat === "Victory Conditions") {
                     renderVictoryConditions();
                 } else {

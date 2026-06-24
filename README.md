@@ -19,7 +19,7 @@ static page that runs **100% in your browser**. No account, no upload, no server
   breakdown, a faction performance leaderboard, hero/councillor stats, and a sortable,
   filterable match table with per-game detail.
 - **Compendium** — searchable reference for units, buildings, sietches, tech trees,
-  Landsraad politics, faction overviews, operations, village bonuses, plus a match
+  Landsraad politics, faction overviews, operations, regions, plus a match
   randomizer.
 - **Shareable links** — send your full results or a compact summary to a friend; the
   data rides inside the URL, so there is still no server involved.
@@ -163,12 +163,13 @@ grouped by faction.
 
 ![Operations tab](docs/sec-compendium-operations.png)
 
-### Village Bonuses
+### Regions
 
-Every village specialization and production bonus, grouped by category, so you can plan
-how to develop captured villages.
+What each region is worth, in two parts: **Region Specializations** (natural-resource nodes
+that unlock or supercharge a specific village building) and **Special Regions** (unique named
+landmarks that each grant a steady **Hegemony** income plus a powerful one-off bonus).
 
-![Village bonuses tab](docs/sec-compendium-village.png)
+![Regions tab](docs/sec-compendium-regions.png)
 
 ### Match Randomizer
 
