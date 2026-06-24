@@ -434,6 +434,31 @@
         .charter-reward { font-size:0.78rem; color:var(--accent-spice); margin-top:8px; }
         .charter-note { font-size:0.74rem; color:var(--text-muted); font-style:italic; margin-top:8px; }
 
+        /* Unit customization (Armory loadout) */
+        .unit-loadout { border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; margin-top:10px; }
+        .loadout-title { font-size:0.7rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent-spice); margin-bottom:8px; display:flex; align-items:center; gap:5px; }
+        .loadout-slot { display:flex; align-items:stretch; gap:8px; margin-bottom:8px; }
+        .loadout-slot:last-child { margin-bottom:0; }
+        .loadout-slot-num { flex:0 0 16px; display:flex; align-items:center; justify-content:center; font-size:0.66rem; font-weight:700; color:var(--text-muted); border-right:1px solid var(--border-color); }
+        .loadout-opts { display:flex; align-items:stretch; gap:6px; flex:1; min-width:0; }
+        .loadout-opt { flex:1; min-width:0; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:7px 9px; cursor:pointer; transition:border-color .12s, background .12s, box-shadow .12s; }
+        .loadout-opt:hover { border-color:var(--accent-spice); background:rgba(230,126,34,0.06); }
+        .loadout-opt.selected { border-color:var(--accent-spice); background:rgba(230,126,34,0.13); box-shadow:inset 0 0 0 1px var(--accent-spice); }
+        .loadout-opt .opt-name { font-size:0.76rem; font-weight:700; color:var(--text-main); margin-bottom:3px; display:flex; align-items:center; gap:5px; }
+        .loadout-opt.selected .opt-name::before { content:'✓'; color:var(--accent-spice); font-weight:800; }
+        .loadout-opt .opt-eff { font-size:0.72rem; color:var(--text-muted); line-height:1.45; }
+        .loadout-opt.pending { border-style:dashed; }
+
+        /* Reactive stat panel */
+        .rstats { display:grid; grid-template-columns:repeat(auto-fit,minmax(58px,1fr)); gap:7px; border-top:1px solid rgba(255,255,255,0.06); padding-top:11px; margin-bottom:2px; }
+        .rstat { display:flex; flex-direction:column; align-items:center; gap:2px; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:6px 4px; }
+        .rstat-label { font-size:0.58rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); }
+        .rstat-val { font-size:1.05rem; font-weight:800; color:var(--text-main); transition:color .12s; }
+        .rstat-val.up { color:#37c978; }
+        .rstat-val.down { color:#eb5757; }
+        .loadout-or { flex:0 0 auto; display:flex; align-items:center; font-size:0.64rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; opacity:0.7; }
+        .opt-pending { display:inline-block; cursor:help; color:var(--accent-gold); font-weight:700; border:1px solid var(--accent-gold); border-radius:50%; width:13px; height:13px; line-height:11px; text-align:center; font-size:0.6rem; margin-left:2px; }
+
         /* Effect list */
         .effects {
             font-size: 0.78rem;
@@ -1067,11 +1092,63 @@ const UNITS = [
     },
     "upkeep": "10 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 14 | Armor: 6",
       "Supply: 100",
       "+ Coordination: Gain 10% Power for each bonus received from an ally unit"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Front Line Tactics",
+            "effect": "Gives effects to allied unit at melee range; -1 Power",
+            "pending": true,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": -1
+              }
+            ]
+          },
+          {
+            "name": "Offensive Mindset",
+            "effect": "+2 Power; +15% damage received",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Parrying Armguards",
+            "effect": "-10% melee damage received",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Prana Bindu Initiation",
+            "effect": "Experience levels grant an additional effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 500,
+      "power": 14,
+      "armor": 6,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Ranger",
@@ -1083,14 +1160,77 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 17 | Armor: 0",
       "Supply: 100",
       "+ Focus Fire: Ally units attacking the same target gain 5% Power",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Crossfire Tactics",
+            "effect": "Ally Military Units attacking the same target deal +10% damage (stacking); -10% attack speed",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "attackSpeed",
+                "kind": "mult",
+                "val": 0.9
+              }
+            ]
+          },
+          {
+            "name": "Long Rifle",
+            "effect": "+40% attack range",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "range",
+                "kind": "ratio",
+                "val": 0.4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Automatic Weapons",
+            "effect": "+50% attack speed; -30% Power",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "attackSpeed",
+                "kind": "mult",
+                "val": 1.5
+              },
+              {
+                "stat": "power",
+                "kind": "mult",
+                "val": 0.7
+              }
+            ]
+          },
+          {
+            "name": "War Memoirs",
+            "effect": "Experience levels grant an additional effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 17,
+      "armor": 0,
+      "range": 35,
+      "supply": 100
+    }
   },
   {
     "name": "Heavy Weapon Squad",
@@ -1102,7 +1242,6 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 23 | Armor: 0",
       "Supply: 100",
       "+ Disruption: Dealing damage to an enemy applies Disrupted (x5 max) until the end of combat:",
       "+ Demolition Team:",
@@ -1113,7 +1252,59 @@ const UNITS = [
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "Survival Training"
+    "unlock": "Survival Training",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Distracting Flashes",
+            "effect": "Gives effects to allied units at melee range",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Heavy Loads",
+            "effect": "+30% Power; -25% attack speed",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "mult",
+                "val": 1.3
+              },
+              {
+                "stat": "attackSpeed",
+                "kind": "mult",
+                "val": 0.75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Whistling Ammo",
+            "effect": "+20% damage vs airships",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "War Memoirs",
+            "effect": "Experience levels grant an additional effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 23,
+      "armor": 0,
+      "range": 35,
+      "supply": 100
+    }
   },
   {
     "name": "Support Drone",
@@ -1125,12 +1316,63 @@ const UNITS = [
     },
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 300 | Power: 14 | Armor: 4",
       "Supply: 100",
       "+ Medkits: Nearby ally units gain 20% Health regeneration per day (x1 max)",
       "+ Drone: Does not attract Sandworms"
     ],
-    "unlock": "Support Structures"
+    "unlock": "Support Structures",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Kraken Protocols",
+            "effect": "+2 Power; -1 Armor; For each unit carried by the Drone, it gets: effects",
+            "pending": true,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": 2
+              },
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": -1
+              }
+            ]
+          },
+          {
+            "name": "Supporting Field",
+            "effect": "As long as the Drone is not full, non-mechanical Atreides base units at Long Range gain (stacking): effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Evasion Booster",
+            "effect": "+50% move speed at full carry in combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Optimized Bed Arrangement",
+            "effect": "+1 Carry Capacity; Requires +2 Fuel Cell",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 14,
+      "armor": 4,
+      "range": 25,
+      "supply": 100
+    }
   },
   {
     "name": "Warden",
@@ -1143,11 +1385,51 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 16 | Armor: 8",
       "Supply: 100",
       "+ Bulwark: Nearby ally units gain +2 Armor (x1 max)"
     ],
-    "unlock": "Call to Arms"
+    "unlock": "Call to Arms",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Cover Tactics",
+            "effect": "While in combat, ally units with no target at Short Range gain (stacking): effects",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Last Stand Protocols",
+            "effect": "Allows using the Last Stand Protocols ability: Ignore allied buffs, Cannot be turned off while engaged in melee",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Parrying Armguards",
+            "effect": "-10% melee damage received",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Prana Bindu Initiation",
+            "effect": "Experience levels grant an additional effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 500,
+      "power": 16,
+      "armor": 8,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Hawk",
@@ -1207,11 +1489,63 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100",
       "+ Berserkers: Gain up to 50% Power depending on missing Health"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Scarring Armor",
+            "effect": "up to +6 Armor as Health drops; -3 Armor",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": -3
+              }
+            ]
+          },
+          {
+            "name": "Morbid Climax",
+            "effect": "In combat, keeps fighting for::target_duration_seconds:: seconds after reaching no Life, then dies",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Fix-up Kit",
+            "effect": "Heal 30% Life at the start of combat; Lose Life healed this way at the end of combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Red Fluid",
+            "effect": "+30% attack speed; -50 Life per day, while in combat",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "attackSpeed",
+                "kind": "ratio",
+                "val": 0.3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 15,
+      "armor": 4,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Gunner",
@@ -1223,7 +1557,6 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 16 | Armor: 0",
       "Supply: 100",
       "+ Shrapnel Ammunitions:",
       "+ Demolition:",
@@ -1235,7 +1568,65 @@ const UNITS = [
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Blood Thinner",
+            "effect": "Lose Life above 75% at the start of combat; Regain Life lost that way at the end of combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Heavy Loads",
+            "effect": "+30% Power; -25% attack speed",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "mult",
+                "val": 1.3
+              },
+              {
+                "stat": "attackSpeed",
+                "kind": "mult",
+                "val": 0.75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Bird Slayer",
+            "effect": "+40% damage vs airships under 50% Health",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Red Fluid",
+            "effect": "+30% attack speed; -50 Life per day, while in combat",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "attackSpeed",
+                "kind": "ratio",
+                "val": 0.3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 16,
+      "armor": 0,
+      "range": 35,
+      "supply": 100
+    }
   },
   {
     "name": "Cerberus",
@@ -1247,11 +1638,63 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 11 | Armor: 0",
       "Supply: 100",
       "+ Last stand: Upon dying, split in to 3 Unchained Cerberus"
     ],
-    "unlock": "Survival Training"
+    "unlock": "Survival Training",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Elacca Injector",
+            "effect": "Split into 2 Unchained Cerberus upon death; -150 Health",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "health",
+                "kind": "flat",
+                "val": -150
+              }
+            ]
+          },
+          {
+            "name": "Stealth Gear",
+            "effect": "Cloaked",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Endocrine Arouser",
+            "effect": "up to +30% move speed as Health drops",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Red Fluid",
+            "effect": "+30% attack speed; -50 Life per day, while in combat",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "attackSpeed",
+                "kind": "ratio",
+                "val": 0.3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 11,
+      "armor": 0,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Combat Probe",
@@ -1263,13 +1706,53 @@ const UNITS = [
     },
     "upkeep": "4 Solari · 1 CP · 2 Fuel Cell",
     "effects": [
-      "Health: 100 | Power: 10 | Armor: 0",
       "Supply: 200",
       "+ Fight Analysis: Upon death, nearby ally units in combat gain 10% Power (x5 max)",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
       "  + Only visible from close range"
     ],
-    "unlock": "Support Structures (or Piter De Vries as one of your Councilors)"
+    "unlock": "Support Structures (or Piter De Vries as one of your Councilors)",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Torture Tools",
+            "effect": "Attacks in melee; ignores 50% of enemy armor",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Mounted Explosives",
+            "effect": "Upon death, deals high damage in a melee range; Requires +2 Fuel Cell",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Optic Camouflage",
+            "effect": "Cloaked; Requires +1 Fuel Cell",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Virtual Black Box",
+            "effect": "Upon death, gain 10 Intel",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 100,
+      "power": 10,
+      "armor": 0,
+      "range": 25,
+      "supply": 200
+    }
   },
   {
     "name": "Executioner",
@@ -1282,13 +1765,65 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 15 | Armor: 5",
       "Supply: 100",
       "+ Head Hunter: While in combat, any nearby unit death grants (x10 max):",
       "  +3% Power",
       "  +3% Health regeneration per day"
     ],
-    "unlock": "Call to Arms"
+    "unlock": "Call to Arms",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Hibernation Breastplate",
+            "effect": "While he has no stack of Elite Buff, the Elite gains:::target_effects_list2::",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Parrying Armguards",
+            "effect": "-10% melee damage received",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Meat Armor",
+            "effect": "On reaching no Life, lose one stack of Elite Buff and regain 40 Life instead of dying; -150 Health",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "health",
+                "kind": "flat",
+                "val": -150
+              }
+            ]
+          },
+          {
+            "name": "Red Fluid",
+            "effect": "+30% attack speed; -50 Life per day, while in combat",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "attackSpeed",
+                "kind": "ratio",
+                "val": 0.3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 500,
+      "power": 15,
+      "armor": 5,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Harpy",
@@ -1347,11 +1882,62 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 15 | Armor: 2",
       "Supply: 100",
       "+ Scavengers: Gain 5% Health regeneration per day until the end of combat whenever a unit dies nearby (5x max)"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Chasing Stance",
+            "effect": "Current target suffer effects (stacking)",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Gnarly Recyclers",
+            "effect": "heals for 20% of damage dealt",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Heavy Armor",
+            "effect": "+2 Armor; -2 Power",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": 2
+              },
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": -2
+              }
+            ]
+          },
+          {
+            "name": "Dismantling Tools",
+            "effect": "ignores 50% of mechanical/building armor",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 15,
+      "armor": 2,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Wrecker",
@@ -1363,7 +1949,6 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 8 | Armor: 0",
       "Supply: 100",
       "+ Chemical Weapons:",
       "+ Demolition Team:",
@@ -1377,7 +1962,54 @@ const UNITS = [
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Concentrated Toxins",
+            "effect": "+75% damage to current target",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Bazooka",
+            "effect": "+50% attack range",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "range",
+                "kind": "ratio",
+                "val": 0.5
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Traumatic Repeater",
+            "effect": "Damaged units suffer effects (stacking)",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Stinging Gas",
+            "effect": "Damaged enemy units receive +10% damage from all sources (stacking)",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 8,
+      "armor": 0,
+      "range": 25,
+      "supply": 100
+    }
   },
   {
     "name": "Sniper",
@@ -1389,7 +2021,6 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 250 | Power: 21 | Armor: 0",
       "Supply: 100",
       "+ Elimination Shots: Deal +30% damage against non-mechanical units",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1398,7 +2029,48 @@ const UNITS = [
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "Survival Training"
+    "unlock": "Survival Training",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Propelling Ammo",
+            "effect": "Gain Power depending on distance from target, up to +5 Power at Long Range",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Recursive Lens",
+            "effect": "+10% damage vs slowed",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Barrel Cleaner",
+            "effect": "At full Life, the first attack has +100% Power",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Whistling Ammo",
+            "effect": "+20% damage vs airships",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 250,
+      "power": 21,
+      "armor": 0,
+      "range": 50,
+      "supply": 100
+    }
   },
   {
     "name": "Scavenging Drone",
@@ -1410,14 +2082,54 @@ const UNITS = [
     },
     "upkeep": "10 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 500 | Power: 16 | Armor: 5",
       "Supply: 200",
       "+ Loot Distributor: While in combat, any nearby unit death grants the following bonuses for your allied units(10x max):",
       "+ Drone: Does not attract Sandworms",
       "  +2% Power",
       "  +2% max Health"
     ],
-    "unlock": "Support Structures"
+    "unlock": "Support Structures",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Shielding Straightener",
+            "effect": "Allows to use the Makeshift Protection ability: Ally ground Military Units in Medium Range gain effects (stacking), Consumes 4 stacks of Drone Buff per day, Can be turned off",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Shock Dampener",
+            "effect": "Gain 5 Intel when delivering Drone Buff to a Village",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Optic Camouflage",
+            "effect": "Cloaked; Requires +1 Fuel Cell",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Motivational Cashbox",
+            "effect": "When receiving Drone Buff, every ally unit at Medium Range get effects for 0.5 days (x::target_stacking_limit2:: max)",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 500,
+      "power": 16,
+      "armor": 5,
+      "range": 25,
+      "supply": 200
+    }
   },
   {
     "name": "Free Company",
@@ -1430,14 +2142,54 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 14 | Armor: 2",
       "Supply: 100",
       "+ Sharpen Swords: Gain up to +100% Power depending on the missing Health of the target they're fighting",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
       "  + Only visible from close range",
       "  + Gain 10% increased Movement Speed when near combat"
     ],
-    "unlock": "Call to Arms"
+    "unlock": "Call to Arms",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Running Sandshoes",
+            "effect": "Allows using the Haste ability: effects",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Stealth Gear",
+            "effect": "Cloaked",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Dual Guns",
+            "effect": "Attacks at Medium Range; Gains Ranged Trait; effects while engaged in melee",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Dismantling Tools",
+            "effect": "ignores 50% of mechanical/building armor",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 500,
+      "power": 14,
+      "armor": 2,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Banshee",
@@ -1496,12 +2248,52 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 15 | Armor: 4",
       "Supply: 100",
       "+ Sand Tactics: Enemies engaged in combat with this unit suffer Disoriented (x1) max:",
       "  + -15% Power"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Dry Training",
+            "effect": "+1 Life per Water",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Sand Cover",
+            "effect": "-20% ranged damage received",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Confusing Tactics",
+            "effect": "effects per enemy units at melee range (stacking)",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Shelter Maps",
+            "effect": "-15% damage received in own/neutral territory",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 15,
+      "armor": 4,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Skirmisher",
@@ -1513,7 +2305,6 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 5 | Armor: 0",
       "Supply: 100",
       "+ Fremen Opression: For each penalty suffered by the target, gain +1 Power (5x max)",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
@@ -1525,7 +2316,48 @@ const UNITS = [
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Camouflage Fabric",
+            "effect": "Cannot be seen outside of combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Scatter Grenades",
+            "effect": "+40% attack AoE radius",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Anti-personnel Shrapnels",
+            "effect": "+10% damage vs non-mechanical",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Loud Bang",
+            "effect": "Damaged units deal +90% damage",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 5,
+      "armor": 0,
+      "range": 25,
+      "supply": 100
+    }
   },
   {
     "name": "Infiltrator",
@@ -1537,14 +2369,60 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 11 | Armor: 0",
       "Supply: 100",
       "+ Weakness Revealed: First attack in combat inflicts +40 Damage and makes the target take +20% more damage from all sources",
       "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
       "  + Only visible from close range",
       "  + Gain 10% increased Movement Speed when near combat"
     ],
-    "unlock": "Survival Training"
+    "unlock": "Survival Training",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Camouflage Fabric",
+            "effect": "Cannot be seen outside of combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Electronic Scrambler",
+            "effect": "Once per combat, a mechanical target is TElectronic Scrambler Debuff until the end of combat (stacking): effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Chasing Stance",
+            "effect": "Current target suffer effects (stacking)",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Focused Mind",
+            "effect": "Immune to slows (no speed loss); +1 Armor",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 11,
+      "armor": 0,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Mobile Turret",
@@ -1557,14 +2435,54 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 18 | Armor: 0",
       "+ Mobile Battery: Can set up an anti-air turret:",
       "  + Gain 20 Power",
       "  − Can only attack Flying Units",
       "  − Unable to move",
       "Patch 2.2.5: Can hold position without deploying"
     ],
-    "unlock": "Support Structures"
+    "unlock": "Support Structures",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Folding Frame",
+            "effect": "-75% deploy/undeploy time",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Ambush Camouflage",
+            "effect": "While deployed, gain: Cannot be seen outside of combat, Do not lose Supply, Do not attract Sandworms, The target suffers effects for::target_duration:: days when attacking undetected",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Shadow Scan",
+            "effect": "Detects cloaked units",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Pre-Loaded Weapons",
+            "effect": "+100% Power when attacking undetected",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 18,
+      "armor": 0,
+      "range": 35,
+      "supply": 100
+    }
   },
   {
     "name": "Fedaykin",
@@ -1577,13 +2495,70 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 22 | Armor: 5",
       "Supply: 100",
       "+ Against the Odds: For each enemy military unit (x5 max) in combat with this unit, gain:",
       "  + +10% Power",
       "  + +1 Armor"
     ],
-    "unlock": "Call to Arms"
+    "unlock": "Call to Arms",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Maker's Effigy",
+            "effect": "+2 Power; -1 Armor",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": 2
+              },
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": -1
+              }
+            ]
+          },
+          {
+            "name": "Devastating Strikes",
+            "effect": "+10% damage per enemy unit hit by the attack",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Confusing Tactics",
+            "effect": "effects per enemy units at melee range (stacking)",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Self-sufficiency",
+            "effect": "+6 Power; Requires +1 Command Point",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": 6
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 22,
+      "armor": 5,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Spire",
@@ -1615,7 +2590,6 @@ const UNITS = [
     },
     "upkeep": "50 Solari",
     "effects": [
-      "Health: 1600 | Power: 22 | Armor: 4",
       "+ Can activate Deploy Sails",
       "+ Has access to on-board enhancements",
       "+ Siege Weapons:",
@@ -1628,7 +2602,80 @@ const UNITS = [
       "  − Cannot occupy Village nor contest their occupation",
       "  − Cannot target Village Buildings"
     ],
-    "unlock": ""
+    "unlock": "",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Sky Facade",
+            "effect": "Cloaked",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Wreck Harness",
+            "effect": "Killing enemy flying units at Long Range gives +2% Scraps",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Makeshift Workshop",
+            "effect": "Regenerates outside of combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Symbol of Freedom",
+            "effect": "Gain 50 Authority when liberating a Village in the region",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Storm Sails",
+            "effect": "Ignores damage from Sandstorms; +50% Speed in a Sandstorm",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Recon Stations",
+            "effect": "+1 vision range; Detects cloaked units",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Sand Cloud",
+            "effect": "Ground ally Military Units at Long Range get Sneak Trait",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Supply Hold",
+            "effect": "Ally Military Units at Long Range regain Supply outside combat",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 1600,
+      "power": 22,
+      "armor": 4,
+      "range": 50,
+      "supply": 100
+    }
   },
   {
     "name": "Conscript Swordman",
@@ -1640,11 +2687,57 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 13 | Armor: 3",
       "Supply: 100",
       "+ Protection Support: Other nearby ally Military Units gain +5% damage reduction while they have at least 1 Armour (5x max)"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Small Formation",
+            "effect": "Requires -1 Command Point; -35% damage; -35% Health",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "health",
+                "kind": "mult",
+                "val": 0.65
+              }
+            ]
+          },
+          {
+            "name": "Supporting Tactics",
+            "effect": "Gives effects to non-Conscript allied units at Short Range",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Live Reformation",
+            "effect": "When Life is above 50%, transfer 50% Life per day to a unit of the same kind with less Life at melee range",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Parrying Armguards",
+            "effect": "-10% melee damage received",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 13,
+      "armor": 3,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Conscript Rifleman",
@@ -1656,14 +2749,60 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 14 | Armor: 0",
       "Supply: 100",
       "+ Targeting Support: Gain +30% Power while having at least 3 Armour",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Small Formation",
+            "effect": "Requires -1 Command Point; -35% damage; -35% Health",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "health",
+                "kind": "mult",
+                "val": 0.65
+              }
+            ]
+          },
+          {
+            "name": "Supporting Tactics",
+            "effect": "Gives effects to non-Conscript allied units at Short Range",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Live Reformation",
+            "effect": "When Life is above 50%, transfer 50% Life per day to a unit of the same kind with less Life at melee range",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Whistling Ammo",
+            "effect": "+20% damage vs airships",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 14,
+      "armor": 0,
+      "range": 35,
+      "supply": 100
+    }
   },
   {
     "name": "Incinerator",
@@ -1675,11 +2814,57 @@ const UNITS = [
     },
     "upkeep": "10 Solari · 5 CP",
     "effects": [
-      "Health: 400 | Power: 7 | Armor: 1",
       "Supply: 100",
       "+ Flamethrowers: Attacks deal damage within a frontal cone and ignore enemy Armor"
     ],
-    "unlock": "Survival Training"
+    "unlock": "Survival Training",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Wide Nozzle",
+            "effect": "-30% attack range; +100% attack arc",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "range",
+                "kind": "mult",
+                "val": 0.7
+              }
+            ]
+          },
+          {
+            "name": "Exotic Compounds",
+            "effect": "Units damaged by 2 or more Specials accrue Burned Trait 50% faster",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Phosphorus Mix",
+            "effect": "+30% damage vs non-mechanical",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Terrifying Mask",
+            "effect": "Enemy units deal 1% less damage to Specials per Burned Trait stack",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 7,
+      "armor": 1,
+      "range": 25,
+      "supply": 100
+    }
   },
   {
     "name": "Artillery Drone",
@@ -1691,7 +2876,6 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 40 | Armor: 2",
       "Supply: 200",
       "− Siege Engine:",
       "+ Siege Weapons:",
@@ -1703,7 +2887,65 @@ const UNITS = [
       "  + Attacks have a 50% chance to destroy Armor",
       "  + Gain +100% damage against Flying Units"
     ],
-    "unlock": "Support Structures"
+    "unlock": "Support Structures",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Long Cannons",
+            "effect": "+20% attack range; +30% minimum range (worse up close)",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "range",
+                "kind": "ratio",
+                "val": 0.2
+              }
+            ]
+          },
+          {
+            "name": "Heavy Loads",
+            "effect": "+30% Power; -25% attack speed",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "mult",
+                "val": 1.3
+              },
+              {
+                "stat": "attackSpeed",
+                "kind": "mult",
+                "val": 0.75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Incendiary Ammo",
+            "effect": "Dealing damage to an enemy unit applies 2 Burned Trait stacks until the end of combat",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Whistling Ammo",
+            "effect": "+20% damage vs airships",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 40,
+      "armor": 2,
+      "range": 80,
+      "supply": 200
+    }
   },
   {
     "name": "Sardaukar",
@@ -1716,13 +2958,53 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 500 | Power: 17 | Armor: 5",
       "Supply: 100",
       "+ Executioner:",
       "  + Execute enemies under 20% Health",
       "  + Gain +5% executing Health threshold upon killing an enemy for the rest of combat (5x max)"
     ],
-    "unlock": "Call to Arms (or have Captain Aramsham as one of your Councilors)"
+    "unlock": "Call to Arms (or have Captain Aramsham as one of your Councilors)",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Frightening Reputation",
+            "effect": "Every execution gives 5 Influence",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Parrying Armguards",
+            "effect": "-10% melee damage received",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Sardaukar's Cleaver",
+            "effect": "Raises the execution threshold by 10% as if there were 5 more units around the Elite",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Battlefield Frenzy",
+            "effect": "+1% attack speed per allied unit at Medium Range",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 500,
+      "power": 17,
+      "armor": 5,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Hammer",
@@ -1783,11 +3065,57 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "Health: 450 | Power: 10 | Armor: 7",
       "Supply: 100",
       "+ Crusher: Enemy units targeted by the Squire suffer -4 Armour (1x max)"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Front Line Tactics",
+            "effect": "Gives effects to allied unit at melee range; -1 Power",
+            "pending": true,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": -1
+              }
+            ]
+          },
+          {
+            "name": "Knightly Protector",
+            "effect": "Get effects if at least 1 Knight is at Short Range",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Sobering Medication",
+            "effect": "50% of damage bonuses are turned into damage reduction",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Prickly Spear",
+            "effect": "Target deals +80% damage, except against Squire",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 450,
+      "power": 10,
+      "armor": 7,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Musketeer",
@@ -1799,14 +3127,65 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 21 | Armor: 0",
       "Supply: 100",
       "+ Thunder: Enemy units targeted by the Musketeer suffer +10% damage received (1x max)",
       "− Ranged: Suffers Pinned down while engaged in melee combat:",
       "  − -50% Power",
       "  − Cannot use ranged attacks"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Shadow Scan",
+            "effect": "Detects cloaked units",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Heavy Loads",
+            "effect": "+30% Power; -25% attack speed",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "mult",
+                "val": 1.3
+              },
+              {
+                "stat": "attackSpeed",
+                "kind": "mult",
+                "val": 0.75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Barrel Cleaner",
+            "effect": "At full Life, the first attack has +100% Power",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Bird Slayer",
+            "effect": "+40% damage vs airships under 50% Health",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 21,
+      "armor": 0,
+      "range": 35,
+      "supply": 100
+    }
   },
   {
     "name": "Fencer",
@@ -1818,12 +3197,52 @@ const UNITS = [
     },
     "upkeep": "6 Solari · 3 CP",
     "effects": [
-      "Health: 300 | Power: 11 | Armor: 1",
       "Supply: 100",
       "+ Deadly Dance: Gain +150% attack speed when no ally units are close",
       "Patch 2.2.3: -40% damage received from target"
     ],
-    "unlock": "None"
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Jumping Boot",
+            "effect": "effects for::target_duration_seconds:: seconds after the target died",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Personal Mantlet",
+            "effect": "effects until first attack dealt in combat",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Parrying Armguards",
+            "effect": "-10% melee damage received",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Chasing Stance",
+            "effect": "Current target suffer effects (stacking)",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 11,
+      "armor": 1,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "War Banner",
@@ -1835,7 +3254,6 @@ const UNITS = [
     },
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
-      "Health: 300 | Power: 16 | Armor: 3",
       "Supply: 200",
       "+ Inspiring Sight:",
       "+ Demolition:",
@@ -1848,7 +3266,54 @@ const UNITS = [
       "  + Does not attract Sandworms",
       "  + Consume Solari to heal"
     ],
-    "unlock": "National Mythos"
+    "unlock": "National Mythos",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Distracting Lights",
+            "effect": "Enemy units targeting this unit receive +20% damage",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Marching Colors",
+            "effect": "+20% move speed out of combat; Ecaz non-mechanical units at Medium Range get +20% Speed outside combat",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Propaganda Machine",
+            "effect": "Enemy units at Medium Range inflict +90% damage (stacking)",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Big Banner",
+            "effect": "+100 Health; Increase range of effects to Long Range",
+            "pending": true,
+            "mods": [
+              {
+                "stat": "health",
+                "kind": "flat",
+                "val": 100
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 300,
+      "power": 16,
+      "armor": 3,
+      "range": 25,
+      "supply": 200
+    }
   },
   {
     "name": "Knight",
@@ -1861,13 +3326,71 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP",
     "effects": [
-      "Health: 250 | Power: 25 | Armor: 2",
       "Supply: 100",
       "+ Nobility:",
       "  + This unit receives -20% damage per other Ecazi non-mechanical unit nearby",
       "  + Cannot be killed if there is at least one other Ecazi non-mechanical unit nearby"
     ],
-    "unlock": ""
+    "unlock": "",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Vow of Bravery",
+            "effect": "ignores 50% of enemy armor; -2 Armor",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": -2
+              }
+            ]
+          },
+          {
+            "name": "Vow of Fervor",
+            "effect": "+20% damage; -100 Health",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "health",
+                "kind": "flat",
+                "val": -100
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Vow of Heroism",
+            "effect": "+15 Power; Requires +3 Command Point",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": 15
+              }
+            ]
+          },
+          {
+            "name": "Vow of Honor",
+            "effect": "Squires at Short Range gain effects",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 250,
+      "power": 25,
+      "armor": 2,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Siren",
@@ -2114,11 +3637,57 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 13 | Armor: 5",
       "Supply: 100",
       "Self-learning combat drones using a shifting repertoire of deadly moves."
     ],
-    "unlock": "Available from the start"
+    "unlock": "Available from the start",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Material Pre-processor",
+            "effect": "+5% Power per point of enemy Armor; -5% attack speed per point of enemy Armor",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Heavy Shielding",
+            "effect": "+2 Armor; Requires +2 Fuel Cell",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Anatomical Scanner",
+            "effect": "+15% damage vs non-mechanical",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Learning Transistors",
+            "effect": "+0.5 Knowledge while Tethered in combat",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 13,
+      "armor": 5,
+      "range": 0,
+      "supply": 100
+    }
   },
   {
     "name": "Labthopter",
@@ -2156,11 +3725,51 @@ const UNITS = [
     },
     "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
-      "Health: 400 | Power: 14 | Armor: 4",
       "Supply: 100",
       "The Resonance Drone induces a self-repeating electrical feedback loop in its Holtzman Coil, charging nearby Faraday cages with a powerful electrostatic effect."
     ],
-    "unlock": "Ix military development required"
+    "unlock": "Ix military development required",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Fractal Frequencies",
+            "effect": "The Drone Buff deals +50% damage; Requires +2 Fuel Cell",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Feedback Gate",
+            "effect": "effects per ally drone at Medium Range (stacking)",
+            "pending": true,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Deep Signals",
+            "effect": "Ally mechanical units at Medium Range inflict +10% damage (stacking)",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Repeater Node",
+            "effect": "Always Tethered; Ally mechanical units at Medium Range are Tethered",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 14,
+      "armor": 4,
+      "range": 25,
+      "supply": 100
+    }
   },
   {
     "name": "Fight-Engineer",
@@ -2177,11 +3786,51 @@ const UNITS = [
     },
     "upkeep": "16 Solari · 4 CP",
     "effects": [
-      "Health: 400 | Power: 16 | Armor: 2",
       "Supply: 100",
       "Fight-Engineers are a caste of Ixian specialists constantly trying to improve the programming of fighting drones."
     ],
-    "unlock": "5,000 Hegemony"
+    "unlock": "5,000 Hegemony",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Work Shelter",
+            "effect": "Gain effects while the repair station is deployed",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "Shadow Scan",
+            "effect": "Detects cloaked units",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Multi-purpose Parts",
+            "effect": "Ally mechanical units at Medium Range get: +80% Solari upkeep, +80% regeneration costs",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Memory Implant",
+            "effect": "+1 bonus XP per level",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 400,
+      "power": 16,
+      "armor": 2,
+      "range": 25,
+      "supply": 100
+    }
   },
   {
     "name": "Duncan",
@@ -2401,6 +4050,131 @@ const UNITS = [
       "★ Ally non-mechanical units at Short Range are Sneak Trait"
     ],
     "unlock": "Faction Hero"
+  },
+  {
+    "name": "Suboid Soldier",
+    "faction": "Vernius",
+    "type": "military",
+    "subtitle": "Range: Melee",
+    "cost": {
+      "manpower": 20
+    },
+    "upkeep": "4 Solari · 2 CP",
+    "effects": [
+      "Supply: 100",
+      "+ Worker's Solidarity: Inflicts +5% damage per Soldier at Short Range (stacking)"
+    ],
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Tinkering Gear",
+            "effect": "Ally drones at Short Range get effects (stacking)",
+            "pending": true,
+            "mods": []
+          },
+          {
+            "name": "DIY Kit",
+            "effect": "No Solari upkeep",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Focused Mind",
+            "effect": "Immune to slows (no speed loss); +1 Armor",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "armor",
+                "kind": "flat",
+                "val": 1
+              }
+            ]
+          },
+          {
+            "name": "Dismantling Tools",
+            "effect": "ignores 50% of mechanical/building armor",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 200,
+      "power": 8,
+      "armor": 0,
+      "range": 0,
+      "supply": 100
+    }
+  },
+  {
+    "name": "Railgun Drone",
+    "faction": "Vernius",
+    "type": "military",
+    "subtitle": "Range: 35",
+    "cost": {
+      "solari": 400
+    },
+    "upkeep": "8 Solari · 4 CP · 4 Fuel Cell",
+    "effects": [
+      "Supply: 100",
+      "+ Trajectory Computing: Attack at Long Range when Tethered",
+      "+ Armor Penetration: Ignores half of the enemy armor"
+    ],
+    "unlock": "None",
+    "customization": [
+      {
+        "options": [
+          {
+            "name": "Propelling Ammo",
+            "effect": "Gain Power depending on distance from target, up to +5 Power at Long Range",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Strong Magnets",
+            "effect": "+3 Power; Requires +2 Fuel Cell",
+            "pending": false,
+            "mods": [
+              {
+                "stat": "power",
+                "kind": "flat",
+                "val": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "options": [
+          {
+            "name": "Whistling Ammo",
+            "effect": "+20% damage vs airships",
+            "pending": false,
+            "mods": []
+          },
+          {
+            "name": "Learning Transistors",
+            "effect": "+0.5 Knowledge while Tethered in combat",
+            "pending": false,
+            "mods": []
+          }
+        ]
+      }
+    ],
+    "baseStats": {
+      "health": 320,
+      "power": 23,
+      "armor": 1,
+      "range": 35,
+      "supply": 100
+    }
   }
 ];
 
@@ -4982,6 +6756,52 @@ function makeStatBar(label, val, max, barClass) {
     </div>`;
 }
 
+// Compact reactive stat panel for customizable units. Values recompute on gear selection.
+function renderStatPanel(bs) {
+    const cell = (label, stat, base, disp) =>
+        `<div class="rstat"><span class="rstat-label">${label}</span><span class="rstat-val" data-stat="${stat}" data-base="${base}" title="Base: ${disp}">${disp}</span></div>`;
+    let cells = cell('Health', 'health', bs.health, bs.health)
+        + cell('Power', 'power', bs.power, bs.power)
+        + cell('Armor', 'armor', bs.armor, bs.armor);
+    if (bs.range > 0) cells += cell('Range', 'range', bs.range, bs.range);
+    cells += cell('Atk Spd', 'attackSpeed', 100, '100%');
+    return `<div class="rstats">${cells}</div>`;
+}
+
+// Recompute a card's stat panel from its currently-selected gear options.
+function recalcCard(card) {
+    if (!card) return;
+    const acc = {};
+    card.querySelectorAll('.loadout-opt.selected').forEach(opt => {
+        let mods = [];
+        try { mods = JSON.parse(opt.dataset.mods || '[]'); } catch (e) { mods = []; }
+        mods.forEach(m => {
+            const a = acc[m.stat] || (acc[m.stat] = { flat: 0, mult: 1, ratio: 0 });
+            if (m.kind === 'flat') a.flat += m.val;
+            else if (m.kind === 'mult') a.mult *= m.val;
+            else if (m.kind === 'ratio') a.ratio += m.val;
+        });
+    });
+    card.querySelectorAll('.rstat-val').forEach(span => {
+        const stat = span.dataset.stat, base = parseFloat(span.dataset.base);
+        const m = acc[stat] || { flat: 0, mult: 1, ratio: 0 };
+        const v = Math.round((base + m.flat) * m.mult * (1 + m.ratio));
+        span.textContent = stat === 'attackSpeed' ? v + '%' : v;
+        const changed = Math.abs(v - base) > 0.0001;
+        span.classList.toggle('up', changed && v > base);
+        span.classList.toggle('down', changed && v < base);
+    });
+}
+
+// Click a gear option: toggle it (one selected per slot), then recompute stats.
+function toggleGear(opt) {
+    const slot = opt.closest('.loadout-slot');
+    const was = opt.classList.contains('selected');
+    slot.querySelectorAll('.loadout-opt').forEach(o => o.classList.remove('selected'));
+    if (!was) opt.classList.add('selected');
+    recalcCard(opt.closest('.entry-card'));
+}
+
 function renderUnitCard(u) {
     const fc = factionColor(u.faction);
     const typeClass = tagClass(u.type);
@@ -5002,17 +6822,31 @@ function renderUnitCard(u) {
                 <span class="tag ${typeClass}">${u.type}</span>
             </div>
         </div>
-        ${hasCombat ? `
+        ${u.baseStats ? renderStatPanel(u.baseStats) : (hasCombat ? `
         <div class="stat-bars">
             ${makeStatBar('Health', u.health, MAX.health, 'bar-health')}
             ${makeStatBar('Power', u.power, MAX.power, 'bar-power')}
             ${makeStatBar('Armor', u.armor, MAX.armor, 'bar-armor')}
             ${makeStatBar('Supply', u.supply, MAX.supply, 'bar-supply')}
-        </div>` : ''}
+        </div>` : '')}
         <div class="cost-row">${makeCostChips(u.cost, u.upkeep)}</div>
         <div class="effects">
             <ul>${u.effects.map(e => `<li>${e}</li>`).join('')}</ul>
         </div>
+        ${u.customization ? `
+        <div class="unit-loadout">
+            <div class="loadout-title"><i data-lucide="settings-2" style="width:13px;height:13px;"></i> Customization · click an option to apply</div>
+            ${u.customization.map((slot, i) => `
+            <div class="loadout-slot">
+                ${u.customization.length > 1 ? `<div class="loadout-slot-num">${i + 1}</div>` : ''}
+                <div class="loadout-opts">
+                    ${slot.options.map(o => `<div class="loadout-opt${o.pending ? ' pending' : ''}" onclick="toggleGear(this)" data-mods='${JSON.stringify(o.mods || [])}'>
+                        <div class="opt-name">${o.name}</div>
+                        <div class="opt-eff">${o.effect}${o.pending ? ` <span class="opt-pending" title="Conditional/aura effect — exact values pending in-game confirmation">?</span>` : ''}</div>
+                    </div>`).join('<div class="loadout-or">or</div>')}
+                </div>
+            </div>`).join('')}
+        </div>` : ''}
         <div class="unlock-note">🔓 ${u.unlock}</div>
     </div>`;
 }

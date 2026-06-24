@@ -114,8 +114,15 @@ Larger builds (high value, plan separately — see roadmap):
       verified against the CDB unit/trait sheets. Generic combat traits and faction leaders
       were omitted (placeholder text / cosmetic respectively).
 
-- [ ] Armory / Equipment section — ~112 live gear items (filter out ~45 legacy `*_Old`),
-      4 slots/unit (Fremen Altar 8), effects via the `trait` join. New "Armory" category.
+- [x] Armory / Equipment — implemented as **interactive per-unit customization on the unit cards**
+      (not a separate category). Verified against the game DB: each equippable unit has **2 gear
+      slots** (Fremen Altar = 4), and **each slot is a binary choice between 2 options** — 36 units,
+      148 options. Clicking an option recomputes a live stat panel (Health/Power/Armor/Range/Attack
+      Speed) from the gear's decoded stat modifiers (green = up, red = down). The "157 equipment rows"
+      breaks down as 112 equippable + 44 orphaned/cut (referenced by no unit) + 1 legacy `*_Old`; only
+      the 112 are shown. Also added the 2 Vernius combat units missing from the compendium (Suboid
+      Soldier, Railgun Drone). Fixed an `_MRatio` formatting bug (multiplier `1.3` → +30%, not +130%).
+      ~34 conditional/aura options are flagged "?" (exact values pending in-game tooltip confirmation).
 
 - [ ] Audit all icons/graphics across the dashboard and add relevant game art — the
       dashboard and compendium currently lean on external wiki image URLs (WIKI_IMAGES),
