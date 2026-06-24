@@ -63,6 +63,23 @@
       concede endings (and/or split unknown camelCase tags) in `getVictoryCondition`
       and the detail-modal reason text, e.g. render "Conceded (Supremacy)".
 
+- [ ] (PLANNING — investigated 2026-06-23) Connect a Steam account to pull records —
+      **not feasible from the hosted static page; feasible only as a local helper.** The
+      Steam Web API requires a secret API key (can't ship in client-side code) and sends no
+      CORS headers, so a GitHub-Pages browser app cannot call it directly — it would need a
+      backend/proxy, which breaks the no-server design. What the API *would* add: achievements
+      (107 exist in `data.cdb`; their Steam API names are NOT stored here — `achievement@platforms.steamId`
+      is empty, 0/107 — so pull names from Steam `GetSchemaForGame` and match by display name),
+      plus playtime / owned / recently-played (`GetOwnedGames`, `GetRecentlyPlayedGames`). What it
+      would NOT add: the real career/match records (Games started, Victory ratio, Factions ratio,
+      Conquest best time, per-match faction/resource data — see the `profileStatsTracking` sheet,
+      16 entries). Those live in the local `profile_stats_*.sav` and are NOT Steam cloud stats
+      (no steamId mapping), and the dashboard already parses them (`parsed_result.json` → conquest,
+      games). **Recommended path:** a local-only helper (like the `src_scripts`) that takes the
+      user's Steam Web API key + SteamID64, fetches achievements + playtime for appid **1605220**,
+      and emits a JSON the dashboard loads — key kept private/gitignored, same handling as the .sav.
+      Net: Steam adds achievements + playtime on top of the richer .sav data; it cannot replace it.
+
 - [x] Confirm unit data is on the latest patch — refreshed all 55 matched units
       against the game database (data.cdb): Health/Power/Armor, Supply, Range, and the
       cost model. The old schema was wrong (Water is no longer a recruit cost,
@@ -135,11 +152,59 @@ Add-content PRs (high value, medium effort):
       `onlyForConquestOwner` props). Standard-game faction customization is the councilors
       (already covered). If built: a clearly-labeled "Conquest Campaign Bonuses" section.
 
-- [ ] Operations cleanup (deferred from the quick-win fix) — replace the 14 "Variable"
-      faction-op costs with the tier-fixed values (VeryEasy 100 Intel / Easy 200 Intel +
-      200 Solari / Medium 500 Intel + 500 Solari, verified in `mission`); confirm the
-      Gear Sabotage ↔ Defense Breaches name swap from a tooltip; add ~9 missing spy ops +
-      an Infiltration-fields table.
+- [~] Operations cleanup — **costs done (2026-06-23).** All 21 faction-op "Variable" costs
+      replaced with the CDB-verified tier values (VeryEasy 100 Intel / Easy 200 Intel + 200
+      Solari / Medium 500 Intel + 500 Solari) and now rendered on the faction-op cards; the
+      Gear Sabotage ↔ Defense Breaches mix-up was a **cost** swap (not a name swap) — corrected
+      to Gear Sabotage = 100 Intel (VeryEasy, ope `GearSabotage`) and Defense Breaches = 500
+      Intel + 500 Solari (Medium, ope `DefenseSabotage`); Probe Setup is the lone 50-Intel
+      outlier. **Still open:** add the ~9 missing spy/infiltration ops (MScavengerTeam,
+      MSupplyCaches, MDecoyThumper, MEMPBomb, MAdministrativeBurden, InfiltrationCells,
+      CellSearch, the CB_* Conquest ops) + an Infiltration-fields table.
+
+- [x] Differentiate buildings by build location + fix faction availability (2026-06-23) —
+      reworked the Buildings tab from a 2-way Main Base/Village split into **5 location
+      categories** verified against the CDB: **Main Base (HQ)** (`Main_*`), **Village**,
+      **Sietch** (Fremen settlement buildings, `SI*` — tagged Fremen), **Underworld** (Smuggler
+      Underworld-HQ buildings in enemy/neutral villages — the covert 1-day set, tagged Smugglers),
+      and **Enemy Main Base** (Smuggler Underworld in enemy Main Bases, `MB*` — tagged Smugglers).
+      Each gets a colored badge + lucide icon + its own filter pill. Fixed faction availability
+      from the CDB `onlyForFactions`/`notForFactions` (e.g. Windtrap is Fremen-only not "All";
+      Dew Collector/Water Extractor/Recycling Vats/Embassy/etc. exclude Fremen but now correctly
+      include Vernius), and fixed the faction filter to honor multi-faction lists (was exact-match,
+      so multi-faction buildings only showed under "All"). 3 buildings have no clean CDB match and
+      kept their curated faction (flagged): **Ceremonial Caves, Concord Chamber, Underground Tunnels**.
+      Also: charter resolution **schedule logic** documented on the Landsraad page (3 drawn/Council,
+      2-Council cooldown, eligibility-gated — not random); operation costs (above); type-badge icons
+      on all unit/building cards; and the `MAIN_BASE` → "Main Base" badge formatting fix.
+
+- [x] Authoritative building re-derivation + Smuggler confirmation (2026-06-24, multi-agent
+      workflow + adversarial verify) — confirmed via the game files: **Smuggler Underworld
+      buildings (28: 19 village `HeadquartersBuilding` + 9 enemy-Main-Base `MB*`) are
+      Smuggler-EXCLUSIVE**, and `SI*` Sietch buildings (12) are Fremen-exclusive — gated by the
+      Smuggler-only `InstallUWHeadquarter` / Fremen-only `AlliedSietch_BuildLocalSietch` unlocks,
+      NOT by the building row (which is untagged), so they must be faction-gated in the UI (they are).
+      Location is now taken from the authoritative `building.props.tip.cat` (was a construction-time
+      heuristic). **Provenance audit found ~50/80 building COSTS were data-entry errors** — regenerated
+      every cost/upkeep straight from `building@states[0].cost`/`.upkeep`: Water moved from cost to
+      **upkeep** (~24 buildings), Smuggler Underworld 200→**100** Solari, MB enemy-base 2000→**1000
+      Solari + 100 Intel** (MBHiddenExplosives 500), SI* Plascrete 1000→**800** (Hidden Plascrete 250),
+      Vernius HQ upkeep 0→10 Solari. Qualitative data (all 7 factions' bonuses, 28 councillors,
+      hegemony 5k/10k tiers, building effect text) verified fully CDB-traceable. Added `authority` to
+      the cost-chip icons; hid the ugly "None/day" upkeep chip. Flagged (kept as-is, need in-game check):
+      dead-stub rows Spice Collectors / Underground Tunnels / Clandestine Scouts, untagged Support Station,
+      and unmatched Ceremonial Caves / Concord Chamber.
+
+- [x] Main Base Planner (district-bonus calculator) (2026-06-24) — new **Main Base** tab. Per-faction
+      district layouts from `structure.props.districtSlots` (Atreides 1-2-3-2-1-1, Harkonnen 3-2-1-2-3,
+      Smugglers 3-2-1-1-1-1, Fremen 3-2-1, Corrino 3-2-1 ×up-to-3 bases, Ecaz 1-3-2-3-1, Vernius S-Vault
+      3-3-3). Districts are domain-agnostic (`nbSlots` only): assign Economy/Military/Statecraft to each,
+      and filling an N-slot district grants that domain's **tier-N** bonus from `domain.districtLevels`
+      (Economy: Investment Offices/Insurance Banks +30 Solari/Economic Lobbies +10% Solari; Military:
+      Military Academy/Master Armorers +1 Armor [Fremen: Master Raiders +10% atk spd]/Military Investments
+      +20% Health; Statecraft: Administrative Complex/Senate Envoys +3 Influence +5 Intel/Political Forum
+      +150 Council Votes [Smugglers & Fremen: +150 max Influence +6 Influence]). Live bonus rollup + Corrino
+      multi-base (5k/10k Hegemony) + faction-correct variant reference table. Verified headless, 0 errors.
 
 - [ ] Treaties cleanup (deferred) — add per-treaty costs + the hidden −10% Authority
       treaty upkeep, and fix the Non-Aggression Pact description (the open-borders / no-
@@ -178,6 +243,22 @@ Larger builds (high value, plan separately — see roadmap):
       inline desc), so the decoder now recursively expands the placeholder via REFMAP and pulls
       durations/stacking limits from the granted trait's `props` (e.g. Distracting Flashes → "−10% damage
       received to allied units at melee range"; Morbid Climax → "keeps fighting for 5 seconds…").
+
+- [ ] Add a DPS stat to unit cards — **feasible, model validated (investigated 2026-06-23).**
+      Each unit's attack is exactly one `combo` → one `sequence` (no multi-hit: `multiSeq=0`
+      across all 65 combos): damage per hit = the unit's `power` stat (× `sequence.powerRatio`,
+      default 1; only the 0.5 agent-handgun and a few `*_Death_Attack` explosions override via
+      `powerOverride`), and `sequence.duration` is the attack period in seconds. Confirmed three
+      ways: the global constants `Army_Attack_Time = 2` / `Army_Attack_WindUp = 0.5` equal the
+      generic combo's duration/windUp; the game itself displays `unit_attack_speed` ("Attack
+      speed: ::speed::"); and only 2 of 23 projectiles carry damage (special siege units), so
+      `power` is the damage source for ~all units. **DPS = power / duration**, computable for all
+      110 combat units (Sardaukar 17/1.5 ≈ 11.3, Ranger 17/2 = 8.5, Trooper 14/2 = 7, Chani
+      18/1 = 18). The loadout panel already renders an "Atk Spd" row and the 36 customizable units
+      already carry `attackSpeed` gear mods, so DPS can recompute live with the loadout for free
+      (effective DPS = power × powerMult × atkSpeed% ÷ baseDuration). `engageSpeed` is a movement
+      closing-speed (pairs with `Unit_Speed_EngageFactor`), NOT attack rate — exclude it. Caveat:
+      raw DPS ignores target armor; it's offensive output, not effective damage vs a specific target.
 
 - [ ] Audit all icons/graphics across the dashboard and add relevant game art — the
       dashboard and compendium currently lean on external wiki image URLs (WIKI_IMAGES),
