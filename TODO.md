@@ -87,10 +87,19 @@
       resolved from the CDB. The tree is requires-driven (no gridX/gridY needed); both render as
       children of the correct parent. Done as part of the tech-tree deep-dive above.
 
-- [ ] Re-derive unit ability/trait text from the CDB — the stat/cost refresh kept the
-      existing curated ability prose. The authoritative text lives in the `trait` /
-      `equipment` sheets behind the same templated-attribute layer as developments;
-      resolve and refresh those lines for accuracy.
+- [x] Re-derive unit ability/trait text from the CDB — the stat/cost refresh had kept the
+      existing curated prose, which turned out to be **substantially outdated** (e.g. Trooper
+      "Coordination" said "10% Power per ally bonus" → really **+3 Power** when under an ally
+      bonus; Ranger "Focus Fire: allies +5% Power" → really **"Suppressive Fire: target −10%
+      damage"**; Support Drone "Medkits: +20% heal" → really **"Life Pods: +2 Carry Capacity"**).
+      Extracted the gear decoder into a shared `src_scripts/_decoder.js` and regenerated each
+      unit's ability lines from its traits (own + inherited type traits) as clean `Name: eff;
+      eff` bullets. **52 regular units regenerated**; the 14 heroes were left alone (their
+      signature abilities were already CDB-derived/verified in the Heroes task and reference
+      other hero units that don't auto-clean well), and 6 generic Neutral units (Militia,
+      Veteran Militia, Ornithopter, Mercenary, Landsraad Guard, Sardaukar) kept their text (no
+      unambiguous CDB match). Verified headless: 36 loadout panels / 148 options / 0 pending
+      still intact, 0 console errors.
 
 ## Compendium expansion (from the game-DB gap audit — see docs/compendium-roadmap.md)
 

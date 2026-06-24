@@ -1097,7 +1097,8 @@ const UNITS = [
     "upkeep": "10 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Coordination: Gain 10% Power for each bonus received from an ally unit"
+      "Coordination: +3 Power under the effect of at least one allied unit bonus",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "None",
     "customization": [
@@ -1165,10 +1166,8 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "+ Focus Fire: Ally units attacking the same target gain 5% Power",
-      "− Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Suppressive Fire: The target is weakened: -10% damage",
+      "Ranged: -50% attack speed while engaged in melee"
     ],
     "unlock": "None",
     "customization": [
@@ -1247,14 +1246,9 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "+ Disruption: Dealing damage to an enemy applies Disrupted (x5 max) until the end of combat:",
-      "+ Demolition Team:",
-      "  + Disrupted: +5% damage received",
-      "  + Ranged attacks deal damage in a moderate area",
-      "  + Ranged attacks have 30% chance to destroy Armor",
-      "  − Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Disruption: The target is weakened: -2 Armor",
+      "Demolition: ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Ranged: -50% attack speed while engaged in melee"
     ],
     "unlock": "Survival Training",
     "customization": [
@@ -1321,8 +1315,8 @@ const UNITS = [
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
       "Supply: 100",
-      "+ Medkits: Nearby ally units gain 20% Health regeneration per day (x1 max)",
-      "+ Drone: Does not attract Sandworms"
+      "Life Pods: +2 Carry Capacity",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "Support Structures",
     "customization": [
@@ -1390,7 +1384,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Bulwark: Nearby ally units gain +2 Armor (x1 max)"
+      "Bulwark: Other ally Military Units at Short Range gain +2 Armor",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "Call to Arms",
     "customization": [
@@ -1446,14 +1441,8 @@ const UNITS = [
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
       "Health: 250 | Power: 8 | Armor: 4",
-      "+ Weight Shedding:",
-      "− Ship:",
-      "  + Attacks 5 times faster",
-      "  + Gain +30% Movement Speed as soon as this unit loses it's Armour",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Shimmering Decoy: +70% damage received from ground units",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -1468,18 +1457,10 @@ const UNITS = [
     "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
       "Health: 2000 | Power: 16 | Armor: 3",
-      "+ Troop Carrier:",
-      "+ Demolition:",
-      "− Frigate:",
-      "  + Can carry up to 10 ally Military Units",
-      "  + Gain +1 Power per carried unit",
-      "  + Attacks deal damage in a moderate area",
-      "  + Attacks have a 30% chance to destroy Armour",
-      "  + Gains +100% damage against Flying Units",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Troop Carrier: +10 Carry Capacity; Each carried unit gives +1 Armor, -1 Power to the Frigate",
+      "Demolition: ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Siege Spacecraft: Can only attack ground units",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -1494,7 +1475,8 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "+ Berserkers: Gain up to 50% Power depending on missing Health"
+      "Berserkers: Gain up to 30% attack speed depending on missing Health",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "None",
     "customization": [
@@ -1562,15 +1544,9 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Shrapnel Ammunitions:",
-      "+ Demolition:",
-      "  + Ranged attacks cause the target to have -50% health regeneration until the end of combat",
-      "  + Ranged attacks deal damage in a moderate area",
-      "  + Ranged attacks have 30% chance to destroy Armor",
-      "  + Gain +100% damage against Flying Units",
-      "  − Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Pain Focus: Gain up to 200% Power depending on missing Health",
+      "Demolition: ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Ranged: -50% attack speed while engaged in melee"
     ],
     "unlock": "None",
     "customization": [
@@ -1643,7 +1619,8 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Last stand: Upon dying, split in to 3 Unchained Cerberus"
+      "Sadistic: Non-mechanical targets suffer a debuff: Lose Health when moving",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "Survival Training",
     "customization": [
@@ -1711,9 +1688,9 @@ const UNITS = [
     "upkeep": "4 Solari · 1 CP · 2 Fuel Cell",
     "effects": [
       "Supply: 200",
-      "+ Fight Analysis: Upon death, nearby ally units in combat gain 10% Power (x5 max)",
-      "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
-      "  + Only visible from close range"
+      "Fight Analysis: Enemy units at Medium Range suffer -2 Armor",
+      "Temporary: Unit will disband after 20 days; Unit will never recover Health",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "Support Structures (or Piter De Vries as one of your Councilors)",
     "customization": [
@@ -1770,9 +1747,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Head Hunter: While in combat, any nearby unit death grants (x10 max):",
-      "  +3% Power",
-      "  +3% Health regeneration per day"
+      "Bloodthirsty: While in combat, any unit death at Short Range grants Elite Buff (x20 max): +1 Power",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "Call to Arms",
     "customization": [
@@ -1840,16 +1816,8 @@ const UNITS = [
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
       "Health: 270 | Power: 10 | Armor: 4",
-      "+ Evasion Tactics:",
-      "+ Demolition:",
-      "− Ship:",
-      "  + While under 30% Health, gain +30% Power and +30% Movement Speed",
-      "  + Attacks deal damage in a moderate area",
-      "  + Attacks have a 30% chance to destroy Armour",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Evasion Tactics: Attacks deal damage in an area around the target; Executes enemy units under 80 Health",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -1864,15 +1832,9 @@ const UNITS = [
     "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
       "Health: 2000 | Power: 0 | Armor: 6",
-      "+ Hive:",
-      "− Frigate:",
-      "  + Can activate Decimiation Protocols: This boosts Sting generation speed and increases damage of nearby drones and Stings but damages them over time",
-      "  + Generate 2 Stings per day",
-      "  + Stocks up to 5 Stings at once",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Hive: Can activate Decimation Protocols to sacrifice all Sting; Stocks up to 5 Stings; Restock 2 Stings per day",
+      "Siege Spacecraft: Can only attack ground units",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -1887,7 +1849,8 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "+ Scavengers: Gain 5% Health regeneration per day until the end of combat whenever a unit dies nearby (5x max)"
+      "Scavengers: Gain +3 Armor until the end of combat after the first time an enemy unit has died at Medium Range",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "None",
     "customization": [
@@ -1954,17 +1917,10 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Chemical Weapons:",
-      "+ Demolition Team:",
-      "  + Ranged attacks reduce the target's Supply by 2%",
-      "  + Dealing damage to an enemy unit applies Poisoned (1x max) until the end of combat:",
-      "  + Drain 20% Supply daily",
-      "  + Ranged attacks deal damage in a moderate area",
-      "  + Ranged attacks have 30% chance to destroy Armor",
-      "  + Gain +100% damage against Flying Units",
-      "  − Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Chemical Weapons: Damaged unit suffer -20% move speed",
+      "Grenadier: Attacks deal damage in an area around the target; Damaged units suffer -2 Armor",
+      "Ranged: -50% attack speed while engaged in melee",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "None",
     "customization": [
@@ -2026,12 +1982,9 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Elimination Shots: Deal +30% damage against non-mechanical units",
-      "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
-      "− Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  + Only visible from close range",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Elimination Shots: The first attack in combat has +200% Power",
+      "Ranged: -50% attack speed while engaged in melee",
+      "Armor Penetration: ignores 50% of enemy armor"
     ],
     "unlock": "Survival Training",
     "customization": [
@@ -2087,10 +2040,8 @@ const UNITS = [
     "upkeep": "10 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
       "Supply: 200",
-      "+ Loot Distributor: While in combat, any nearby unit death grants the following bonuses for your allied units(10x max):",
-      "+ Drone: Does not attract Sandworms",
-      "  +2% Power",
-      "  +2% max Health"
+      "Loot Distributor: Any enemy unit death at Medium Range grants 1 Drone Buff to the closest Drone; Outside combat, going near a Smugglers Village sells every Drone Buff for 75 Solari each",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "Support Structures",
     "customization": [
@@ -2147,10 +2098,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Sharpen Swords: Gain up to +100% Power depending on the missing Health of the target they're fighting",
-      "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
-      "  + Only visible from close range",
-      "  + Gain 10% increased Movement Speed when near combat"
+      "Easy Target: +50% Power when the target has 3 Armor or less",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "Call to Arms",
     "customization": [
@@ -2206,18 +2155,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
       "Health: 360 | Power: 17 | Armor: 4",
-      "+ Chemical Weapons:",
-      "+ Demolition Team:",
-      "+ Stealth: Only visible from close range",
-      "− Ship:",
-      "  + Damaged enemies lose 2% Supply and receive Poisoned:",
-      "  + Drain 20% Supply daily",
-      "  + Ranged attacks deal damage in a moderate area",
-      "  + Ranged attacks have 30% chance to destroy Armor",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Silent Hunter: Cloaked; The target is weakened: -50% Speed and attack speed",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -2232,13 +2171,9 @@ const UNITS = [
     "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
       "Health: 1600 | Power: 0 | Armor: 4",
-      "+ Toxic Gases: Enemy ground units in the area lose 1% max Health and Supply every second",
-      "+ Can active Toxic Purge",
-      "− Frigate:",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Toxic Gases: Deal damage and apply -50% move speed to every enemy ground unit in the area; Can activate Toxic Purge",
+      "Siege Spacecraft: Can only attack ground units",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -2253,8 +2188,8 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "+ Sand Tactics: Enemies engaged in combat with this unit suffer Disoriented (x1) max:",
-      "  + -15% Power"
+      "Elusive Motion: +1 Armor per enemy targeting this unit (x3 max)",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "None",
     "customization": [
@@ -2310,15 +2245,10 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Fremen Opression: For each penalty suffered by the target, gain +1 Power (5x max)",
-      "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
-      "+ Demolition Team:",
-      "  + Only visible from close range",
-      "  + Ranged attacks deal damage in a moderate area",
-      "  + Ranged attacks have 30% chance to destroy Armor",
-      "  − Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Fremen Oppression: +20% damage per enemy unit in the damage radius",
+      "Grenadier: Attacks deal damage in an area around the target; Damaged units suffer -2 Armor",
+      "Ranged: -50% attack speed while engaged in melee",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "None",
     "customization": [
@@ -2374,10 +2304,8 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Weakness Revealed: First attack in combat inflicts +40 Damage and makes the target take +20% more damage from all sources",
-      "+ Stealth: Gain Camouflage when no enemy unit is nearby:",
-      "  + Only visible from close range",
-      "  + Gain 10% increased Movement Speed when near combat"
+      "Sand Cloak: -30% ranged damage received",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "Survival Training",
     "customization": [
@@ -2439,11 +2367,8 @@ const UNITS = [
     },
     "upkeep": "8 Solari · 4 CP",
     "effects": [
-      "+ Mobile Battery: Can set up an anti-air turret:",
-      "  + Gain 20 Power",
-      "  − Can only attack Flying Units",
-      "  − Unable to move",
-      "Patch 2.2.5: Can hold position without deploying"
+      "Anti-Air Turret: Can only attack flying units; Cannot move",
+      "Demolition: ignores 50% of enemy armor; +50% damage vs mechanical"
     ],
     "unlock": "Support Structures",
     "customization": [
@@ -2500,9 +2425,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Against the Odds: For each enemy military unit (x5 max) in combat with this unit, gain:",
-      "  + +10% Power",
-      "  + +1 Armor"
+      "Heavy Hitter: Damages all enemy units in front; ignores 50% of enemy armor",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "Call to Arms",
     "customization": [
@@ -2575,12 +2499,8 @@ const UNITS = [
     "upkeep": "9 Solari · 2 CP",
     "effects": [
       "Health: 150 | Power: 9 | Armor: 3",
-      "+ Suppressive Fire: Unit that is targeted by this suffers -10% Power",
-      "− Ship:",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Swift Hunter: +40% damage against units outside of their territory",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -2594,17 +2514,10 @@ const UNITS = [
     },
     "upkeep": "50 Solari",
     "effects": [
-      "+ Can activate Deploy Sails",
-      "+ Has access to on-board enhancements",
-      "+ Siege Weapons:",
-      "− Frigate:",
-      "  + Fires slowly but deal damage in a large area",
-      "  + Attacks have a 50% chance to destroy Armor",
-      "  + Gain +100% damage against Flying Units",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Supporting Blimp: Has access to on-board enhancements",
+      "Siege Weapons: Deals damage in a small area; ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Siege Spacecraft: Can only attack ground units",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": "",
     "customization": [
@@ -2692,7 +2605,7 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Protection Support: Other nearby ally Military Units gain +5% damage reduction while they have at least 1 Armour (5x max)"
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "None",
     "customization": [
@@ -2754,10 +2667,7 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Targeting Support: Gain +30% Power while having at least 3 Armour",
-      "− Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Ranged: -50% attack speed while engaged in melee"
     ],
     "unlock": "None",
     "customization": [
@@ -2819,7 +2729,8 @@ const UNITS = [
     "upkeep": "10 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Flamethrowers: Attacks deal damage within a frontal cone and ignore enemy Armor"
+      "Flamethrowers: Damaged units accrue multiple stacks of Burned Trait over time, increasing all damage received by -1% per stack, until the end of combat",
+      "Flamer: Attacks deal damage within a frontal cone"
     ],
     "unlock": "Survival Training",
     "customization": [
@@ -2881,15 +2792,9 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
       "Supply: 200",
-      "− Siege Engine:",
-      "+ Siege Weapons:",
-      "+ Drone: Does not attract Sandworms unless deployed on sand",
-      "  − Must be deployed to attack",
-      "  − Cannot fire within close range",
-      "  − Attracts Sandworms if deployed on sand",
-      "  + Fires slowly but deal damage in a large area",
-      "  + Attacks have a 50% chance to destroy Armor",
-      "  + Gain +100% damage against Flying Units"
+      "Siege Engine: Needs to be deployed to attack; Cannot fire within Short Range; Attract Sandworms when deployed on sand",
+      "Siege Weapons: Deals damage in a small area; ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "Support Structures",
     "customization": [
@@ -2963,9 +2868,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Executioner:",
-      "  + Execute enemies under 20% Health",
-      "  + Gain +5% executing Health threshold upon killing an enemy for the rest of combat (5x max)"
+      "Executioner: Executes enemy units under 5% Health; Executing threshold is raised by 2% per ally unit at Medium Range (x20 max)",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "Call to Arms (or have Captain Aramsham as one of your Councilors)",
     "customization": [
@@ -3021,15 +2925,10 @@ const UNITS = [
     "upkeep": "16 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
       "Health: 340 | Power: 22 | Armor: 5",
-      "+ Thick Plating: This unit takes -40% area damage while it has at least 1 Armour",
-      "+ Demolition:",
-      "− Ship:",
-      "  + Attacks deal damage in a moderate area",
-      "  + Attacks have a 30% chance to destroy Armor",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Bomber: Damaged units suffer -2 Armor",
+      "Siege Weapons: Deals damage in a small area; ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Siege Spacecraft: Can only attack ground units",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -3044,18 +2943,11 @@ const UNITS = [
     "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
       "Health: 2400 | Power: 14 | Armor: 4",
-      "+ Deck Engineers:",
-      "+ Demolition:",
-      "− Frigate:",
-      "  + Can activate Airfield Configuration, allowing this unit to function as an Airfield",
-      "  + Recover +10% Health per day outside combat",
-      "  + Ranged attacks deal area damage",
-      "  + Attacks have a 30% chance to destroy Armor",
-      "  + 100% damage against Flying Units",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings"
+      "Deck Engineers: Recover Health outside combat; Flying enemy units at Long Range receive -30% damage from all sources",
+      "Demolition: ignores 50% of enemy armor; +50% damage vs mechanical",
+      "AA Spacecraft: Can only attack air units",
+      "Airfield Terminal: Generate a small Airfield range; Cannot attack; 0% Speed",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -3070,7 +2962,8 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "+ Crusher: Enemy units targeted by the Squire suffer -4 Armour (1x max)"
+      "Crusher: The target is weakened: -2 Armor",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "None",
     "customization": [
@@ -3132,10 +3025,9 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Thunder: Enemy units targeted by the Musketeer suffer +10% damage received (1x max)",
-      "− Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Thunder: The target is weakened: +10% damage received",
+      "Ranged: -50% attack speed while engaged in melee",
+      "Armor Penetration: ignores 50% of enemy armor"
     ],
     "unlock": "None",
     "customization": [
@@ -3202,8 +3094,8 @@ const UNITS = [
     "upkeep": "6 Solari · 3 CP",
     "effects": [
       "Supply: 100",
-      "+ Deadly Dance: Gain +150% attack speed when no ally units are close",
-      "Patch 2.2.3: -40% damage received from target"
+      "Deadly Dance: +60% damage received from target",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "None",
     "customization": [
@@ -3259,16 +3151,9 @@ const UNITS = [
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
       "Supply: 200",
-      "+ Inspiring Sight:",
-      "+ Demolition:",
-      "+ Drone:",
-      "  + Ecazi non-mechanical units in a large area gain +10% Power (1x max)",
-      "  + Non-mechanical units of factions in Conflict suffer -10% Power in a large area (1x max)",
-      "  + Attacks deal damage in a moderate area",
-      "  + Attacks have a 30% chance to destroy Armour",
-      "  + Gains +100% damage against Flying Units",
-      "  + Does not attract Sandworms",
-      "  + Consume Solari to heal"
+      "Inspiring Sight: Ecaz non-mechanical units at Medium Range are buffed: +20% damage",
+      "Demolition: ignores 50% of enemy armor; +50% damage vs mechanical",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "National Mythos",
     "customization": [
@@ -3331,9 +3216,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP",
     "effects": [
       "Supply: 100",
-      "+ Nobility:",
-      "  + This unit receives -20% damage per other Ecazi non-mechanical unit nearby",
-      "  + Cannot be killed if there is at least one other Ecazi non-mechanical unit nearby"
+      "Nobility: +1 Armor per other Ecaz non-mechanical unit at Short Range (x10 max)",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "",
     "customization": [
@@ -3407,17 +3291,8 @@ const UNITS = [
     "upkeep": "12 Solari · 3 CP · 3 Fuel Cell",
     "effects": [
       "Health: 230 | Power: 10 | Armor: 4",
-      "+ Alluring Song: Mechanical units targeted by the Siren suffer +30% damage received (1x max)",
-      "+ Demolition:",
-      "− Ship:",
-      "  + Attacks deal damage in a moderate area",
-      "  + Attacks have a 30% chance to destroy Armour",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings",
-      "  + Consume Solari to heal",
-      "Patch 2.2.3: -15% damage to next attack to enemies damaged with AoE"
+      "Alluring Song: Attacks deal damage in an area around the target; Damaged enemy units suffer a debuff: -15% damage",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -3432,17 +3307,11 @@ const UNITS = [
     "upkeep": "50 Solari · 10 Fuel Cell",
     "effects": [
       "Health: 2000 | Power: 12 | Armor: 6",
-      "+ Monument: Broadcasts one of two songs in a large area:",
-      "+ Demolition:",
-      "− Frigate:",
-      "  War Anthem: Ecazi non-mechanical units gain +20% Power in a large area",
-      "  or",
-      "  Lullaby: Non-mechanical units suffer -50% attack speed in a large area",
-      "  − Cannot investigate Discoveries",
-      "  − Cannot investigate Village",
-      "  − Cannot occupy Village nor contest their occupation",
-      "  − Cannot target Village Buildings",
-      "  + Consume Solari to heal"
+      "Monument: Broadcasts one of two songs at Long Range: Frigate War Anthem or Frigate Lullaby",
+      "Siege Spacecraft: Can only attack ground units",
+      "War Anthem: Ecaz non-mechanical units at Long Range gain: +30% damage",
+      "Lullaby: Any non-mechanical unit at Long Range suffers -50% attack speed",
+      "Ship: Cannot investigate Discoveries; Cannot occupy Villages nor contest their occupation; Cannot target Village building; Consume Solari to heal"
     ],
     "unlock": ""
   },
@@ -3476,12 +3345,8 @@ const UNITS = [
     "effects": [
       "Health: 250 | Power: 12 | Armor: 0",
       "Supply: 150",
-      "+ Armed civilians: Suffers Panic under 50% Health:",
-      "− Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -30% Power",
-      "  + +3 max Armor",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Armed Civilians: Suffers a debuff under 30% Health: +2 max Armor, -50% damage",
+      "Ranged: -50% attack speed while engaged in melee"
     ],
     "unlock": "None"
   },
@@ -3497,15 +3362,9 @@ const UNITS = [
     "effects": [
       "Health: 250 | Power: 6 | Armor: 0",
       "Supply: 150",
-      "+ Armed civilians: Suffers Panic under 50% Health:",
-      "+ Demolition Team:",
-      "  − -30% Power",
-      "  + +3 max Armor",
-      "  + Ranged attacks deal area damage",
-      "  + Ranged attacks have 30% chance to destroy Armor",
-      "  − Ranged: Suffers Pinned down while engaged in melee combat:",
-      "  − -50% Power",
-      "  − Cannot use ranged attacks"
+      "Armed Civilians: Suffers a debuff under 30% Health: +2 max Armor, -50% damage",
+      "Grenadier: Attacks deal damage in an area around the target; Damaged units suffer -2 Armor",
+      "Ranged: -50% attack speed while engaged in melee"
     ],
     "unlock": "None"
   },
@@ -3521,9 +3380,9 @@ const UNITS = [
     "effects": [
       "Health: 400 | Power: 13 | Armor: 6",
       "Supply: 150",
-      "+ Armed civilians: Suffers Panic under 50% Health:",
-      "  − -30% Power",
-      "  + +3 max Armor"
+      "Armed Civilians: Suffers a debuff under 30% Health: +2 max Armor, -50% damage",
+      "Handgun: Can attack flying units at short range with half power",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "Call to Arms"
   },
@@ -3609,7 +3468,10 @@ const UNITS = [
     "upkeep": "None",
     "effects": [
       "Health: 400 | Power: 15 | Armor: 4",
-      "Supply: 100"
+      "Supply: 100",
+      "Temporary: Unit will disband after 60 days; Unit will never recover Health",
+      "Elusive Motion: +1 Armor per enemy targeting this unit (x3 max)",
+      "Trooper: -10% move speed to enemy units in melee range"
     ],
     "unlock": "Desert Command"
   },
@@ -3642,7 +3504,9 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
       "Supply: 100",
-      "Self-learning combat drones using a shifting repertoire of deadly moves."
+      "Adaptive Armament: +3 Power while Tethered",
+      "Trooper: -10% move speed to enemy units in melee range",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "Available from the start",
     "customization": [
@@ -3708,10 +3572,10 @@ const UNITS = [
     "upkeep": "None",
     "effects": [
       "Health: 400 | Armor: 4",
-      "Advanced Ix scout drone",
-      "Nuwa Cenva boosts drone recruitment speed",
-      "Enhanced stealth detection range",
-      "Also deploys Repair Stations near friendly units"
+      "Labthopter: This unit cannot recon Point of Interest",
+      "Ornithopter: Detects Sandworms earlier; Can be attached to a Harvester for Orni Support Harv",
+      "Ornithopter: Detects Sandworms earlier",
+      "Swift: +30% damage received from Missile Battery and Main Bases"
     ],
     "unlock": "Available from the start"
   },
@@ -3730,7 +3594,8 @@ const UNITS = [
     "upkeep": "20 Solari · 5 CP · 5 Fuel Cell",
     "effects": [
       "Supply: 100",
-      "The Resonance Drone induces a self-repeating electrical feedback loop in its Holtzman Coil, charging nearby Faraday cages with a powerful electrostatic effect."
+      "Holtzman Coil: Ally drones at Medium Range gain Drone Buff: Non-mechanical enemy units at melee range lose 120 Health per day",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "Ix military development required",
     "customization": [
@@ -3791,7 +3656,8 @@ const UNITS = [
     "upkeep": "16 Solari · 4 CP",
     "effects": [
       "Supply: 100",
-      "Fight-Engineers are a caste of Ixian specialists constantly trying to improve the programming of fighting drones."
+      "Fight-Engineer: Gain Experience from kills of Vernius drones at Medium Range; Vernius drones gain Elite Buff for each Experience level of the best Elite at Medium Range; Can toggle VElite Install",
+      "Repair Station: Drones at Medium Range heal, even in combat.; Cannot move or fight while the repair station is activated"
     ],
     "unlock": "5,000 Hegemony",
     "customization": [
@@ -4066,7 +3932,8 @@ const UNITS = [
     "upkeep": "4 Solari · 2 CP",
     "effects": [
       "Supply: 100",
-      "+ Worker's Solidarity: Inflicts +5% damage per Soldier at Short Range (stacking)"
+      "Worker's Solidarity: Inflicts +5% damage per Soldier at Short Range (x5 max)",
+      "Flanker: Gains +30% move speed at Short Range from an enemy unit"
     ],
     "unlock": "None",
     "customization": [
@@ -4128,8 +3995,9 @@ const UNITS = [
     "upkeep": "8 Solari · 4 CP · 4 Fuel Cell",
     "effects": [
       "Supply: 100",
-      "+ Trajectory Computing: Attack at Long Range when Tethered",
-      "+ Armor Penetration: Ignores half of the enemy armor"
+      "Trajectory Computing: Attack at Long Range when Tethered",
+      "Armor Penetration: ignores 50% of enemy armor",
+      "Drone: Do not attract Sandworms; Consume Solari to heal; Ignore the effects of being engaged in close combat"
     ],
     "unlock": "None",
     "customization": [
