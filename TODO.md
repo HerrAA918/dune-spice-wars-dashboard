@@ -52,16 +52,16 @@
       left empty. Also corrected filled replacement names (Artistic Asperations →
       Aspirations, Imperial Eyes → Emperor Eyes).
 
-- [ ] Add a mouse-over tooltip explaining "Incomplete / Abandoned" — on the
-      Incomplete outcome badge (and the "Abandoned / Incomplete" victory condition)
-      in the match table, clarify that these are games that ended with no recorded
-      result (quit or unfinished), so they are not counted as wins or losses in the
-      win rate.
+- [x] Add a mouse-over tooltip explaining "Incomplete / Abandoned" (2026-06-24) — title
+      tooltip on the Incomplete outcome badge (match table + detail modal) and on the
+      "Abandoned / Incomplete" victory-condition cell, clarifying that these are games
+      that ended with no recorded result (quit or unfinished), so they are not counted
+      as wins or losses in the win rate.
 
-- [ ] Prettify unrecognized end-reason tags (e.g. "ConcededSupremacy") — concede-type
-      endings show the raw tag with no spacing in the Victory Condition column. Handle
-      concede endings (and/or split unknown camelCase tags) in `getVictoryCondition`
-      and the detail-modal reason text, e.g. render "Conceded (Supremacy)".
+- [x] Prettify unrecognized end-reason tags (e.g. "ConcededSupremacy") (2026-06-24) — added
+      `prettifyEndTag`: "Conceded*" → "Conceded (Supremacy)" and any other unknown camelCase
+      tag is spaced out. Wired into `getVictoryCondition`, the detail-modal reason text, and
+      the End Reasons summary/chart.
 
 - [ ] (PLANNING — investigated 2026-06-23) Connect a Steam account to pull records —
       **not feasible from the hosted static page; feasible only as a local helper.** The
@@ -152,15 +152,19 @@ Add-content PRs (high value, medium effort):
       `onlyForConquestOwner` props). Standard-game faction customization is the councilors
       (already covered). If built: a clearly-labeled "Conquest Campaign Bonuses" section.
 
-- [~] Operations cleanup — **costs done (2026-06-23).** All 21 faction-op "Variable" costs
+- [x] Operations cleanup — **costs done (2026-06-23); missing ops + infiltration table done (2026-06-24).** All 21 faction-op "Variable" costs
       replaced with the CDB-verified tier values (VeryEasy 100 Intel / Easy 200 Intel + 200
       Solari / Medium 500 Intel + 500 Solari) and now rendered on the faction-op cards; the
       Gear Sabotage ↔ Defense Breaches mix-up was a **cost** swap (not a name swap) — corrected
       to Gear Sabotage = 100 Intel (VeryEasy, ope `GearSabotage`) and Defense Breaches = 500
       Intel + 500 Solari (Medium, ope `DefenseSabotage`); Probe Setup is the lone 50-Intel
-      outlier. **Still open:** add the ~9 missing spy/infiltration ops (MScavengerTeam,
-      MSupplyCaches, MDecoyThumper, MEMPBomb, MAdministrativeBurden, InfiltrationCells,
-      CellSearch, the CB_* Conquest ops) + an Infiltration-fields table.
+      outlier. **Now done (2026-06-24):** added the 7 missing skirmish ops (Scavenger Team,
+      Decoy Thumper, EMP Bomb, Administrative Burden, Infiltration Cells, Cell Search, and
+      Smuggler Supply Caches) — names/effects derived from the ability→trait chain (mission &
+      ability `texts` are empty in the CDB, but the effect traits carry the values). Added an
+      Infiltration-fields reference (Arrakis / Spacing Guild / CHOAM / Landsraad / Opponent
+      Faction) and the required field + level on every op card (`mission.requiredLevels`). The
+      CB_* ops are Conquest-campaign content, intentionally omitted.
 
 - [x] Differentiate buildings by build location + fix faction availability (2026-06-23) —
       reworked the Buildings tab from a 2-way Main Base/Village split into **5 location
@@ -244,7 +248,11 @@ Larger builds (high value, plan separately — see roadmap):
       durations/stacking limits from the granted trait's `props` (e.g. Distracting Flashes → "−10% damage
       received to allied units at melee range"; Morbid Climax → "keeps fighting for 5 seconds…").
 
-- [ ] Add a DPS stat to unit cards — **feasible, model validated (investigated 2026-06-23).**
+- [x] Add a DPS stat to unit cards — **done 2026-06-24** (model validated 2026-06-23). Added a
+      `UNIT_ATTACK` name→attack-interval map (CDB combo→sequence.duration, matched by name+power to
+      pick the right variant — fixed a Mobile Turret collision), a DPS cell in the stat panel for all
+      36 customizable units, and live recompute in `recalcCard` (effective Power × Atk Speed ÷ interval),
+      with a tooltip noting it ignores target Armor. Verified headless, 0 errors. Original analysis below:
       Each unit's attack is exactly one `combo` → one `sequence` (no multi-hit: `multiSeq=0`
       across all 65 combos): damage per hit = the unit's `power` stat (× `sequence.powerRatio`,
       default 1; only the 0.5 agent-handgun and a few `*_Death_Attack` explosions override via
