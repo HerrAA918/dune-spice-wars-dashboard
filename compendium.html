@@ -38,6 +38,9 @@
             --tag-ship: #e07a5f;
             --tag-main_base: #c98a41;
             --tag-village: #6fcf97;
+            --tag-sietch: #d9a441;
+            --tag-underworld: #9b59b6;
+            --tag-enemy_base: #eb5757;
             /* Tech-tree branch palette — single source of truth, shared by
                .tech-branch-quadrant.*::before (CSS) and getTechColor() (JS). */
             --tech-military: #e74c3c;
@@ -230,6 +233,12 @@
         .filter-pill.active[data-type="ship"] { background: var(--tag-ship); color: #fff; }
         .filter-pill.active[data-type="main_base"] { background: var(--tag-main_base); color: #050407; }
         .filter-pill.active[data-type="village"] { background: var(--tag-village); color: #050407; }
+        .filter-pill[data-type="sietch"] { border-color: var(--tag-sietch); color: var(--tag-sietch); }
+        .filter-pill[data-type="underworld"] { border-color: var(--tag-underworld); color: var(--tag-underworld); }
+        .filter-pill[data-type="enemy_base"] { border-color: var(--tag-enemy_base); color: var(--tag-enemy_base); }
+        .filter-pill.active[data-type="sietch"] { background: var(--tag-sietch); color: #050407; }
+        .filter-pill.active[data-type="underworld"] { background: var(--tag-underworld); color: #fff; }
+        .filter-pill.active[data-type="enemy_base"] { background: var(--tag-enemy_base); color: #fff; }
 
         /* ── Section Labels ── */
         .section-label {
@@ -323,6 +332,9 @@
         }
         .tags { display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0; }
         .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 0.68rem;
@@ -330,6 +342,7 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
+        .tag-icon { width: 11px; height: 11px; flex-shrink: 0; }
         .tag-military { background: rgba(235,87,87,0.2); color: var(--tag-military); border: 1px solid rgba(235,87,87,0.3); }
         .tag-economy { background: rgba(39,174,96,0.2); color: var(--tag-economy); border: 1px solid rgba(39,174,96,0.3); }
         .tag-statecraft { background: rgba(74,144,226,0.2); color: var(--tag-statecraft); border: 1px solid rgba(74,144,226,0.3); }
@@ -341,6 +354,9 @@
         .tag-ship { background: rgba(224,122,95,0.2); color: var(--tag-ship); border: 1px solid rgba(224,122,95,0.3); }
         .tag-main_base { background: rgba(201,138,65,0.2); color: var(--tag-main_base); border: 1px solid rgba(201,138,65,0.3); }
         .tag-village { background: rgba(111,207,151,0.2); color: var(--tag-village); border: 1px solid rgba(111,207,151,0.3); }
+        .tag-sietch { background: rgba(217,164,65,0.2); color: var(--tag-sietch); border: 1px solid rgba(217,164,65,0.3); }
+        .tag-underworld { background: rgba(155,89,182,0.2); color: var(--tag-underworld); border: 1px solid rgba(155,89,182,0.3); }
+        .tag-enemy_base { background: rgba(235,87,87,0.2); color: var(--tag-enemy_base); border: 1px solid rgba(235,87,87,0.3); }
         .tag-all { background: rgba(130,130,130,0.2); color: var(--color-neutral); border: 1px solid rgba(130,130,130,0.3); }
 
         /* Stat bars row */
@@ -1024,6 +1040,7 @@ ul.mechanics-list li {
         <button class="tab-btn" data-category="Victory Conditions">Victory Conditions</button>
         <button class="tab-btn" data-category="Operations">Operations</button>
         <button class="tab-btn" data-category="Regions">Regions</button>
+        <button class="tab-btn" data-category="Main Base">Main Base</button>
         <button class="tab-btn" data-category="Match Randomizer">Match Randomizer</button>
     </div>
 
@@ -1064,7 +1081,8 @@ const MAX = { health: 2000, power: 50, armor: 10, supply: 200 };
 function tagClass(t) {
     const m = { military:'tag-military', economy:'tag-economy', statecraft:'tag-statecraft',
                 elite:'tag-elite', hero:'tag-hero', scout:'tag-scout', special:'tag-special', all:'tag-all',
-                drone:'tag-drone', ship:'tag-ship', main_base:'tag-main_base', village:'tag-village' };
+                drone:'tag-drone', ship:'tag-ship', main_base:'tag-main_base', village:'tag-village',
+                sietch:'tag-sietch', underworld:'tag-underworld', enemy_base:'tag-enemy_base' };
     return m[t] || 'tag-all';
 }
 
@@ -1080,9 +1098,23 @@ const TYPE_META = {
     statecraft: { label: 'Statecraft', icon: 'landmark' },
     main_base:  { label: 'Main Base',  icon: 'castle' },
     village:    { label: 'Village',    icon: 'home' },
+    sietch:     { label: 'Sietch',     icon: 'tent' },
+    underworld: { label: 'Underworld', icon: 'venetian-mask' },
+    enemy_base: { label: 'Enemy Main Base', icon: 'crosshair' },
     special:    { label: 'Special',    icon: 'sparkles' },
 };
 const TYPE_ORDER = Object.keys(TYPE_META);
+
+// Pretty type label (buildings store raw types like "main_base" → "Main Base").
+function typeLabel(t) {
+    return (TYPE_META[t] && TYPE_META[t].label) || String(t || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+// Type badge with a lucide icon + display label. lucide.createIcons() runs after each render.
+function typeBadge(t) {
+    if (!t) return '';
+    const ic = TYPE_META[t] && TYPE_META[t].icon;
+    return `<span class="tag ${tagClass(t)}">${ic ? `<i data-lucide="${ic}" class="tag-icon"></i>` : ''}${typeLabel(t)}</span>`;
+}
 
 // ─── UNITS DATA ──────────────────────────────────────────────────────────────
 const UNITS = [
@@ -4058,10 +4090,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 400,
-      "water": 2
+      "plascrete": 400
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 2 Water",
     "effects": [
       "Allows deployment of a Harvester to a Spice Field within the same region"
     ],
@@ -4084,14 +4115,13 @@ const BUILDINGS = [
   },
   {
     "name": "Spice Silos",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Fremen | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "20 Solari",
+    "upkeep": "8 Solari · 2 Water",
     "effects": [
       "+20% Spice production in ally Villages in the Region and its neighbors (x1 max)"
     ],
@@ -4103,10 +4133,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 50,
-      "water": 2
+      "plascrete": 50
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 2 Water",
     "effects": [
       "+10 Plascrete production"
     ],
@@ -4114,14 +4143,13 @@ const BUILDINGS = [
   },
   {
     "name": "Maintenance Center",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Smugglers | Fremen | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "None",
+    "upkeep": "2 Water",
     "effects": [
       "-25% Solari Upkeep in ally Villages in this region and it's neighbors (x1 max)"
     ],
@@ -4147,10 +4175,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "4 Solari",
+    "upkeep": "4 Solari · 2 Water",
     "effects": [
       "+20 Solari production",
       "− Can only be built in a Region containing Rare Elements or the Well of Riches"
@@ -4159,7 +4186,7 @@ const BUILDINGS = [
   },
   {
     "name": "Dew Collector",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
@@ -4173,7 +4200,7 @@ const BUILDINGS = [
   },
   {
     "name": "Windtrap",
-    "faction": "All",
+    "faction": "Fremen",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
@@ -4187,7 +4214,7 @@ const BUILDINGS = [
   },
   {
     "name": "Water Extractor",
-    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
@@ -4202,15 +4229,14 @@ const BUILDINGS = [
   },
   {
     "name": "Experimental Furnace",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
-      "plascrete": 500,
-      "water": 5
+      "plascrete": 500
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 10 Fuel Cell · 3 Water",
     "effects": [
       "Prerequisite: 5k Hegemony",
       "+30% resource production for other Economy buildings in this region and it's neighbours (1x max)",
@@ -4222,7 +4248,7 @@ const BUILDINGS = [
     "name": "Shai-Hulud Temple",
     "faction": "Fremen",
     "type": "village",
-    "subtitle": "Construction time: 4 Days",
+    "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
       "plascrete": 500
@@ -4240,10 +4266,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 2 Water",
     "effects": [
       "+3 Manpower production"
     ],
@@ -4251,14 +4276,13 @@ const BUILDINGS = [
   },
   {
     "name": "Fuel Cell Factory",
-    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "6 Solari",
+    "upkeep": "6 Solari · 2 Water",
     "effects": [
       "+10 Fuel Cells",
       "Note: Must be built in a region with Geothermal Energy or in the Great Volcano"
@@ -4271,10 +4295,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "10 Solari",
+    "upkeep": "10 Solari · 2 Water",
     "effects": [
       "Automatically attacks enemy units in range within your territory",
       "Note: Won't attack while the Village it's built in is under siege"
@@ -4287,10 +4310,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 2 Water",
     "effects": [
       "+20% Power to ally military Units in this Region and it's neighbors (x1 max)"
     ],
@@ -4298,14 +4320,13 @@ const BUILDINGS = [
   },
   {
     "name": "Airfield",
-    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 2 Water",
     "effects": [
       "Military units can embark on Shuttles to be transported within the range of airfields",
       "Note: Your Main Base also counts as an Airfield by default"
@@ -4314,15 +4335,14 @@ const BUILDINGS = [
   },
   {
     "name": "Military Factory",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "village",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
-      "plascrete": 500,
-      "water": 5
+      "plascrete": 500
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 10 Fuel Cell · 3 Water",
     "effects": [
       "Prerequisite: 5k Hegemony",
       "+ Increased Military Unit Power and Health by 15%"
@@ -4331,15 +4351,14 @@ const BUILDINGS = [
   },
   {
     "name": "Nuclear Silo",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 8 Days",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
+    "type": "village",
+    "subtitle": "Construction time: 12 Days",
     "cost": {
       "solari": 2000,
-      "plascrete": 1000,
-      "water": 5
+      "plascrete": 1000
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 10 Fuel Cell · 3 Water",
     "effects": [
       "+ Allows for the preperation and launch of Nuclear Warheads"
     ],
@@ -4348,7 +4367,7 @@ const BUILDINGS = [
   {
     "name": "Ceremonial Caves",
     "faction": "Fremen",
-    "type": "",
+    "type": "village",
     "subtitle": "Construction time: 2 Days",
     "cost": {
       "plascrete": 150,
@@ -4365,13 +4384,12 @@ const BUILDINGS = [
   {
     "name": "Research Hub",
     "faction": "All",
-    "type": "",
+    "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "16 Solari",
+    "upkeep": "16 Solari · 2 Water",
     "effects": [
       "+1 Knowledge"
     ],
@@ -4380,13 +4398,12 @@ const BUILDINGS = [
   {
     "name": "Data Center",
     "faction": "All",
-    "type": "",
+    "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 2 Water",
     "effects": [
       "+3 Intel production"
     ],
@@ -4395,13 +4412,12 @@ const BUILDINGS = [
   {
     "name": "Listening Post",
     "faction": "All",
-    "type": "",
+    "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "12 Solari",
+    "upkeep": "12 Solari · 2 Water",
     "effects": [
       "+1 Influence production, must be built in a Village neighbouring an enemy region"
     ],
@@ -4409,14 +4425,13 @@ const BUILDINGS = [
   },
   {
     "name": "Investment Office",
-    "faction": "All",
-    "type": "",
+    "faction": "Atreides | Harkonnen | Smugglers | Fremen | Corrino | Vernius",
+    "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "10 Solari",
+    "upkeep": "10 Solari · 2 Water",
     "effects": [
       "+1 instance of this Village's Traits"
     ],
@@ -4425,13 +4440,12 @@ const BUILDINGS = [
   {
     "name": "Crafts Workshop",
     "faction": "All",
-    "type": "",
+    "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "25 Solari",
+    "upkeep": "25 Solari · 2 Water",
     "effects": [
       "+ Generates 8 Hegemony per day",
       "Note: Must be built in a Special Region"
@@ -4441,7 +4455,7 @@ const BUILDINGS = [
   {
     "name": "Concord Chamber",
     "faction": "Atreides",
-    "type": "",
+    "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
       "plascrete": 150,
@@ -4456,15 +4470,14 @@ const BUILDINGS = [
   },
   {
     "name": "Research Station",
-    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz",
-    "type": "",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
+    "type": "village",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
-      "plascrete": 500,
-      "water": 5
+      "plascrete": 500
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 10 Fuel Cell · 3 Water",
     "effects": [
       "Prerequisite: 5k Hegemony",
       "+ Gain +100% Research Hub resource production",
@@ -4475,15 +4488,14 @@ const BUILDINGS = [
   },
   {
     "name": "Spacing Guild Branch",
-    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz",
-    "type": "",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
+    "type": "village",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
-      "plascrete": 500,
-      "water": 5
+      "plascrete": 500
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 3 Water",
     "effects": [
       "Prerequisite: 5k Hegemony",
       "Allows trading resouces with Guild Favour",
@@ -4496,14 +4508,13 @@ const BUILDINGS = [
   {
     "name": "Recycling Plant",
     "faction": "Fremen",
-    "type": "",
-    "subtitle": "Construction time: 4 Days",
+    "type": "village",
+    "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
-      "plascrete": 500,
-      "water": 10
+      "plascrete": 500
     },
-    "upkeep": "20 Solari",
+    "upkeep": "20 Solari · 10 Water",
     "effects": [
       "Prerequisite: 5k Hegemony",
       "Allows trading resources with Spaceship Parts",
@@ -4564,7 +4575,7 @@ const BUILDINGS = [
   },
   {
     "name": "Recycling Vats",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
@@ -4645,7 +4656,7 @@ const BUILDINGS = [
   },
   {
     "name": "Enhanced Fortifications",
-    "faction": "Atreides | Harkonnen | Fremen",
+    "faction": "All",
     "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
@@ -4678,7 +4689,7 @@ const BUILDINGS = [
   },
   {
     "name": "Embassy",
-    "faction": "All",
+    "faction": "Atreides | Harkonnen | Smugglers | Corrino | Ecaz | Vernius",
     "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
@@ -4711,7 +4722,7 @@ const BUILDINGS = [
   {
     "name": "Intelligence Agency",
     "faction": "All",
-    "type": "",
+    "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
@@ -4727,7 +4738,7 @@ const BUILDINGS = [
   {
     "name": "Council Chamber",
     "faction": "Atreides",
-    "type": "",
+    "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
@@ -4743,7 +4754,7 @@ const BUILDINGS = [
   {
     "name": "Interrogation Center",
     "faction": "Harkonnen",
-    "type": "",
+    "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
@@ -4760,7 +4771,7 @@ const BUILDINGS = [
   {
     "name": "Black Market Branch",
     "faction": "Smugglers",
-    "type": "",
+    "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
@@ -4777,7 +4788,7 @@ const BUILDINGS = [
   {
     "name": "Bazaar",
     "faction": "Fremen",
-    "type": "",
+    "type": "main_base",
     "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
@@ -4793,13 +4804,13 @@ const BUILDINGS = [
   },
   {
     "name": "Bootleg Market",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "Produce 40% of the Village's Spice production as Solari",
       "Produce 40% of the Village's Plascrete production as Solari",
@@ -4809,13 +4820,13 @@ const BUILDINGS = [
   },
   {
     "name": "Contraband Cache",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Stocks 40% of the Village's Solari production, up to 500",
       "Stocks 40% of the Village's Spice production, up to 500",
@@ -4826,13 +4837,13 @@ const BUILDINGS = [
   },
   {
     "name": "Worker's Guild",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "Host Village gains +20% Resource production"
     ],
@@ -4840,13 +4851,13 @@ const BUILDINGS = [
   },
   {
     "name": "Trafficking Station",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "+1% Solari production for you and your allies"
     ],
@@ -4854,13 +4865,13 @@ const BUILDINGS = [
   },
   {
     "name": "Back-Alley Doctor",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Water",
     "effects": [
       "Regenerates Health for nearby ally units",
       "Refills Supply for nearby units"
@@ -4869,13 +4880,13 @@ const BUILDINGS = [
   },
   {
     "name": "Support Station",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "Ally military units in the region have -30% Solari upkeep"
     ],
@@ -4883,8 +4894,8 @@ const BUILDINGS = [
   },
   {
     "name": "Hidden Explosives",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
       "solari": 100
@@ -4898,8 +4909,8 @@ const BUILDINGS = [
   },
   {
     "name": "Clandestine Scouts",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
       "solari": 200
@@ -4912,13 +4923,13 @@ const BUILDINGS = [
   },
   {
     "name": "Spyware",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "Advances a random Development owned by the Village's faction every day"
     ],
@@ -4926,13 +4937,13 @@ const BUILDINGS = [
   },
   {
     "name": "Whisperers Lair",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "+1 Intel production",
       "-10% daily chance of agent capture when assigned on this faction",
@@ -4942,13 +4953,13 @@ const BUILDINGS = [
   },
   {
     "name": "Activist Quarters",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "+5 more Minor Houses votes are guaranteed on resolutions with a Bounty"
     ],
@@ -4956,13 +4967,13 @@ const BUILDINGS = [
   },
   {
     "name": "Enrollment Station",
-    "faction": "All",
-    "type": "",
+    "faction": "Smugglers",
+    "type": "underworld",
     "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 200
+      "solari": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "1 Solari",
     "effects": [
       "+50% Agent recruitment speed for you and your allies"
     ],
@@ -4970,13 +4981,14 @@ const BUILDINGS = [
   },
   {
     "name": "Contraband Hub",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Gain 30% more resources when pillaging Villages owned by this faction"
     ],
@@ -4984,13 +4996,14 @@ const BUILDINGS = [
   },
   {
     "name": "Spice Traffickers",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Produce 5 Spice per active Spice Harvester of this main base's faction"
     ],
@@ -4998,13 +5011,14 @@ const BUILDINGS = [
   },
   {
     "name": "Laundering Network",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "+30 Solari production per level of this main base's biggest completed Economy district"
     ],
@@ -5012,13 +5026,14 @@ const BUILDINGS = [
   },
   {
     "name": "Contraband Hub",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Gain 30% more resources when pillaging Villages owned by this faction"
     ],
@@ -5026,13 +5041,14 @@ const BUILDINGS = [
   },
   {
     "name": "Hidden Explosives",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 1000
+      "solari": 500,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Destroy 20 Armor from the Main Base upon ally Siege",
       "This building is destroyed upon ally Siege on the Main Base"
@@ -5041,13 +5057,14 @@ const BUILDINGS = [
   },
   {
     "name": "Beacon Network",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Ally military units in this faction's territory gain +2 Armor"
     ],
@@ -5055,13 +5072,14 @@ const BUILDINGS = [
   },
   {
     "name": "Weapon Dealers",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "+3% unit Power per level of this main base's biggest completed Military district"
     ],
@@ -5069,13 +5087,14 @@ const BUILDINGS = [
   },
   {
     "name": "Whisperers Hub",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "+10 Infiltration production towards this faction",
       "Captured Agents have +100% escape chances in this faction"
@@ -5084,13 +5103,14 @@ const BUILDINGS = [
   },
   {
     "name": "Scheme Lodge",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "Gain +5 Intel production per active treaty with this faction"
     ],
@@ -5098,13 +5118,14 @@ const BUILDINGS = [
   },
   {
     "name": "Activist Headquarters",
-    "faction": "All",
-    "type": "",
-    "subtitle": "Construction time: 2 Days",
+    "faction": "Smugglers",
+    "type": "enemy_base",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
-      "solari": 2000
+      "solari": 1000,
+      "intel": 100
     },
-    "upkeep": "5 Solari",
+    "upkeep": "None",
     "effects": [
       "+20 max Influence per level of this main base's biggest completed Statecraft district"
     ],
@@ -5112,15 +5133,14 @@ const BUILDINGS = [
   },
   {
     "name": "Fremen Trade Hub",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+100% trade resources gains with this Sietch for you and your allies"
     ],
@@ -5128,15 +5148,14 @@ const BUILDINGS = [
   },
   {
     "name": "Melange Mixing Mill",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+30% Spice production in ally Villages in the Region and its neighbors (x1 max)"
     ],
@@ -5144,15 +5163,14 @@ const BUILDINGS = [
   },
   {
     "name": "Hidden Plascrete Factory",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 250,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+80 Plascrete production"
     ],
@@ -5160,15 +5178,14 @@ const BUILDINGS = [
   },
   {
     "name": "Thumpers Factory",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+20% Thumper production",
       "+2 max Thumper"
@@ -5177,15 +5194,14 @@ const BUILDINGS = [
   },
   {
     "name": "Raid Gathering Site",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "This Sietch will raid more frequently"
     ],
@@ -5193,15 +5209,14 @@ const BUILDINGS = [
   },
   {
     "name": "Master Knife Makers",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+10% military units Power"
     ],
@@ -5209,15 +5224,14 @@ const BUILDINGS = [
   },
   {
     "name": "Gossip Barterers",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+10 Intel production per neutral Village in the region and its neighbors"
     ],
@@ -5225,13 +5239,12 @@ const BUILDINGS = [
   },
   {
     "name": "Desert Analysis",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
     "upkeep": "None",
     "effects": [
@@ -5241,15 +5254,14 @@ const BUILDINGS = [
   },
   {
     "name": "Terraforming Research Hub",
-    "faction": "All",
-    "type": "",
+    "faction": "Fremen",
+    "type": "sietch",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 1000,
-      "authority": 20,
-      "water": 5
+      "plascrete": 800,
+      "authority": 20
     },
-    "upkeep": "None",
+    "upkeep": "4 Water",
     "effects": [
       "+100% Hegemony production from Water production"
     ],
@@ -5258,13 +5270,13 @@ const BUILDINGS = [
   {
     "name": "Spice Laboratory",
     "faction": "Vernius",
-    "type": "economy",
-    "subtitle": "Main Base building",
+    "type": "main_base",
+    "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
       "plascrete": 500
     },
-    "upkeep": "0",
+    "upkeep": "10 Solari",
     "effects": [
       "+2 Knowledge per exploited Spice Field",
       "-2 Fuel Cell requirement for Combine Harvester Drones"
@@ -5274,13 +5286,13 @@ const BUILDINGS = [
   {
     "name": "Neural Core",
     "faction": "Vernius",
-    "type": "economy",
-    "subtitle": "Main Base building",
+    "type": "main_base",
+    "subtitle": "Construction time: 8 Days",
     "cost": {
       "solari": 1000,
       "plascrete": 500
     },
-    "upkeep": "0",
+    "upkeep": "10 Solari",
     "effects": [
       "Connected Neural Nodes each produce +1 Fuel Cell",
       "+2% Knowledge per connected Neural Node"
@@ -5290,13 +5302,13 @@ const BUILDINGS = [
   {
     "name": "Neural Node",
     "faction": "Vernius",
-    "type": "economy",
-    "subtitle": "Nodal Network",
+    "type": "village",
+    "subtitle": "Construction time: 1 Day",
     "cost": {
       "plascrete": 50,
       "standing": 3
     },
-    "upkeep": "0",
+    "upkeep": "None",
     "effects": [
       "Connects the region to the Vernius Nodal Network",
       "Can only be built in a Village where exactly one neighbor is already connected to the network"
@@ -6647,14 +6659,14 @@ function factionColor(f) {
 }
 
 function makeCostChips(cost, upkeep) {
-    const icons = { solari:'🪙', manpower:'⚔️', water:'💧', plascrete:'🧱', cp:'◆', commandPoints:'◆', knowledge:'🔬', influence:'🏛', guildFavor:'🚀', spice:'🟠', scraps:'🔩', intel:'🔍', fuelCell:'🔋', fuelCells:'🔋', standing:'⚖️' };
-    const labels = { solari:'Solari', manpower:'Manpower', water:'Water', plascrete:'Plascrete', cp:'CP', commandPoints:'CP', knowledge:'Knowledge', influence:'Influence', guildFavor:'Guild Favor', spice:'Spice', scraps:'Scraps', intel:'Intel', fuelCell:'Fuel Cell', fuelCells:'Fuel Cell', standing:'Standing' };
+    const icons = { solari:'🪙', manpower:'⚔️', water:'💧', plascrete:'🧱', authority:'👑', cp:'◆', commandPoints:'◆', knowledge:'🔬', influence:'🏛', guildFavor:'🚀', spice:'🟠', scraps:'🔩', intel:'🔍', fuelCell:'🔋', fuelCells:'🔋', standing:'⚖️' };
+    const labels = { solari:'Solari', manpower:'Manpower', water:'Water', plascrete:'Plascrete', authority:'Authority', cp:'CP', commandPoints:'CP', knowledge:'Knowledge', influence:'Influence', guildFavor:'Guild Favor', spice:'Spice', scraps:'Scraps', intel:'Intel', fuelCell:'Fuel Cell', fuelCells:'Fuel Cell', standing:'Standing' };
     let chips = '';
     for (const [key, val] of Object.entries(cost)) {
         if (!val) continue;
         chips += `<div class="cost-chip cost-${key}"><span class="cost-icon">${icons[key]||'·'}</span>${val} ${labels[key]||key}</div>`;
     }
-    if (upkeep && upkeep !== '0') {
+    if (upkeep && upkeep !== '0' && upkeep !== 'None') {
         chips += `<div class="cost-chip cost-upkeep">🔄 ${upkeep}/day</div>`;
     }
     return chips;
@@ -6732,7 +6744,7 @@ function renderUnitCard(u) {
                 </div>
             </div>
             <div class="tags">
-                <span class="tag ${typeClass}">${u.type}</span>
+                ${typeBadge(u.type)}
             </div>
         </div>
         ${u.baseStats ? renderStatPanel(u.baseStats) : (hasCombat ? `
@@ -6780,7 +6792,7 @@ function renderBuildingCard(b) {
                 </div>
             </div>
             <div class="tags">
-                <span class="tag ${typeClass}">${b.type}</span>
+                ${typeBadge(b.type)}
             </div>
         </div>
         <div class="cost-row">${makeCostChips(b.cost, b.upkeep)}</div>
@@ -6806,7 +6818,7 @@ function renderSietchCard(s) {
                 </div>
             </div>
             <div class="tags">
-                <span class="tag ${typeClass}">${s.type}</span>
+                ${typeBadge(s.type)}
             </div>
         </div>
         <div class="cost-row">${makeCostChips(s.cost, s.upkeep)}</div>
@@ -7392,8 +7404,8 @@ function renderLandsraad() {
 
             <div class="landsraad-card">
                 <h2><i data-lucide="landmark"></i> The Landsraad Council</h2>
-                <p>Every 20 days, the Landsraad convenes to vote on three dynamic, randomized Resolutions. The effects of these resolutions can completely change the landscape of Arrakis.</p>
-                
+                <p>Every 20 days, the Landsraad convenes to vote on three Resolutions drawn from the pool. The effects of these resolutions can completely change the landscape of Arrakis.</p>
+
                 <h3>Voting Mechanics</h3>
                 <ul class="mechanics-list">
                     <li><strong>Base Votes:</strong> Factions receive a fixed number of base votes depending on their current <strong>Landsraad Standing</strong>. If you fall to 0 standing, you become a Pariah and lose all base votes.</li>
@@ -7407,11 +7419,17 @@ function renderLandsraad() {
                     <li><strong>Targeted Charters:</strong> The Landsraad votes to grant a specific faction a powerful permanent bonus or office (e.g. Judge of the Council, granting control over certain military actions).</li>
                     <li><strong>Sanctions:</strong> Targeted penalties aimed at crippling a specific faction. Highly useful against a faction approaching victory.</li>
                 </ul>
+
+                <h3>How Resolutions Are Drawn</h3>
+                <ul class="mechanics-list">
+                    <li><strong>Three at a time, on cooldown:</strong> each Council draws <strong>3</strong> Resolutions, and a drawn Resolution cannot reappear for <strong>2</strong> Councils — so the pool rotates rather than repeating. The draw is conditional, not purely random: each Resolution carries availability conditions before it can be offered.</li>
+                    <li><strong>Charters are prerequisite-gated:</strong> a Charter only enters the draw once a faction <em>can</em> hold it (the requirements below). Most Charters then sit on a 2-Council cooldown; the <strong>Dune Governorship</strong> can be contested every Council. Holding the <strong>Speaker of the Council</strong> lets you reroll one Resolution each Council.</li>
+                </ul>
             </div>
 
             <div class="landsraad-card full-width">
                 <h2><i data-lucide="award"></i> Charters (${CHARTERS.length})</h2>
-                <p>Charters are permanent offices the Landsraad grants to a single faction once it meets the requirements. They occupy a Council slot, persist until revoked (a Loss of Rights resolution) or won by a rival, and pay a one-time reward on first election.</p>
+                <p>Charters are permanent offices the Landsraad grants to a single faction once it meets the requirements. A Charter only enters the vote once a faction meets its prerequisites (Fremen follow a separate path), each carries its own cooldown, they occupy a Council slot, persist until revoked (a Loss of Rights resolution) or won by a rival, and pay a one-time reward on first election.</p>
                 <div class="charter-grid">${CHARTERS.map(renderCharter).join('')}</div>
             </div>
 
@@ -7444,7 +7462,8 @@ function renderAll() {
     const q = searchQuery.trim().toLowerCase();
 
     function matches(item) {
-        if (currentFaction !== 'All' && item.faction !== 'All' && item.faction !== 'Neutral' && item.faction !== currentFaction) return false;
+        if (currentFaction !== 'All' && item.faction !== 'All' && item.faction !== 'Neutral'
+            && !item.faction.split('|').map(s => s.trim()).includes(currentFaction)) return false;
         if (currentType !== 'all' && item.type !== currentType) return false;
         if (q) {
             const searchable = (item['data-name'] || `${item.name} ${item.subtitle} ${item.faction} ${item.type} ${(item.effects||[]).join(' ')}`).toLowerCase();
@@ -7482,7 +7501,7 @@ function renderAll() {
 }
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
-const CATEGORIES_WITHOUT_SEARCH = ['Tech Trees', 'Landsraad & Politics', 'Factions Overview', 'Operations', 'Match Randomizer', 'Regions', 'Victory Conditions'];
+const CATEGORIES_WITHOUT_SEARCH = ['Tech Trees', 'Landsraad & Politics', 'Factions Overview', 'Operations', 'Match Randomizer', 'Regions', 'Victory Conditions', 'Main Base'];
 
 // Items relevant to the current category, honoring the faction filter (but not the type filter).
 function itemsForCategory() {
@@ -7531,7 +7550,7 @@ function updateFilterBarVisibility() {
     // Faction tabs are meaningless on the randomizer / regions / victory views.
     const factionTabs = document.getElementById('faction-tabs');
     if (factionTabs) factionTabs.style.display =
-        (currentCategory === 'Match Randomizer' || currentCategory === 'Regions' || currentCategory === 'Victory Conditions') ? 'none' : '';
+        (currentCategory === 'Match Randomizer' || currentCategory === 'Regions' || currentCategory === 'Victory Conditions' || currentCategory === 'Main Base') ? 'none' : '';
 }
 
 function updateContainerWidth() {
@@ -7656,7 +7675,7 @@ renderAll();
     
     <script id="factions-data">
         const FACTIONS_DATA = {"atreides":{"name":"House Atreides","quote":"\"The stellar reputation of House Atreides owes a lot to its leader’s commanding style: firm yet honorable and fair. By imperial decree, the Atreides have just inherited the stewardship of Arrakis and have a lot of work to do to take over from the Harkonnens.\"","bonuses":["Can use the Peaceful Annexation Ability","Other factions lose no Authority from treaties with you","Other factions lose 100% more Landsraad Standing when breaking a Truce with you","− Cannot pillage neutral Villages"],"hegemony5k":["While under the effect of a positive Resolution, gain +10% Solari","While under the effects of a negative Resolution, gain +10% unit Power"],"hegemony10k":["You can ignore Charters prerequisites except for the necessary Landsraad Standing","Permanently gain +2% resource production upon being elected for a positive Resolution (x10 max)"],"councilors":[{"name":"Thufir Hawat","effects":["Agents have 1 additional trait","Can Hasten mission progress and construction of Village Buildings at the cost of Solari","Increases Building construction speed","Increases Mission progress speed"]},{"name":"Dr. Wellington Yueh","effects":["Produce +2 Knowledge","Non-mechanical Military Units have +15% max Health","Non-mechanical Military Units have +30% regeneration speed"]},{"name":"Lady Jessica","effects":["Can spend Influence to force Peace with another faction","Atreides Treaties have no Authority upkeep","A faction that betrays a Peace with Atreides loses an additional 50 Landsraad Standing"]},{"name":"Paul Atreides","effects":["Peaceful Annexations are performed instantly","Destroyed Villages are repaired instantly"]}]},"harkonnen":{"name":"House Harkonnen","quote":"\"House Harkonnen shares its chilling reputation with its leader, Baron Vladimir Harkonnen. They have been called despotic, merciless, scheming and devious. And those are only their finer qualities.\"","bonuses":["Can use the Oppression Ability on Harkonnen Villages","Gain 50 Intel when you pillage a Village","Villages gain +5% resource production per active Militia","− Villages suffer -10% resource production"],"hegemony5k":["Gain 50 Intel when you pillage a Village","Receive a free Brainwashed Agent after killing 20 non-mechanical enemy units"],"hegemony10k":["Sacrificed Agents give a chance to not consume an operation on use","Grants +1 additional Agent slot in each non-faction field"],"councilors":[{"name":"Cron Vatia","effects":["Villages under Oppression construct Buildings 200% faster","On Village Oppression, gain 2 Manpower for each empty and potential building slot","Gain 50 Solari upon killing Rebels"]},{"name":"Umman Kudu","effects":["Produce +2 Manpower","Units take -30% time to recruit","Units in a region with an active Harkonnen operation gain +1 Armor"]},{"name":"Feyd-Rautha Harkonnen","effects":["Can use Corruption on Landsraad resolutions","Gain +1% Hegemony per unit trained","Units have +10% damage when pillageing"]},{"name":"Piter De Vries","effects":["Agents produce +1 Intel","Agent traits present only once on an Information field apply their effects twice"]}]},"smugglers":{"name":"Smugglers","quote":"\"There’s a fine line between smugglers and full-fledged bandits, and Esmar Tuek is adept at walking that line.  Smugglers can provide anything to anyone, provided they put the price… and do not look at the specifics too closely.\"","bonuses":["Can install Underworld Headquarters in opponent’s Villages","Gain +30% resources from pillaging a Village","Authority cost to Annex a Village is not increased by distance from your Main Base","− Authority cost to Annex a Village is increased 100% more by owner Villages"],"hegemony5k":["Can place a Bounty on Landsraad Resolutions","Join the Landsraad Council with 50 Votes"],"hegemony10k":["Automatically installs a Major Underworld Headquarters in every enemy Main Base","Gain +50% resources from pillaging a Village"],"councilors":[{"name":"Staban Tuek","effects":["Underworld Headquarters have +1 Extension slots"]},{"name":"Lingar Bewt","effects":["Produces 12 Water","Unlocks the Water Network and Water Seller Extensions in Underworld Headquarters"]},{"name":"Lashon Hara","effects":["Every time a trade successfully goes through with a faction, gain 1 Information level in this faction","Faction Information levels reduce 50% slower","Each faction Information level gives +15 Solari production and +1 Influence production"]},{"name":"Stakkanov","effects":["Villages with no neighboring Smuggler-controlled regions gain bonus resource production","Refund 50% of the Authority capture cost when a Village is lost"]}]},"fremen":{"name":"Fremen","quote":"\"Fremen are the only people native to Arrakis and will do anything to protect their way against the offworlders.  While their leader, Liet-Kynes, doesn’t originally come from Dune, she is every bit as determined and attached to the planet as the next Fremen.\"","bonuses":["Spice Fields in neutral and controlled regions are harvested by Harvesting Teams, a mobile unit","Can form alliances with Sietches outside of your territory","May use Thumpers for Wormriding","− Villages have -1 maximum Building slot"],"hegemony5k":["Surrounding a Deep Desert region grants control over it","Thumpers are generated passively and attract larger Sandworms that can travel further"],"hegemony10k":["Grants knowledge of enemy alliances with Sietches","Every allied Sietch automatically has a Settlement on it, allowing you to build unique Sietch Buildings"],"councilors":[{"name":"Shimoom","effects":["Each Village producing at least 12 Water gives -4% Solari Upkeep globally","Each Village producing at least 12 Water gives +4 Plascrete production","Villages produce 1 Water on empty and potential Building slots"]},{"name":"Jamis","effects":["Gain 70 Authority upon liberating an enemy Village","Military Units outside of Fremen territory inflict +10% damage","Trade 10 Authority for 30 Manpower in the top bar"]},{"name":"Mother Ramallo","effects":["Can use Incite Rebellion on Landsraad resolutions, causing rebellions in enemy Villages if it passes","Gain +3 Intel production per deployed Harvesting Team","Gain +0.5 Authority production per deployed Harvesting Team"]},{"name":"Stilgar","effects":["Reveal all Sietches at the start of the game","Produce +1 Authority"]}]},"corrino":{"name":"House Corrino","quote":"\"Imperial House Corrino has ruled the galaxy for ten millenia, and Shaddam IV intends to keep it that way. The situation on Arrakis calls for the direct intervention of the Padishah Emperor, who will use all His wit and the might of His administration to turn the war to His benefit.\"","bonuses":["Can use Imperial Edict on Landsraad Resolutions to switch their scope","Villages have +1  Building slots","Units from any faction that recently betrayed a Truce receive +10% damage from Corrino","− +100% Authority cost to annex Villages due to the distance from Main Base"],"hegemony5k":["Can use Main Base Deployment on Corrino and neutral Villages once","Can offer Imperial Mandate, which gives Sardaukar to another faction, as part of a trade"],"hegemony10k":["Destroying the Main Base of a faction at War with you for 50+ days grants a second use of Main Base Deployment","Gain 15 Influence for every kill on the territory of a faction at Peace with you"],"councilors":[{"name":"Princess Irulan","effects":["Every building can be constructed one more time anywhere on the map"]},{"name":"Zum Garon","effects":["Military Units have +15% Power per faction in Truce","Proposing an Imperial Mandate has no cost"]},{"name":"Gaius Helen Mohiam","effects":["Every Corrino vote placed on a resolution affected by an Imperial Edict counts double","Support to increase Charter Priority counts double"]},{"name":"Hasimir Fenring","effects":["Can investigate Discoveries quickly anywhere, regardless of how many Agents are on the Infiltration field","Resolving a Discovery this way progresses Agent recruitment by 1 day"]}]},"ecaz":{"name":"House Ecaz","quote":"\"House Ecaz is known for it's touristic resorts, it's recreational drugs, and it's patronage for the Art. But behind this enticing exterior, the refined house and it's no less refined ruler, Archduchess Armanda, are ruthless and efficient defenders of their interests.\"","bonuses":["Surrounded neutral Villages become Sanctuaries that cannot be attacked by other factions","Gain 1 Authority production per Sanctuary","Villages adjacent to a Sanctuary gain +1 instance of the Village's traits","− Cannot betray a faction in Truce"],"hegemony5k":["A single Ecazi Village can be turned into a Garden Resort","A single Ecazi non-mechanical unit can be named Champion, who raises Hegemony by killing other factions' units"],"hegemony10k":["Turn 0.2% of your Hegemony in to Solari production","The first 50 votes placed on each Resolution are free"],"councilors":[{"name":"Sanya Ecaz","effects":["For each Sanctuary on the map, gain +15 Solari production","For each Sanctuary on the map, gain -40% Masterpiece construction costs"]},{"name":"Rivvy Dinari","effects":["Military units at max level have no Solari upkeep","Military units start with 1 more Experience level"]},{"name":"Ibbo Vipp","effects":["Can use Landsraad Immunity on a resolution to become ineligible","Gain 2 Landsraad Standing upon building a Masterpiece"]},{"name":"Mesa Ecaz","effects":["Abandoning a Village grants 100 Influence","Can trade 30 Influence for 1 Masterpiece"]}]},"vernius":{"name":"House Vernius","quote":"\"House Vernius of the Ixian confederacy is the main provider of spacefolding ships in the galaxy. Their obsession with technological progress clashes with the prohibition on thinking machines imposed by the Butlerian Jihad.\"","bonuses":["Spice Fields in neutral and controlled regions can be harvested by Tethered Combine Harvester Drones","Factions in Truce get the effects of unresearched developments that have been researched by House Vernius","Mixed S-Vault districts are split to give district bonuses","− Villages not connected to the Nodal Network through Neural Nodes suffer -50% resource production"],"hegemony5k":["Can File Patent on researched developments that no other faction has researched","Can research 1 development without having researched its requirements"],"hegemony10k":["Can Obfuscate a single researched development","Each Knowledge point increases the production of all other resources by +0.2%"],"councilors":[{"name":"Bolig Avati","effects":["Can build multiple Buildings at the same time in the same district of S-Vault","Removed Buildings in S-Vault are reimbursed fully","Gain 1 Knowledge per district bonus"]},{"name":"Bronso Vernius","effects":["Villages neighboring a single Vernius region cost +80% Authority to Annex","The furthest connected Neural Node generates an Airfield"]},{"name":"Cammar Pilru","effects":["Maximum Influence increases by 5 per Knowledge","Immediately gain 200 Influence when entering Conflict with another faction","Receive 30 Landsraad Standing when an opponent imposes conflict in any way"]},{"name":"Tessia Vernius","effects":["Information levels required for spying missions are lowered by 1","While no development is in progress, 50% of Knowledge is turned into Intel and Solari"]}]}};
-        const OPERATIONS_DATA = [{"name":"Probe Setup","cost":"50 Intel","difficulty":"Easy","description":"Removes Fog of War in the targeted region for 3 days.","faction":"Generic"},{"name":"Supply Drop","cost":"100 Intel","difficulty":"Easy","description":"Military units in the targeted region gain +100% Supply and suffer no Supply drain for 1 day.","faction":"Generic"},{"name":"Defense Breaches","cost":"100 Intel","difficulty":"Easy","description":"Villages in the targeted region lose 20% Health per day and Missile Batteries stop firing for 1 day.","faction":"Generic"},{"name":"Leave Order","cost":"100 Intel","difficulty":"Easy","description":"All non-mechanical enemy units in the targeted region must immediately retreat to their nearest base.","faction":"Generic"},{"name":"Gear Sabotage","cost":"200 Intel, 100 Solari","difficulty":"Medium","description":"Enemy units in the targeted region suffer -20% Power and +20% damage received for 1 day.","faction":"Generic"},{"name":"Assassination","cost":"Varies","difficulty":"Epic","description":"Requires max Infiltration of the target faction. Initiates an assassination attempt against the enemy leader. If successful, the faction is instantly defeated.","faction":"Generic"},{"name":"Support Intelligence","cost":"Variable","difficulty":"Faction","description":"Any operations launched on the zone apply -5% damage received to ally units.","faction":"Atreides"},{"name":"Arrakis Diplomacy","cost":"Variable","difficulty":"Faction","description":"Disband all rebellions and raids; +200% relation gain and resources from Sietch trades.","faction":"Atreides"},{"name":"Cease Fire","cost":"Variable","difficulty":"Faction","description":"Interrupts and prevents battles.","faction":"Atreides"},{"name":"Combat Drugs","cost":"Variable","difficulty":"Faction","description":"Ally non-mechanical units: -10% Health/day, +10% Speed, +30% attack damage.","faction":"Harkonnen"},{"name":"Sleeper Agent","cost":"Variable","difficulty":"Faction","description":"50% chance for non-temporary non-mechanical units to spawn Sleeper Agent on death.","faction":"Harkonnen"},{"name":"Toxic Vapors","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units: no health regeneration, -30% Health per day.","faction":"Harkonnen"},{"name":"Poison the Reserves","cost":"Variable","difficulty":"Faction","description":"Enemies losing supply: -20% Speed, -5% Health per day.","faction":"Smugglers"},{"name":"Extraction Network","cost":"Variable","difficulty":"Faction","description":"Instantly extract all units around village to Sietch Tuek for duration.","faction":"Smugglers"},{"name":"Communication Jamming","cost":"Variable","difficulty":"Faction","description":"Blocks all operations on the Region.","faction":"Smugglers"},{"name":"Hiding Tracks","cost":"Variable","difficulty":"Faction","description":"Ally units get Stealth; enemy units get -10% Speed in region and neighbors.","faction":"Fremen"},{"name":"Hidden Thumpers","cost":"Variable","difficulty":"Faction","description":"Sandworm riding doesn't consume Thumpers; military units gain Stealth.","faction":"Fremen"},{"name":"Awake the People","cost":"Variable","difficulty":"Faction","description":"Start a rebellion in the village.","faction":"Fremen"},{"name":"Consolidation","cost":"Variable","difficulty":"Faction","description":"Apply to Allies: +2 Armor to mechanical units and structures.","faction":"Corrino"},{"name":"Interdiction Zone","cost":"Variable","difficulty":"Faction","description":"Apply to Enemies: disable Carryalls and Airfields.","faction":"Corrino"},{"name":"Orbital Strike","cost":"Variable","difficulty":"Faction","description":"Missile strike dealing 40 Power to all ground units, villages, and bases in area.","faction":"Corrino"},{"name":"Epic Quest","cost":"Variable","difficulty":"Faction","description":"Strongest military unit's attacks deal +100% damage.","faction":"Ecaz"},{"name":"Live Performance","cost":"Variable","difficulty":"Faction","description":"+5 Influence per enemy kill; -5 Influence per unit death/departure.","faction":"Ecaz"},{"name":"Elacca Fog","cost":"Variable","difficulty":"Faction","description":"Non-mechanical units cannot be controlled in combat.","faction":"Ecaz"},{"name":"Ambient Connection","cost":"Variable","difficulty":"Faction","description":"Ally mechanical units are Tethered remotely.","faction":"Vernius"},{"name":"Empirical Data","cost":"Variable","difficulty":"Faction","description":"+1 Knowledge per unit of any faction in combat in region.","faction":"Vernius"},{"name":"Hidden Backdoor","cost":"Variable","difficulty":"Faction","description":"Enemy mechanical units cannot be controlled and attack their allies.","faction":"Vernius"}];
+        const OPERATIONS_DATA = [{"name":"Probe Setup","cost":"50 Intel","difficulty":"Very Easy","description":"Removes Fog of War in the targeted region for 3 days.","faction":"Generic"},{"name":"Supply Drop","cost":"100 Intel","difficulty":"Very Easy","description":"Military units in the targeted region gain +100% Supply and suffer no Supply drain for 1 day.","faction":"Generic"},{"name":"Gear Sabotage","cost":"100 Intel","difficulty":"Very Easy","description":"Enemy units in the targeted region suffer -20% Power and +20% damage received for 1 day.","faction":"Generic"},{"name":"Leave Order","cost":"100 Intel","difficulty":"Very Easy","description":"All non-mechanical enemy units in the targeted region must immediately retreat to their nearest base.","faction":"Generic"},{"name":"Defense Breaches","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Villages in the targeted region lose 20% Health per day and Missile Batteries stop firing for 1 day.","faction":"Generic"},{"name":"Assassination","cost":"500 Intel, 1000 Solari","difficulty":"Victory","description":"Requires max Infiltration of the target faction. Initiates an assassination attempt against the enemy leader. If successful, the faction is instantly defeated.","faction":"Generic"},{"name":"Support Intelligence","cost":"100 Intel","difficulty":"Very Easy","description":"Any operations launched on the zone apply -5% damage received to ally units.","faction":"Atreides"},{"name":"Arrakis Diplomacy","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"Disband all rebellions and raids; +200% relation gain and resources from Sietch trades.","faction":"Atreides"},{"name":"Cease Fire","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Interrupts and prevents battles.","faction":"Atreides"},{"name":"Combat Drugs","cost":"100 Intel","difficulty":"Very Easy","description":"Ally non-mechanical units: -10% Health/day, +10% Speed, +30% attack damage.","faction":"Harkonnen"},{"name":"Sleeper Agent","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"50% chance for non-temporary non-mechanical units to spawn Sleeper Agent on death.","faction":"Harkonnen"},{"name":"Toxic Vapors","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Non-mechanical units: no health regeneration, -30% Health per day.","faction":"Harkonnen"},{"name":"Poison the Reserves","cost":"100 Intel","difficulty":"Very Easy","description":"Enemies losing supply: -20% Speed, -5% Health per day.","faction":"Smugglers"},{"name":"Extraction Network","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"Instantly extract all units around village to Sietch Tuek for duration.","faction":"Smugglers"},{"name":"Communication Jamming","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Blocks all operations on the Region.","faction":"Smugglers"},{"name":"Hiding Tracks","cost":"100 Intel","difficulty":"Very Easy","description":"Ally units get Stealth; enemy units get -10% Speed in region and neighbors.","faction":"Fremen"},{"name":"Hidden Thumpers","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"Sandworm riding doesn't consume Thumpers; military units gain Stealth.","faction":"Fremen"},{"name":"Awake the People","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Start a rebellion in the village.","faction":"Fremen"},{"name":"Consolidation","cost":"100 Intel","difficulty":"Very Easy","description":"Apply to Allies: +2 Armor to mechanical units and structures.","faction":"Corrino"},{"name":"Interdiction Zone","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"Apply to Enemies: disable Carryalls and Airfields.","faction":"Corrino"},{"name":"Orbital Strike","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Missile strike dealing 40 Power to all ground units, villages, and bases in area.","faction":"Corrino"},{"name":"Epic Quest","cost":"100 Intel","difficulty":"Very Easy","description":"Strongest military unit's attacks deal +100% damage.","faction":"Ecaz"},{"name":"Live Performance","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"+5 Influence per enemy kill; -5 Influence per unit death/departure.","faction":"Ecaz"},{"name":"Elacca Fog","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Non-mechanical units cannot be controlled in combat.","faction":"Ecaz"},{"name":"Ambient Connection","cost":"100 Intel","difficulty":"Very Easy","description":"Ally mechanical units are Tethered remotely.","faction":"Vernius"},{"name":"Empirical Data","cost":"200 Intel, 200 Solari","difficulty":"Easy","description":"+1 Knowledge per unit of any faction in combat in region.","faction":"Vernius"},{"name":"Hidden Backdoor","cost":"500 Intel, 500 Solari","difficulty":"Medium","description":"Enemy mechanical units cannot be controlled and attack their allies.","faction":"Vernius"}];
         
         // Build the overview block (traits + hegemony + councilors) for a single faction.
         function factionOverviewBlock(key) {
@@ -7773,7 +7792,11 @@ renderAll();
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         ${byFaction[faction].map(op => `
                             <div class="landsraad-card">
-                                <h3 style="color: var(--color-${faction.toLowerCase()}); margin-top: 0;">${op.name}</h3>
+                                <h3 style="display: flex; justify-content: space-between; color: var(--color-${faction.toLowerCase()}); margin-top: 0;">
+                                    ${op.name}
+                                    <span style="font-size: 12px; color: #888; padding-top: 4px; text-transform: uppercase;">${op.difficulty}</span>
+                                </h3>
+                                <div style="color: #4a90e2; font-weight: bold; margin-bottom: 15px;">Cost: ${op.cost}</div>
                                 <p style="color: #ccc; line-height: 1.5;">${op.description}</p>
                             </div>
                         `).join('')}
@@ -8087,6 +8110,125 @@ renderAll();
             if (window.lucide) window.lucide.createIcons();
         }
 
+        // ─── Main Base Planner (district-bonus calculator) ──────────────────────────
+        // Verified from the game DB: per-faction Main Base district layout = structure.props.districtSlots
+        // (nbSlots only — districts are domain-agnostic, player fills them). Filling a district of N slots
+        // with same-domain Main Base buildings grants that domain's tier-N bonus from domain.districtLevels.
+        const MB_FACTIONS = {
+            Atreides:  { base: 'Arrakeen',      districts: [1, 2, 3, 2, 1, 1] },
+            Harkonnen: { base: 'Carthag',       districts: [3, 2, 1, 2, 3] },
+            Smugglers: { base: 'Sietch Tuek',   districts: [3, 2, 1, 1, 1, 1] },
+            Fremen:    { base: 'Sietch Tabr',   districts: [3, 2, 1] },
+            Corrino:   { base: 'Imperial Base', districts: [3, 2, 1], multiBase: true },
+            Ecaz:      { base: 'Foliage',       districts: [1, 3, 2, 3, 1] },
+            Vernius:   { base: 'S-Vault',       districts: [3, 3, 3] },
+        };
+        const MB_DOMAINS = ['Economy', 'Military', 'Statecraft'];
+        const MB_DOMAIN_COLOR = { Economy: 'var(--tag-economy)', Military: 'var(--tag-military)', Statecraft: 'var(--tag-statecraft)' };
+        // domain.districtLevels[0..2] -> trait effect; variant = faction-specific override
+        const MB_BONUS = {
+            Economy: [
+                { name: 'Investment Offices', effect: '−15% Economy development cost' },
+                { name: 'Insurance Banks', effect: '+30 Solari production' },
+                { name: 'Economic Lobbies', effect: '+10% Solari production' },
+            ],
+            Military: [
+                { name: 'Military Academy', effect: '−15% Military development cost' },
+                { name: 'Master Armorers', effect: '+1 Armor to Military Units', variant: { factions: ['Fremen'], name: 'Master Raiders', effect: '+10% attack speed to Military Units' } },
+                { name: 'Military Investments', effect: '+20% max Health to Military Units' },
+            ],
+            Statecraft: [
+                { name: 'Administrative Complex', effect: '−15% Statecraft development cost' },
+                { name: 'Senate Envoys', effect: '+3 Influence & +5 Intel production' },
+                { name: 'Political Forum', effect: '+150 Council Votes', variant: { factions: ['Smugglers', 'Fremen'], name: 'Political Forum', effect: '+150 max Influence & +6 Influence production' } },
+            ],
+        };
+        let mbState = { faction: 'Atreides', bases: 1, assign: {} };
+        function mbBonusFor(domain, level, faction) {
+            const b = MB_BONUS[domain][level - 1];
+            if (b.variant && b.variant.factions.includes(faction)) return { name: b.variant.name, effect: b.variant.effect };
+            return { name: b.name, effect: b.effect };
+        }
+        function mbSetFaction(f) { mbState.faction = f; mbState.assign = {}; mbState.bases = 1; renderMainBase(); }
+        function mbSetBases(n) { mbState.bases = +n; renderMainBase(); }
+        function mbToggle(key, domain) { mbState.assign[key] = (mbState.assign[key] === domain ? null : domain); renderMainBase(); }
+
+        function renderMainBase() {
+            const fac = mbState.faction, info = MB_FACTIONS[fac];
+            const baseCount = info.multiBase ? mbState.bases : 1;
+            const districts = [];
+            for (let bi = 0; bi < baseCount; bi++) info.districts.forEach((sz, i) => districts.push({ size: sz, key: bi + '-' + i, baseNo: bi + 1 }));
+            const active = [];
+            districts.forEach(d => { const dom = mbState.assign[d.key]; if (dom) active.push({ ...mbBonusFor(dom, d.size, fac) }); });
+
+            const css = `<style>
+            .mb-wrap{max-width:1100px;margin:0 auto;}
+            .mb-wrap h1{color:var(--accent-gold);margin:0 0 6px;}
+            .mb-wrap h2{font-size:1.05rem;margin:0 0 8px;}
+            .mb-factions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
+            .mb-fac-btn{padding:6px 14px;border:1px solid var(--faction-color,#888);background:transparent;color:var(--faction-color,#ccc);border-radius:20px;cursor:pointer;font-weight:700;font-size:0.85rem;}
+            .mb-fac-btn.active{background:var(--faction-color);color:#050407;}
+            .mb-baseinfo{margin:8px 0 18px;color:var(--text-muted);font-size:0.9rem;}
+            .mb-baseinfo select{background:#1a1410;color:#eee;border:1px solid #555;border-radius:4px;padding:2px 4px;}
+            .mb-districts{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px;}
+            .mb-district{border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;background:rgba(255,255,255,0.02);}
+            .mb-district.filled{border-color:rgba(255,255,255,0.28);background:rgba(255,255,255,0.05);}
+            .mb-dsize{font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;}
+            .mb-dopts{display:flex;gap:4px;margin-bottom:8px;}
+            .mb-dopt{flex:1;padding:5px 2px;border:1px solid var(--dc);color:var(--dc);background:transparent;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:700;}
+            .mb-dopt.sel{background:var(--dc);color:#050407;}
+            .mb-dbonus{font-weight:700;font-size:0.85rem;line-height:1.25;}
+            .mb-dbonus span{display:block;font-weight:400;color:var(--text-muted);font-size:0.78rem;margin-top:2px;}
+            .mb-dempty{color:var(--text-muted);font-size:0.8rem;font-style:italic;}
+            .mb-summary{margin:24px 0;padding:16px 18px;border:1px solid var(--accent-gold);border-radius:10px;background:rgba(201,138,65,0.06);}
+            .mb-bonuslist{margin:8px 0 0;padding-left:20px;}
+            .mb-bonuslist li{margin:5px 0;}
+            .mb-stack{color:var(--text-muted);font-size:0.76rem;}
+            .mb-ref{margin:24px 0;}
+            .mb-reftable{width:100%;border-collapse:collapse;font-size:0.82rem;}
+            .mb-reftable th,.mb-reftable td{border:1px solid rgba(255,255,255,0.1);padding:8px;text-align:left;vertical-align:top;}
+            .mb-reftable td span{color:var(--text-muted);font-size:0.76rem;}
+            .mb-note{color:var(--text-muted);font-size:0.8rem;margin-top:6px;}
+            </style>`;
+
+            let html = css + `<div class="mb-wrap">
+                <h1>Main Base Planner</h1>
+                <p style="color:var(--text-muted);max-width:760px;">Each Main Base has fixed <b>districts</b> of 1–3 slots. Fill a district with same-domain buildings (Economy / Military / Statecraft) and you earn that domain's <b>tier-N</b> district bonus (N = district size). Assign a domain to each district to preview the bonuses. All data verified from the game database (<code>domain.districtLevels</code>, <code>structure.districtSlots</code>).</p>
+                <div class="mb-factions">${Object.keys(MB_FACTIONS).map(f => `<button class="mb-fac-btn${f === fac ? ' active' : ''}" style="--faction-color:${factionColor(f)}" onclick="mbSetFaction('${f}')">${f}</button>`).join('')}</div>`;
+
+            html += `<div class="mb-baseinfo">Main Base: <b>${info.base}</b> · ${info.districts.length} districts (slot sizes ${info.districts.slice().sort((a, b) => b - a).join('–')})`;
+            if (info.multiBase) html += ` &nbsp;·&nbsp; Corrino Main Bases: <select onchange="mbSetBases(this.value)">${[1, 2, 3].map(n => `<option value="${n}"${n === mbState.bases ? ' selected' : ''}>${n}</option>`).join('')}</select> <span class="mb-note" style="display:inline">(2nd via Main Base Deployment at 5,000 Hegemony; 3rd at 10,000 after destroying a 50+ day war enemy's base)</span>`;
+            html += `</div>`;
+
+            html += `<div class="mb-districts">` + districts.map(d => {
+                const dom = mbState.assign[d.key];
+                const bn = dom ? mbBonusFor(dom, d.size, fac) : null;
+                return `<div class="mb-district${dom ? ' filled' : ''}">
+                    <div class="mb-dsize">${baseCount > 1 ? 'Base ' + d.baseNo + ' · ' : ''}District · ${d.size} slot${d.size > 1 ? 's' : ''} → tier ${d.size}</div>
+                    <div class="mb-dopts">${MB_DOMAINS.map(dm => `<button class="mb-dopt${dom === dm ? ' sel' : ''}" style="--dc:${MB_DOMAIN_COLOR[dm]}" onclick="mbToggle('${d.key}','${dm}')">${dm.slice(0, 4)}</button>`).join('')}</div>
+                    ${bn ? `<div class="mb-dbonus" style="color:${MB_DOMAIN_COLOR[dom]}">${bn.name}<span>${bn.effect}</span></div>` : `<div class="mb-dempty">— unassigned —</div>`}
+                </div>`;
+            }).join('') + `</div>`;
+
+            const counts = {};
+            active.forEach(a => { const k = a.name + '||' + a.effect; counts[k] = (counts[k] || 0) + 1; });
+            html += `<div class="mb-summary"><h2>Active District Bonuses — ${active.length}/${districts.length} districts filled</h2>`;
+            if (!active.length) html += `<p class="mb-dempty">Assign domains to the districts above to see the bonuses they grant.</p>`;
+            else html += `<ul class="mb-bonuslist">${Object.entries(counts).map(([k, n]) => { const p = k.split('||'); return `<li><b>${p[0]}</b>${n > 1 ? ` ×${n}` : ''} — ${p[1]}${n > 1 ? ` <span class="mb-stack">(stacks per district)</span>` : ''}</li>`; }).join('')}</ul>`;
+            html += `</div>`;
+
+            html += `<div class="mb-ref"><h2>District Bonus Reference (${fac})</h2><table class="mb-reftable"><thead><tr><th>Domain</th><th>Tier 1 · 1-slot</th><th>Tier 2 · 2-slot</th><th>Tier 3 · 3-slot</th></tr></thead><tbody>`;
+            MB_DOMAINS.forEach(dm => {
+                html += `<tr><td style="color:${MB_DOMAIN_COLOR[dm]}"><b>${dm}</b></td>` + [1, 2, 3].map(lv => { const b = mbBonusFor(dm, lv, fac); return `<td><b>${b.name}</b><br><span>${b.effect}</span></td>`; }).join('') + `</tr>`;
+            });
+            html += `</tbody></table><p class="mb-note">Military tier-2 and Statecraft tier-3 vary by faction — Fremen get <b>Master Raiders</b> (attack speed) instead of Master Armorers; Smugglers &amp; Fremen get the Influence-based <b>Political Forum</b>. The table reflects <b>${fac}</b>.</p></div>`;
+            html += `</div>`;
+
+            document.getElementById('compendium-content').innerHTML = html;
+            document.getElementById('result-count').textContent = 'Main Base Planner — ' + fac;
+            if (window.lucide) window.lucide.createIcons();
+        }
+
         // Remove existing render wrapper if this is re-running
         if (!window.HAS_INJECTED_FACTIONS) {
             window.HAS_INJECTED_FACTIONS = true;
@@ -8103,6 +8245,8 @@ renderAll();
                     renderRegions();
                 } else if (cat === "Victory Conditions") {
                     renderVictoryConditions();
+                } else if (cat === "Main Base") {
+                    renderMainBase();
                 } else {
                     origRender();
                 }
