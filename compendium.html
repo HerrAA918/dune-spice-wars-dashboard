@@ -4109,6 +4109,7 @@ const BUILDINGS = [
     },
     "upkeep": "8 Solari",
     "effects": [
+      "⚠ Stale — cut content: no buildable counterpart in the current game files (the matching entry SpiceCollectors is an empty placeholder explicitly marked 'Obsolete', unlocked by nothing). Details below reflect an earlier version.",
       "Allows deployment of a Harvesting Team to a Spice Field within the same region"
     ],
     "unlock": "None"
@@ -4368,12 +4369,11 @@ const BUILDINGS = [
     "name": "Ceremonial Caves",
     "faction": "Fremen",
     "type": "village",
-    "subtitle": "Construction time: 2 Days",
+    "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "12 Solari",
+    "upkeep": "2 Water · 6 Spice",
     "effects": [
       "+5% unit Power",
       "−5% Spice production",
@@ -4458,10 +4458,9 @@ const BUILDINGS = [
     "type": "village",
     "subtitle": "Construction time: 4 Days",
     "cost": {
-      "plascrete": 150,
-      "water": 2
+      "plascrete": 150
     },
-    "upkeep": "6 Solari",
+    "upkeep": "10 Solari · 2 Water",
     "effects": [
       "Sietches in neighbouring regions gain:",
       "Note: Must be built next to a revealed neighbouring sietch"
@@ -4681,6 +4680,7 @@ const BUILDINGS = [
     },
     "upkeep": "10 Solari",
     "effects": [
+      "⚠ Stale — likely cut content: no buildable counterpart in the current game files (the matching entry Main_WeaponsFactory is an empty placeholder with no stats, unlocked by nothing). Details below reflect an earlier version.",
       "Increase armies' max Supply by 30%",
       "Gain 30% more resources when pillaging a Village",
       "-30% damage received from Atomics"
@@ -4917,6 +4917,7 @@ const BUILDINGS = [
     },
     "upkeep": "5 Solari",
     "effects": [
+      "⚠ Stale — likely cut content: no buildable counterpart in the current game files (the matching entry ClandestineScouts is an empty placeholder with no stats, unlocked by nothing). Details below reflect an earlier version.",
       "Ally military units in the Region gain +10% Power"
     ],
     "unlock": ""
@@ -8110,10 +8111,15 @@ renderAll();
             if (window.lucide) window.lucide.createIcons();
         }
 
-        // ─── Main Base Planner (district-bonus calculator) ──────────────────────────
-        // Verified from the game DB: per-faction Main Base district layout = structure.props.districtSlots
-        // (nbSlots only — districts are domain-agnostic, player fills them). Filling a district of N slots
-        // with same-domain Main Base buildings grants that domain's tier-N bonus from domain.districtLevels.
+        // ─── Main Base Planner (district building-placement + bonus calculator) ──────
+        // Verified from the game DB. Each Main Base = structure.props.districtSlots — a set of districts
+        // with 1–3 building slots each. You FILL slots with Main Base Buildings (building sheet, tip.cat
+        // MainbaseBuilding / MajorBuilding; each carries a `domain`). Game tutorial: "fill all the slots of
+        // a district with only one type of Main Base Building → grants a bonus depending on the District's
+        // size" (= that domain's tier-N bonus from domain.districtLevels). Specials, all verified:
+        //   • Vernius  — Vernius trait District_Auto_Split: mixed full districts auto-split by domain.
+        //   • Fremen   — Bazaar building (AllDistricts_Eligible): counts as any domain (wildcard).
+        //   • Corrino  — Emperor Monument (Main_Monument → AllDistrict_ExtraBonus): doubles completed-district bonuses.
         const MB_FACTIONS = {
             Atreides:  { base: 'Arrakeen',      districts: [1, 2, 3, 2, 1, 1] },
             Harkonnen: { base: 'Carthag',       districts: [3, 2, 1, 2, 3] },
@@ -8121,10 +8127,167 @@ renderAll();
             Fremen:    { base: 'Sietch Tabr',   districts: [3, 2, 1] },
             Corrino:   { base: 'Imperial Base', districts: [3, 2, 1], multiBase: true },
             Ecaz:      { base: 'Foliage',       districts: [1, 3, 2, 3, 1] },
-            Vernius:   { base: 'S-Vault',       districts: [3, 3, 3] },
+            Vernius:   { base: 'S-Vault',       districts: [3, 3, 3], autoSplit: true },
         };
         const MB_DOMAINS = ['Economy', 'Military', 'Statecraft'];
         const MB_DOMAIN_COLOR = { Economy: 'var(--tag-economy)', Military: 'var(--tag-military)', Statecraft: 'var(--tag-statecraft)' };
+        const MB_WILDCARD = 'Bazaar';            // Fremen — counts as any domain
+        const MB_DOUBLER = 'Emperor Monument';   // Corrino — doubles completed-district bonuses
+        // Placeable Main Base Buildings per faction (✦ = Major Building) — derived from the game DB.
+        const MB_BUILDINGS = {
+            Atreides: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Harvester Works", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Fusion Plant", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Nuclear Silo", d: 'Military', mj: 1, c: {Solari:2000,Plascrete:1000} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Council Chamber", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Landsraad Quarters", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Spacing Guild Branch", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+            Harkonnen: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Harvester Works", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Fusion Plant", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Nuclear Silo", d: 'Military', mj: 1, c: {Solari:2000,Plascrete:1000} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Interrogation Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Landsraad Quarters", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Spacing Guild Branch", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+            Smugglers: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Harvester Works", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Fusion Plant", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Nuclear Silo", d: 'Military', mj: 1, c: {Solari:2000,Plascrete:1000} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Black Market Branch", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Landsraad Quarters", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Spacing Guild Branch", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+            Fremen: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Shai-hulud Temple", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Al-Gaib Temple", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Bazaar", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Plant", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+            Corrino: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Harvester Works", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Fusion Plant", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Nuclear Silo", d: 'Military', mj: 1, c: {Solari:2000,Plascrete:1000} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Emperor Monument", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Landsraad Quarters", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Spacing Guild Branch", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+            Ecaz: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Harvester Works", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Fusion Plant", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Nuclear Silo", d: 'Military', mj: 1, c: {Solari:2000,Plascrete:1000} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Landsraad Quarters", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Museum of Unbound Arts", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Spacing Guild Branch", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+            Vernius: [
+                { n: "Administrative Hall", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "CHOAM branch", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Experimental Furnace", d: 'Economy', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Mason Guild", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Recycling Vats", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Spice Laboratory", d: 'Economy', c: {Solari:1000,Plascrete:500} },
+                { n: "Barracks", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Command Post", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Fusion Plant", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Academy", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Military Factory", d: 'Military', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Nuclear Silo", d: 'Military', mj: 1, c: {Solari:2000,Plascrete:1000} },
+                { n: "Recruitment Center", d: 'Military', c: {Solari:1000,Plascrete:500} },
+                { n: "Embassy", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Intelligence Agency", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Landsraad Quarters", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Neural Core", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Center", d: 'Statecraft', c: {Solari:1000,Plascrete:500} },
+                { n: "Research Station", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+                { n: "Spacing Guild Branch", d: 'Statecraft', mj: 1, c: {Solari:1000,Plascrete:500} },
+            ],
+        };
         // domain.districtLevels[0..2] -> trait effect; variant = faction-specific override
         const MB_BONUS = {
             Economy: [
@@ -8143,23 +8306,62 @@ renderAll();
                 { name: 'Political Forum', effect: '+150 Council Votes', variant: { factions: ['Smugglers', 'Fremen'], name: 'Political Forum', effect: '+150 max Influence & +6 Influence production' } },
             ],
         };
-        let mbState = { faction: 'Atreides', bases: 1, assign: {} };
+        let mbState = { faction: 'Atreides', bases: 1, slots: {} };
         function mbBonusFor(domain, level, faction) {
-            const b = MB_BONUS[domain][level - 1];
+            const b = MB_BONUS[domain][Math.min(level, 3) - 1];
             if (b.variant && b.variant.factions.includes(faction)) return { name: b.variant.name, effect: b.variant.effect };
             return { name: b.name, effect: b.effect };
         }
-        function mbSetFaction(f) { mbState.faction = f; mbState.assign = {}; mbState.bases = 1; renderMainBase(); }
+        function mbSetFaction(f) { mbState.faction = f; mbState.slots = {}; mbState.bases = 1; renderMainBase(); }
         function mbSetBases(n) { mbState.bases = +n; renderMainBase(); }
-        function mbToggle(key, domain) { mbState.assign[key] = (mbState.assign[key] === domain ? null : domain); renderMainBase(); }
+        function mbSetSlot(key, idx, val) {
+            if (!mbState.slots[key]) mbState.slots[key] = [];
+            mbState.slots[key][idx] = (val === '' ? null : +val);
+            renderMainBase();
+        }
+        function mbClearAll() { mbState.slots = {}; renderMainBase(); }
+        // Resolve a district's outcome: { filled, size, completed, mixed, bonuses:[{name,effect,domain,level}] }
+        function mbDistrictResult(key, size, fac) {
+            const arr = mbState.slots[key] || [];
+            const placed = [];
+            for (let i = 0; i < size; i++) { const v = arr[i]; if (v != null && MB_BUILDINGS[fac][v]) placed.push(MB_BUILDINGS[fac][v]); }
+            const r = { filled: placed.length, size, completed: false, mixed: false, bonuses: [] };
+            if (placed.length < size) return r;                          // not full → no bonus
+            if (MB_FACTIONS[fac].autoSplit) {                            // Vernius — split full district by domain
+                const byDom = {};
+                placed.forEach(b => byDom[b.d] = (byDom[b.d] || 0) + 1);
+                Object.keys(byDom).forEach(d => r.bonuses.push({ ...mbBonusFor(d, byDom[d], fac), domain: d, level: byDom[d] }));
+                r.completed = true;
+                return r;
+            }
+            const fixed = [...new Set(placed.filter(b => b.n !== MB_WILDCARD).map(b => b.d))];
+            if (fixed.length <= 1) {                                     // homogeneous (wildcard joins the domain)
+                const dom = fixed[0] || 'Statecraft';                    // all-wildcard → Bazaar's native domain
+                r.bonuses.push({ ...mbBonusFor(dom, size, fac), domain: dom, level: size });
+                r.completed = true;
+            } else r.mixed = true;
+            return r;
+        }
 
         function renderMainBase() {
             const fac = mbState.faction, info = MB_FACTIONS[fac];
+            const blist = MB_BUILDINGS[fac];
             const baseCount = info.multiBase ? mbState.bases : 1;
             const districts = [];
             for (let bi = 0; bi < baseCount; bi++) info.districts.forEach((sz, i) => districts.push({ size: sz, key: bi + '-' + i, baseNo: bi + 1 }));
-            const active = [];
-            districts.forEach(d => { const dom = mbState.assign[d.key]; if (dom) active.push({ ...mbBonusFor(dom, d.size, fac) }); });
+
+            // Aggregate across all districts: completed count, bonus stacks, total build cost, doubler,
+            // and the set of already-placed building indices (each Main Base Building is unique — factionLimit 1).
+            let completed = 0, doublerPlaced = false;
+            const totalCost = {}, bonusCounts = {}, placed = new Set();
+            districts.forEach(d => {
+                const arr = mbState.slots[d.key] || [];
+                for (let i = 0; i < d.size; i++) { const v = arr[i]; if (v != null && blist[v]) { placed.add(v); const c = blist[v].c; for (const r in c) totalCost[r] = (totalCost[r] || 0) + c[r]; if (blist[v].n === MB_DOUBLER) doublerPlaced = true; } }
+                const res = mbDistrictResult(d.key, d.size, fac);
+                if (res.completed) completed++;
+                res.bonuses.forEach(bn => { const k = bn.name + '||' + bn.effect + '||' + bn.domain; bonusCounts[k] = (bonusCounts[k] || 0) + 1; });
+            });
+            const doubles = fac === 'Corrino' && doublerPlaced;
 
             const css = `<style>
             .mb-wrap{max-width:1100px;margin:0 auto;}
@@ -8168,22 +8370,30 @@ renderAll();
             .mb-factions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
             .mb-fac-btn{padding:6px 14px;border:1px solid var(--faction-color,#888);background:transparent;color:var(--faction-color,#ccc);border-radius:20px;cursor:pointer;font-weight:700;font-size:0.85rem;}
             .mb-fac-btn.active{background:var(--faction-color);color:#050407;}
-            .mb-baseinfo{margin:8px 0 18px;color:var(--text-muted);font-size:0.9rem;}
+            .mb-baseinfo{margin:8px 0 16px;color:var(--text-muted);font-size:0.9rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
             .mb-baseinfo select{background:#1a1410;color:#eee;border:1px solid #555;border-radius:4px;padding:2px 4px;}
-            .mb-districts{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px;}
+            .mb-clear{background:transparent;color:var(--text-muted);border:1px solid #555;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:0.78rem;}
+            .mb-clear:hover{color:#eee;border-color:#888;}
+            .mb-special{margin:0 0 16px;color:var(--text-muted);font-size:0.82rem;padding:8px 12px;border-left:3px solid var(--accent-gold);background:rgba(201,138,65,0.05);border-radius:0 6px 6px 0;}
+            .mb-districts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;}
             .mb-district{border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;background:rgba(255,255,255,0.02);}
             .mb-district.filled{border-color:rgba(255,255,255,0.28);background:rgba(255,255,255,0.05);}
+            .mb-district.mixed{border-color:rgba(217,136,65,0.45);}
             .mb-dsize{font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;}
-            .mb-dopts{display:flex;gap:4px;margin-bottom:8px;}
-            .mb-dopt{flex:1;padding:5px 2px;border:1px solid var(--dc);color:var(--dc);background:transparent;border-radius:6px;cursor:pointer;font-size:0.7rem;font-weight:700;}
-            .mb-dopt.sel{background:var(--dc);color:#050407;}
-            .mb-dbonus{font-weight:700;font-size:0.85rem;line-height:1.25;}
+            .mb-slots{display:flex;flex-direction:column;gap:5px;margin-bottom:9px;}
+            .mb-slot{background:#1a1410;color:#cfc9c2;border:1px solid #4a4038;border-radius:6px;padding:5px 6px;font-size:0.76rem;font-weight:600;cursor:pointer;width:100%;}
+            .mb-slot option:disabled{color:#5a5048;}
+            .mb-dbonus{font-weight:700;font-size:0.85rem;line-height:1.25;margin-top:3px;}
+            .mb-dbonus small{font-weight:600;opacity:0.75;}
             .mb-dbonus span{display:block;font-weight:400;color:var(--text-muted);font-size:0.78rem;margin-top:2px;}
+            .mb-x2{color:var(--accent-gold);font-size:0.72rem;border:1px solid var(--accent-gold);border-radius:4px;padding:0 4px;margin-left:3px;}
+            .mb-dmixed{color:#d98841;font-size:0.78rem;font-style:italic;line-height:1.3;margin-top:3px;}
             .mb-dempty{color:var(--text-muted);font-size:0.8rem;font-style:italic;}
             .mb-summary{margin:24px 0;padding:16px 18px;border:1px solid var(--accent-gold);border-radius:10px;background:rgba(201,138,65,0.06);}
             .mb-bonuslist{margin:8px 0 0;padding-left:20px;}
             .mb-bonuslist li{margin:5px 0;}
             .mb-stack{color:var(--text-muted);font-size:0.76rem;}
+            .mb-cost{margin:12px 0 0;color:var(--text-muted);font-size:0.86rem;}
             .mb-ref{margin:24px 0;}
             .mb-reftable{width:100%;border-collapse:collapse;font-size:0.82rem;}
             .mb-reftable th,.mb-reftable td{border:1px solid rgba(255,255,255,0.1);padding:8px;text-align:left;vertical-align:top;}
@@ -8193,29 +8403,51 @@ renderAll();
 
             let html = css + `<div class="mb-wrap">
                 <h1>Main Base Planner</h1>
-                <p style="color:var(--text-muted);max-width:760px;">Each Main Base has fixed <b>districts</b> of 1–3 slots. Fill a district with same-domain buildings (Economy / Military / Statecraft) and you earn that domain's <b>tier-N</b> district bonus (N = district size). Assign a domain to each district to preview the bonuses. All data verified from the game database (<code>domain.districtLevels</code>, <code>structure.districtSlots</code>).</p>
+                <p style="color:var(--text-muted);max-width:820px;">Each Main Base is split into <b>districts</b> with 1–3 building slots. Drop a Main Base Building into each slot — fill <b>every</b> slot of a district with a single domain (Economy / Military / Statecraft) to specialize it and earn that domain's <b>tier-N</b> bonus (N = the district's size). <b>✦</b> marks Major Buildings. Verified from the game database (<code>structure.districtSlots</code>, <code>building.domain</code>, <code>domain.districtLevels</code>).</p>
                 <div class="mb-factions">${Object.keys(MB_FACTIONS).map(f => `<button class="mb-fac-btn${f === fac ? ' active' : ''}" style="--faction-color:${factionColor(f)}" onclick="mbSetFaction('${f}')">${f}</button>`).join('')}</div>`;
 
-            html += `<div class="mb-baseinfo">Main Base: <b>${info.base}</b> · ${info.districts.length} districts (slot sizes ${info.districts.slice().sort((a, b) => b - a).join('–')})`;
-            if (info.multiBase) html += ` &nbsp;·&nbsp; Corrino Main Bases: <select onchange="mbSetBases(this.value)">${[1, 2, 3].map(n => `<option value="${n}"${n === mbState.bases ? ' selected' : ''}>${n}</option>`).join('')}</select> <span class="mb-note" style="display:inline">(2nd via Main Base Deployment at 5,000 Hegemony; 3rd at 10,000 after destroying a 50+ day war enemy's base)</span>`;
-            html += `</div>`;
+            html += `<div class="mb-baseinfo"><span>Main Base: <b>${info.base}</b> · ${districts.length} district${districts.length > 1 ? 's' : ''} (slot sizes ${info.districts.slice().sort((a, b) => b - a).join('–')})</span>`;
+            if (info.multiBase) html += `<span>Corrino Main Bases: <select onchange="mbSetBases(this.value)">${[1, 2, 3].map(n => `<option value="${n}"${n === mbState.bases ? ' selected' : ''}>${n}</option>`).join('')}</select></span>`;
+            html += `<button class="mb-clear" onclick="mbClearAll()">Clear all</button></div>`;
+
+            // faction-specific district mechanics note
+            let special = '';
+            if (fac === 'Vernius') special = `<b>S-Vault auto-split:</b> a completed mixed district is automatically split by domain — each domain present grants a bonus at the tier of its building count (Vernius faction trait <code>District_Auto_Split</code>).`;
+            else if (fac === 'Fremen') special = `<b>Bazaar</b> is a wildcard — it counts as Economy, Military <i>and</i> Statecraft, so it completes a district of any single domain (<code>AllDistricts_Eligible</code>).`;
+            else if (fac === 'Corrino') special = `<b>Emperor Monument</b> doubles every completed-district bonus (<code>AllDistrict_ExtraBonus</code>); place it in any slot. The 2nd Main Base unlocks via <b>Deploy Main Base</b> at 5,000 Hegemony (cost <b>3,000 Solari + 100 Authority</b>); the 3rd at 10,000 Hegemony, after destroying the Main Base of a faction that's been at War with you 50+ days. For Corrino, each <b>completed district</b> and the <b>Monument</b> also generate <b>Hegemony</b> — progress toward the 30,000-Hegemony victory.`;
+            if (special) html += `<div class="mb-special">${special}</div>`;
 
             html += `<div class="mb-districts">` + districts.map(d => {
-                const dom = mbState.assign[d.key];
-                const bn = dom ? mbBonusFor(dom, d.size, fac) : null;
-                return `<div class="mb-district${dom ? ' filled' : ''}">
-                    <div class="mb-dsize">${baseCount > 1 ? 'Base ' + d.baseNo + ' · ' : ''}District · ${d.size} slot${d.size > 1 ? 's' : ''} → tier ${d.size}</div>
-                    <div class="mb-dopts">${MB_DOMAINS.map(dm => `<button class="mb-dopt${dom === dm ? ' sel' : ''}" style="--dc:${MB_DOMAIN_COLOR[dm]}" onclick="mbToggle('${d.key}','${dm}')">${dm.slice(0, 4)}</button>`).join('')}</div>
-                    ${bn ? `<div class="mb-dbonus" style="color:${MB_DOMAIN_COLOR[dom]}">${bn.name}<span>${bn.effect}</span></div>` : `<div class="mb-dempty">— unassigned —</div>`}
+                const arr = mbState.slots[d.key] || [];
+                const res = mbDistrictResult(d.key, d.size, fac);
+                let slots = '';
+                for (let i = 0; i < d.size; i++) {
+                    const sel = (arr[i] != null) ? arr[i] : null;
+                    const selDom = (sel != null && blist[sel]) ? blist[sel].d : null;
+                    const style = selDom ? `color:${MB_DOMAIN_COLOR[selDom]};border-color:${MB_DOMAIN_COLOR[selDom]}` : '';
+                    slots += `<select class="mb-slot" style="${style}" onchange="mbSetSlot('${d.key}',${i},this.value)">
+                        <option value=""${sel == null ? ' selected' : ''}>— empty —</option>
+                        ${MB_DOMAINS.map(dm => `<optgroup label="${dm}">${blist.map((b, bi) => b.d === dm ? `<option value="${bi}"${bi === sel ? ' selected' : ''}${placed.has(bi) && bi !== sel ? ' disabled' : ''}>${b.n}${b.mj ? ' ✦' : ''}${placed.has(bi) && bi !== sel ? ' (built)' : ''}</option>` : '').join('')}</optgroup>`).join('')}
+                    </select>`;
+                }
+                let resHtml;
+                if (res.completed) resHtml = res.bonuses.map(bn => `<div class="mb-dbonus" style="color:${MB_DOMAIN_COLOR[bn.domain]}">${bn.name} <small>· tier ${bn.level}</small>${doubles ? `<span class="mb-x2">×2</span>` : ''}<span>${bn.effect}</span></div>`).join('');
+                else if (res.mixed) resHtml = `<div class="mb-dmixed">Mixed — fill all ${d.size} slots with one domain to specialize</div>`;
+                else resHtml = `<div class="mb-dempty">${res.filled}/${d.size} slots filled</div>`;
+                return `<div class="mb-district${res.completed ? ' filled' : ''}${res.mixed ? ' mixed' : ''}">
+                    <div class="mb-dsize">${baseCount > 1 ? 'Base ' + d.baseNo + ' · ' : ''}${d.size}-slot district</div>
+                    <div class="mb-slots">${slots}</div>
+                    ${resHtml}
                 </div>`;
             }).join('') + `</div>`;
 
-            const counts = {};
-            active.forEach(a => { const k = a.name + '||' + a.effect; counts[k] = (counts[k] || 0) + 1; });
-            html += `<div class="mb-summary"><h2>Active District Bonuses — ${active.length}/${districts.length} districts filled</h2>`;
-            if (!active.length) html += `<p class="mb-dempty">Assign domains to the districts above to see the bonuses they grant.</p>`;
-            else html += `<ul class="mb-bonuslist">${Object.entries(counts).map(([k, n]) => { const p = k.split('||'); return `<li><b>${p[0]}</b>${n > 1 ? ` ×${n}` : ''} — ${p[1]}${n > 1 ? ` <span class="mb-stack">(stacks per district)</span>` : ''}</li>`; }).join('')}</ul>`;
-            html += `</div>`;
+            const entries = Object.entries(bonusCounts);
+            html += `<div class="mb-summary"><h2>Active District Bonuses — ${completed}/${districts.length} districts completed</h2>`;
+            if (!entries.length) html += `<p class="mb-dempty">Fill every slot of a district with Main Base Buildings of one domain to specialize it and earn a bonus.</p>`;
+            else html += `<ul class="mb-bonuslist">${entries.map(([k, n]) => { const p = k.split('||'); return `<li><b style="color:${MB_DOMAIN_COLOR[p[2]]}">${p[0]}</b>${n > 1 ? ` ×${n}` : ''} — ${p[1]}${n > 1 ? ` <span class="mb-stack">(per completed district)</span>` : ''}</li>`; }).join('')}</ul>`;
+            if (doubles) html += `<p class="mb-note">⚑ <b>Emperor Monument</b> placed — Corrino doubles every completed-district bonus (each effect applies twice).</p>`;
+            const costStr = Object.keys(totalCost).length ? Object.entries(totalCost).map(([r, q]) => `${q.toLocaleString()} ${r}`).join(' + ') : '—';
+            html += `<p class="mb-cost">Total build cost: <b>${costStr}</b></p></div>`;
 
             html += `<div class="mb-ref"><h2>District Bonus Reference (${fac})</h2><table class="mb-reftable"><thead><tr><th>Domain</th><th>Tier 1 · 1-slot</th><th>Tier 2 · 2-slot</th><th>Tier 3 · 3-slot</th></tr></thead><tbody>`;
             MB_DOMAINS.forEach(dm => {
