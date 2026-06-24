@@ -495,6 +495,33 @@
             margin-top: auto;
         }
 
+        /* Stale / cut-content flag on building cards */
+        .stale-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.66rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #f0c088;
+            background: rgba(217, 136, 65, 0.16);
+            border: 1px solid rgba(217, 136, 65, 0.55);
+            border-radius: 10px;
+            padding: 1px 7px;
+        }
+        .stale-banner {
+            margin: 10px 0 2px;
+            padding: 7px 10px;
+            border-left: 3px solid #d98841;
+            background: rgba(217, 136, 65, 0.10);
+            color: #e0b483;
+            font-size: 0.76rem;
+            line-height: 1.35;
+            border-radius: 0 6px 6px 0;
+        }
+        .stale-banner b { color: #f0c088; }
+
         /* Faction badge in header */
         .faction-badge {
             font-size: 0.68rem;
@@ -4679,8 +4706,8 @@ const BUILDINGS = [
       "plascrete": 500
     },
     "upkeep": "10 Solari",
+    "stale": "No buildable counterpart in the current game files — its CDB entry (Main_WeaponsFactory) is an empty placeholder, unlocked by nothing. The stats below reflect an earlier version of the game.",
     "effects": [
-      "⚠ Stale — likely cut content: no buildable counterpart in the current game files (the matching entry Main_WeaponsFactory is an empty placeholder with no stats, unlocked by nothing). Details below reflect an earlier version.",
       "Increase armies' max Supply by 30%",
       "Gain 30% more resources when pillaging a Village",
       "-30% damage received from Atomics"
@@ -6793,9 +6820,10 @@ function renderBuildingCard(b) {
                 </div>
             </div>
             <div class="tags">
-                ${typeBadge(b.type)}
+                ${typeBadge(b.type)}${b.stale ? `<span class="stale-chip" title="${b.stale}">⚠ Stale</span>` : ''}
             </div>
         </div>
+        ${b.stale ? `<div class="stale-banner">⚠ <b>Stale — likely cut content.</b> ${b.stale}</div>` : ''}
         <div class="cost-row">${makeCostChips(b.cost, b.upkeep)}</div>
         <div class="effects">
             <ul>${b.effects.map(e => `<li>${e}</li>`).join('')}</ul>
