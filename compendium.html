@@ -7818,7 +7818,9 @@ renderAll();
             });
             
             const factionOrder = ['Atreides', 'Harkonnen', 'Smugglers', 'Fremen', 'Corrino', 'Ecaz', 'Vernius'];
-            
+            // Respect the faction filter: a selected faction shows only its operations (+ universal).
+            const showFactions = currentFaction === 'All' ? factionOrder : factionOrder.filter(f => f === currentFaction);
+
             const htmlContent = `
             <div id="operations-section" style="max-width: 1200px; margin: 0 auto;">
                 <!-- Generic Operations Section -->
@@ -7839,7 +7841,7 @@ renderAll();
                 </div>
                 
                 <!-- Faction-Specific Operations -->
-                ${factionOrder.map(faction => byFaction[faction] ? `
+                ${showFactions.map(faction => byFaction[faction] ? `
                 <div style="margin-bottom: 40px;">
                     <h2 style="color: var(--color-${faction.toLowerCase()}); font-size: 24px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--color-${faction.toLowerCase()});">⚔ ${faction} Operations</h2>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
@@ -7855,7 +7857,8 @@ renderAll();
             </div>`;
             
             document.getElementById('compendium-content').innerHTML = htmlContent;
-            document.getElementById('result-count').textContent = 'Viewing All Operations';
+            document.getElementById('result-count').textContent =
+                currentFaction === 'All' ? 'Viewing All Operations' : 'Viewing ' + currentFaction + ' Operations';
             if (window.lucide) window.lucide.createIcons();
         }
         
@@ -7873,22 +7876,28 @@ renderAll();
 
         function rpFaction(key) { return RP_FACTIONS.find(f => f.key === key); }
         function rpNewPlayer(n) {
-            return { id: ++rpSeq, name: 'Player ' + n, factionKey: null, councilor: null,
+            return { id: ++rpSeq, name: 'Player ' + n, factionKey: null, councilors: [],
                      locked: false, excluded: [], showExcl: false };
         }
-        function rpRandomCouncilor(f) {
-            if (!f || !f.councilors.length) return null;
-            return f.councilors[Math.floor(Math.random() * f.councilors.length)];
+        // Each faction starts with two councillors — pick two distinct ones at random.
+        function rpRandomCouncilors(f, n = 2) {
+            if (!f || !f.councilors.length) return [];
+            const pool = f.councilors.slice();
+            const picks = [];
+            while (picks.length < n && pool.length) {
+                picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+            }
+            return picks;
         }
         // Assign a unique faction to player p, avoiding factions in `taken` and the
         // player's own exclusions. Excludes are relaxed only if otherwise impossible.
         function rpAssign(p, taken) {
             let pool = RP_FACTIONS.filter(f => !taken.has(f.key) && !p.excluded.includes(f.key));
             if (!pool.length) pool = RP_FACTIONS.filter(f => !taken.has(f.key));
-            if (!pool.length) { p.factionKey = null; p.councilor = null; return; }
+            if (!pool.length) { p.factionKey = null; p.councilors = []; return; }
             const pick = pool[Math.floor(Math.random() * pool.length)];
             p.factionKey = pick.key;
-            p.councilor = rpRandomCouncilor(pick);
+            p.councilors = rpRandomCouncilors(pick);
             taken.add(pick.key);
         }
         function rpRandomizeAll() {
@@ -7906,7 +7915,7 @@ renderAll();
         }
         function rpRerollCouncilor(id) {
             const p = rpPlayers.find(x => x.id === id); if (!p || !p.factionKey) return;
-            p.councilor = rpRandomCouncilor(rpFaction(p.factionKey)); rpRender();
+            p.councilors = rpRandomCouncilors(rpFaction(p.factionKey)); rpRender();
         }
         function rpAddPlayer() {
             if (rpPlayers.length >= 4) return;
@@ -7957,12 +7966,12 @@ renderAll();
                         </div>
                     </div>
                     <div>
-                        <div class="rp-section-label">Suggested Councillor</div>
-                        ${p.councilor ? `
+                        <div class="rp-section-label">Suggested Councillors</div>
+                        ${p.councilors && p.councilors.length ? p.councilors.map(c => `
                             <div class="rp-councilor">
-                                <div class="rp-councilor-name">${rpEsc(p.councilor.name)}</div>
-                                <ul>${p.councilor.effects.map(e => `<li>${rpEsc(e)}</li>`).join('')}</ul>
-                            </div>` : `<div class="rp-hint">No councillor data</div>`}
+                                <div class="rp-councilor-name">${rpEsc(c.name)}</div>
+                                <ul>${c.effects.map(e => `<li>${rpEsc(e)}</li>`).join('')}</ul>
+                            </div>`).join('') : `<div class="rp-hint">No councillor data</div>`}
                     </div>`
                     : `<div class="rp-empty">No faction available — too many exclusions.</div>`;
                 const exclPanel = p.showExcl ? `
@@ -7983,7 +7992,7 @@ renderAll();
                     ${factionBlock}
                     <div class="rp-actions">
                         <button class="rp-mini" onclick="rpReroll(${p.id})"><i data-lucide="dices" width="14" height="14"></i>Re-roll faction</button>
-                        ${f ? `<button class="rp-mini" onclick="rpRerollCouncilor(${p.id})"><i data-lucide="refresh-cw" width="14" height="14"></i>Councillor</button>` : ''}
+                        ${f ? `<button class="rp-mini" onclick="rpRerollCouncilor(${p.id})"><i data-lucide="refresh-cw" width="14" height="14"></i>Councillors</button>` : ''}
                         <button class="rp-mini ${p.locked ? 'locked' : ''}" onclick="rpToggleLock(${p.id})"><i data-lucide="${p.locked ? 'lock' : 'lock-open'}" width="14" height="14"></i>${p.locked ? 'Locked' : 'Lock'}</button>
                         <button class="rp-mini" onclick="rpToggleExcl(${p.id})"><i data-lucide="ban" width="14" height="14"></i>Exclude${p.excluded.length ? ` (${p.excluded.length})` : ''}</button>
                     </div>
