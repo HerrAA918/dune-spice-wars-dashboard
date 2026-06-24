@@ -6913,14 +6913,32 @@ function renderSietchCard(s) {
 var selectedTech = null;
 var techNodeMap = {};
 
+// Research (Knowledge) cost per development, derived from the game DB rather than guessed.
+// The game's curve is deliberately flat — Development_BaseCost=10 scaled by
+// Development_ScalePerStep=1.036 per "step" (StepsPerTier=[2,3,4,5]) — so per-tier base costs
+// are ~10–14; tier progression is gated by tier-unlock requirements, not escalating cost.
+// A handful of developments carry an explicit higher cost in the DB (overrides below).
 function getBaseCost(tier) {
     switch(tier) {
-        case 1: return 100;
-        case 2: return 200;
-        case 3: return 300;
-        case 4: return 400;
-        default: return 100;
+        case 1: return 10;
+        case 2: return 11;
+        case 3: return 12;
+        case 4: return 14;
+        default: return 10;
     }
+}
+
+// Explicit per-tech Knowledge costs from the game DB (development `costs` field).
+const TECH_COST_OVERRIDES = {
+    "Intelligence Network": 20,
+    "Lay of the Land": 80,
+    "Valuable Trinkets": 40,
+    "Wonders of the Desert": 80,
+};
+
+// Cost for a development node: explicit DB override if present, else the per-tier base.
+function getTechCost(tech) {
+    return TECH_COST_OVERRIDES[tech.name] ?? getBaseCost(tech.tier);
 }
 
 // Resolves the tech-branch palette from the --tech-* CSS custom properties (:root),
@@ -6957,8 +6975,8 @@ function buildTechTreeNode(genericTech, catKey, visited = new Set()) {
         facName = currentFaction + ' Unique';
     }
 
-    const cost = getBaseCost(genericTech.tier);
-    
+    const cost = getTechCost(genericTech);
+
     techNodeMap[genericTech.name] = {
         genericName: genericTech.name,
         activeName: active.name,
