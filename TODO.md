@@ -152,7 +152,12 @@ Larger builds (high value, plan separately — see roadmap):
       breaks down as 112 equippable + 44 orphaned/cut (referenced by no unit) + 1 legacy `*_Old`; only
       the 112 are shown. Also added the 2 Vernius combat units missing from the compendium (Suboid
       Soldier, Railgun Drone). Fixed an `_MRatio` formatting bug (multiplier `1.3` → +30%, not +130%).
-      ~34 conditional/aura options are flagged "?" (exact values pending in-game tooltip confirmation).
+      **All 148 options now resolve cleanly (0 pending).** The ~34 conditional/aura options that were
+      flagged "?" are nearly all "grant-a-trait" wrappers: the gear's `desc` carries the condition/target
+      with a `::target_effects::` placeholder and the granted trait holds the real stat values (with no
+      inline desc), so the decoder now recursively expands the placeholder via REFMAP and pulls
+      durations/stacking limits from the granted trait's `props` (e.g. Distracting Flashes → "−10% damage
+      received to allied units at melee range"; Morbid Climax → "keeps fighting for 5 seconds…").
 
 - [ ] Audit all icons/graphics across the dashboard and add relevant game art — the
       dashboard and compendium currently lean on external wiki image URLs (WIKI_IMAGES),
