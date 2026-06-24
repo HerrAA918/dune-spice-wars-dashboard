@@ -98,8 +98,19 @@
       signature abilities were already CDB-derived/verified in the Heroes task and reference
       other hero units that don't auto-clean well), and 6 generic Neutral units (Militia,
       Veteran Militia, Ornithopter, Mercenary, Landsraad Guard, Sardaukar) kept their text (no
-      unambiguous CDB match). Verified headless: 36 loadout panels / 148 options / 0 pending
-      still intact, 0 console errors.
+      unambiguous CDB match — fixed the one clear stale value there: Sardaukar execute 20%→5%).
+      An independent multi-agent CDB re-derivation then caught **6 sign/magnitude bugs** I'd have
+      shipped, all from two decoder gaps: (1) three `Entity_DamageReceived_*_MRatio` refs were
+      missing from REFMAP so they rendered `+v×100` instead of `(v−1)×100` (Hawk +70→**−30%**,
+      Fencer +60→**−40%**, Ornithopter "Swift" +30→**−70%**); (2) the `CustomProperty_Inverted`
+      handling must key off the desc token — `::s_percent::` is a multiplier `(v−1)×100`
+      (Banshee −50%, Loud Bang −10%) while `::*_value::` is additive `+v×100` (Cronos +30%,
+      Incinerator 1%). Also fixed unit matching to prefer the canonical **base** unit (variants
+      carry `props.baseUnit`) — a campaign variant `C_Trooper_Aramsham` had been masking the
+      Conscripts' real "Protection/Targeting Support" traits. Unified the gear generator onto the
+      same `_decoder.js` (one source of truth), which also corrected a shipped gear bug (Skirmisher
+      "Loud Bang" +90%→−10%). Re-verified headless: 36 loadout panels / 148 options / 0 pending,
+      0 console errors.
 
 ## Compendium expansion (from the game-DB gap audit — see docs/compendium-roadmap.md)
 
