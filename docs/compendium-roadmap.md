@@ -76,13 +76,22 @@ larger systems. Each item notes its **data source**, **schema**, **UI placement*
 ## Larger builds (high value, plan separately)
 
 ### Build 1 — Heroes section  ✅ DONE — see detailed plan below (shipped as a `hero` unit type)
-### Build 2 — Armory / Equipment
-- **Data:** `equipment` (157 rows; ~112 live, ~45 legacy like `*_Old`), 4 gear slots/unit (Fremen Altar = 8).
-  Effects resolve via the `trait` join (e.g. Heavy Armor +2 Armor / −2 Power, Long Rifle +40% range,
-  Red Fluid +30% attack speed). Filter out legacy items.
-- **Schema:** `EQUIPMENT = [{name, slot, effect, factions?}]`.
-- **UI:** new **Armory** category with a slot filter; optionally a per-unit "build" view.
-- **Effort:** Large (data join + new UI + legacy filtering).
+### Build 2 — Armory / Equipment  ✅ DONE — shipped as interactive per-unit customization
+- **Shipped:** rather than a separate Armory catalog, gear was added directly to the **unit cards** as an
+  interactive customization panel (matches the in-game loadout screen). Each equippable unit has **2 gear
+  slots** (Fremen **Altar** = 4), and **each slot is a binary choice between 2 options**. Clicking an
+  option recomputes a **live stat panel** (Health/Power/Armor/Range/Attack Speed) from the gear's decoded
+  stat modifiers — 36 units, 148 options. Also added the 2 missing Vernius units (Suboid Soldier, Railgun
+  Drone) so all 36 loadouts have a home.
+- **Data reality (corrected):** `equipment` has 157 rows = **112 equippable** (attached to a unit's slots)
+  + **44 orphaned/cut** (referenced by no unit, no dev, no inherit chain) + **1** legacy `*_Old`. The
+  original "~45 legacy" was actually the orphan count, not `*_Old`-named. Only the 112 are shown.
+- **Decoding:** effects come from each gear's `trait` attributes (`ref` + `val`). `_MRatio` stores a
+  *multiplier* (`1.3` → +30%); the shared `resolveDesc` mis-formatted these as `val×100` (+130%) — fixed
+  in the generator with multiplier-correct formatters used ahead of the desc path.
+- **Caveat:** ~34 conditional/aura options (trait-grants, per-stack, ally auras) aren't fully resolvable
+  from the DB and are flagged "?" — exact values pending in-game tooltip confirmation (same pattern as
+  unit abilities / sietch magnitudes).
 
 ---
 
