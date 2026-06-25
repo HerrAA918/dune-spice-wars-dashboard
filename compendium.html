@@ -1008,6 +1008,13 @@ ul.mechanics-list li {
 .rp-councilor-name { font-size:15px; font-weight:700; color:#fff; margin-bottom:6px; }
 .rp-councilor ul { margin:0; padding-left:16px; }
 .rp-councilor li { font-size:12px; color:#bbb; line-height:1.45; }
+.rp-pick-hint { text-transform:none; letter-spacing:0; color:#7a7a7a; font-weight:600; font-size:10.5px; }
+.rp-coun-pills { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 10px; }
+.rp-coun-pill { font-size:11.5px; padding:5px 11px; border-radius:999px; border:1px solid rgba(255,255,255,0.15);
+                background:transparent; color:#ccc; cursor:pointer; transition:background .12s, border-color .12s, color .12s; }
+.rp-coun-pill:hover { background: rgba(255,255,255,0.08); }
+.rp-coun-pill.selected { background: rgba(255,255,255,0.10); border-color: var(--faction-color, var(--accent-gold));
+                         color: var(--faction-color, #fff); font-weight:700; }
 .rp-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; }
 .rp-mini { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#ddd;
            border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer; display:inline-flex;
@@ -8035,6 +8042,17 @@ renderAll();
             const p = rpPlayers.find(x => x.id === id); if (!p || !p.factionKey) return;
             p.councilors = rpRandomCouncilors(rpFaction(p.factionKey)); rpRender();
         }
+        // Manually toggle a councillor (by index into the faction's pool) in/out of a player's
+        // picks. Capped at 2 (matching the game's starting pair); selecting a 3rd drops the oldest.
+        function rpToggleCouncilor(id, ci) {
+            const p = rpPlayers.find(x => x.id === id); if (!p || !p.factionKey) return;
+            const f = rpFaction(p.factionKey); if (!f || !f.councilors[ci]) return;
+            const c = f.councilors[ci];
+            const i = p.councilors.findIndex(x => x.name === c.name);
+            if (i >= 0) p.councilors.splice(i, 1);
+            else { p.councilors.push(c); if (p.councilors.length > 2) p.councilors.shift(); }
+            rpRender();
+        }
         function rpAddPlayer() {
             if (rpPlayers.length >= 4) return;
             const p = rpNewPlayer(rpPlayers.length + 1);
@@ -8084,12 +8102,17 @@ renderAll();
                         </div>
                     </div>
                     <div>
-                        <div class="rp-section-label">Suggested Councillors</div>
-                        ${p.councilors && p.councilors.length ? p.councilors.map(c => `
-                            <div class="rp-councilor">
-                                <div class="rp-councilor-name">${rpEsc(c.name)}</div>
-                                <ul>${c.effects.map(e => `<li>${rpEsc(e)}</li>`).join('')}</ul>
-                            </div>`).join('') : `<div class="rp-hint">No councillor data</div>`}
+                        <div class="rp-section-label">Councillors <span class="rp-pick-hint">— choose 2 (${p.councilors.length}/2)</span></div>
+                        ${f.councilors && f.councilors.length ? `
+                            <div class="rp-coun-pills">
+                                ${f.councilors.map((c, ci) => `<button class="rp-coun-pill ${p.councilors.some(s => s.name === c.name) ? 'selected' : ''}" onclick="rpToggleCouncilor(${p.id}, ${ci})">${rpEsc(c.name)}</button>`).join('')}
+                            </div>
+                            ${p.councilors.length ? p.councilors.map(c => `
+                                <div class="rp-councilor">
+                                    <div class="rp-councilor-name">${rpEsc(c.name)}</div>
+                                    <ul>${c.effects.map(e => `<li>${rpEsc(e)}</li>`).join('')}</ul>
+                                </div>`).join('') : `<div class="rp-hint">Click up to two councillors above to pick them.</div>`}
+                        ` : `<div class="rp-hint">No councillor data</div>`}
                     </div>`
                     : `<div class="rp-empty">No faction available — too many exclusions.</div>`;
                 const exclPanel = p.showExcl ? `
@@ -8110,7 +8133,7 @@ renderAll();
                     ${factionBlock}
                     <div class="rp-actions">
                         <button class="rp-mini" onclick="rpReroll(${p.id})"><i data-lucide="dices" width="14" height="14"></i>Re-roll faction</button>
-                        ${f ? `<button class="rp-mini" onclick="rpRerollCouncilor(${p.id})"><i data-lucide="refresh-cw" width="14" height="14"></i>Councillors</button>` : ''}
+                        ${f ? `<button class="rp-mini" onclick="rpRerollCouncilor(${p.id})" title="Randomly pick 2 councillors"><i data-lucide="dices" width="14" height="14"></i>Random councillors</button>` : ''}
                         <button class="rp-mini ${p.locked ? 'locked' : ''}" onclick="rpToggleLock(${p.id})"><i data-lucide="${p.locked ? 'lock' : 'lock-open'}" width="14" height="14"></i>${p.locked ? 'Locked' : 'Lock'}</button>
                         <button class="rp-mini" onclick="rpToggleExcl(${p.id})"><i data-lucide="ban" width="14" height="14"></i>Exclude${p.excluded.length ? ` (${p.excluded.length})` : ''}</button>
                     </div>
@@ -8122,7 +8145,7 @@ renderAll();
                 <div class="rp-toolbar">
                     <button class="rp-btn" onclick="rpRandomizeAll()"><i data-lucide="dices" width="16" height="16"></i>Randomize All</button>
                     <button class="rp-btn secondary" onclick="rpAddPlayer()" ${rpPlayers.length >= 4 ? 'disabled' : ''}><i data-lucide="user-plus" width="16" height="16"></i>Add Player</button>
-                    <span class="rp-hint">${rpPlayers.length}/4 players · each player gets a unique faction · 🔒 keeps a faction when you Randomize All</span>
+                    <span class="rp-hint">${rpPlayers.length}/4 players · each player gets a unique faction · click a councillor to choose your 2 · 🔒 keeps a faction when you Randomize All</span>
                 </div>
                 <div class="rp-grid">${cards}</div>`;
             document.getElementById('compendium-content').innerHTML = html;
