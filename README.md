@@ -213,8 +213,8 @@ construction gate.
 ### Match Randomizer
 
 Add up to four players and assign each a **unique** random faction. Re-roll any faction,
-get a random suggested councillor, and lock or exclude factions to fine-tune the draft —
-handy for spicing up a lobby.
+**pick each player's two councillors** from their faction's pool (or roll a random pair),
+and lock or exclude factions to fine-tune the draft — handy for spicing up a lobby.
 
 ![Match randomizer tab](docs/sec-compendium-randomizer.png)
 
