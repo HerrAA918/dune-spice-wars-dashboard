@@ -146,11 +146,15 @@ Add-content PRs (high value, medium effort):
       first-election reward, all verified against the resolution sheet. Fixed the two
       stale names and added the Water Subsidies global resolution.
 
-- [ ] (LOW PRIORITY) Conquest Campaign Bonuses — the audit's "63 Faction Bonuses" are NOT a
-      pre-match draft and are NOT tied to advisors; they are single-player Conquest-campaign
-      content (CON: `UI/conquest/` art, `CB_*` effect traits, `battlePickChance` /
-      `onlyForConquestOwner` props). Standard-game faction customization is the councilors
-      (already covered). If built: a clearly-labeled "Conquest Campaign Bonuses" section.
+- [ ] (LOW PRIORITY — investigated + deferred 2026-06-24) Conquest Campaign Bonuses — the audit's
+      "63 Faction Bonuses" are NOT a pre-match draft and are NOT tied to advisors; they are
+      single-player Conquest-campaign content (CON: `UI/conquest/` art, `CB_*` effect traits,
+      `battlePickChance` / `onlyForConquestOwner` props). Standard-game faction customization is
+      the councilors (already covered). If built: a clearly-labeled "Conquest Campaign Bonuses"
+      section. **Scoped 2026-06-24:** the `bonus` sheet has **177** entries (per-faction
+      FactionBonus + MissionReward + Generic + map/sietch), names present but effect text only in
+      the `CB_*` traits (needs decode). Per user decision, deferred this round rather than build a
+      177-card campaign-only section; revisit later (faction-bonus subset ~63 is the high-value cut).
 
 - [x] Operations cleanup — **costs done (2026-06-23); missing ops + infiltration table done (2026-06-24).** All 21 faction-op "Variable" costs
       replaced with the CDB-verified tier values (VeryEasy 100 Intel / Easy 200 Intel + 200
@@ -210,10 +214,26 @@ Add-content PRs (high value, medium effort):
       +150 Council Votes [Smugglers & Fremen: +150 max Influence +6 Influence]). Live bonus rollup + Corrino
       multi-base (5k/10k Hegemony) + faction-correct variant reference table. Verified headless, 0 errors.
 
-- [ ] Treaties cleanup (deferred) — add per-treaty costs + the hidden −10% Authority
-      treaty upkeep, and fix the Non-Aggression Pact description (the open-borders / no-
-      supply-drain effect belongs to the separate Land Agreement). Treaty numbers aren't
-      cleanly in the CDB — confirm from in-game tooltips.
+- [x] Treaties cleanup (2026-06-24) — turned out to be cleanly in the game DB after all (the
+      `treaty` sheet + linked traits), not wiki-sourced. Rewrote the Diplomatic Treaties section:
+      per-treaty **costs** (Research / Trade / Political Agreement = 10 Authority to propose, 50
+      Influence to force; Non-aggression Pact = 150 Influence; Tributary = 100 Influence), the
+      hidden **−10% Authority production upkeep per active treaty** (`TreatyUpkeep` trait
+      `Treaty_UpkeepCost_TResProd_ARatio` 0.1; a Political Agreement cuts upkeep 20% via
+      `Treaty_UpkeepCost_MRatio` 0.8; the Council Representative charter waives both), and **fixed
+      the Non-Aggression Pact** — it raises relations to Truce, breaks sieges, and grants +4
+      Standing/Council; the open-borders / no-supply-drain effect belongs to the separate **Land
+      Agreement** (`OpenBordersAgreement`), now added as its own treaty. Also added Tributary and a
+      note on faction treaties (Corrino Imperial Mandate/Favor, Vernius Harmless Gadget).
+      Headless-verified, 0 console errors.
+
+- [ ] Support Station — **in-game check still pending.** The game DB is ambiguous: it has a full
+      build state (100 Solari, **−50% army Solari upkeep** via `T_SupportStation`), real texts, a
+      Military-district thumbnail, and AI build weights (`aiWeights` + `AI_SupportStation_*`
+      constants) — BUT empty `props` (no `tip.cat`) and **no development unlocks it**. Need a live
+      game to see whether it appears in the Main Base Military build menu (→ add to the planner) or
+      is AI-only / cut (→ leave excluded). Attempted 2026-06-24 but blocked: the computer-use access
+      dialog timed out twice. Resume when computer-use access is working.
 
 - [x] Special Regions & Region Specializations — reworked the old "Village Bonuses" page
       (which duplicated the Buildings section) into the **Regions** tab with two CDB-verified
@@ -223,8 +243,13 @@ Add-content PRs (high value, medium effort):
       named-terrain regions omitted. Hegemony per-day magnitude is intentionally *not* stamped
       as a number — `Region_HegemonyProd_Flat` is uniform across landmarks but its data-scale→
       per-day conversion isn't cleanly exposed; confirm the exact rate from an in-game tooltip.
-      Still open: the **2,500-Hegemony build-in-main-base milestone** and a fuller Hegemony-source
-      ledger (these are a separate Hegemony-mechanics writeup, not region data).
+      Done (2026-06-24): the **2,500-Hegemony build-in-main-base milestone** and a full
+      **Hegemony-source ledger** now live on the Victory Conditions tab — a milestone ladder
+      (2,500 = build in Main Base → 5k/10k Hegemony Bonus tiers → 20k race shown → 30k victory,
+      from `MainBase_Buildings_Conditions` / `Game_HegemonyBonuses_Tiers` / `Game_Victory_HegemonyScore`)
+      plus all ~36 Hegemony sources from the `hegemony` sheet, grouped + faction-tagged. The
+      Special-Region magnitude is confirmed `Region_HegemonyProd_Flat = 1000` (flat, persists
+      while held), already shown on the Regions tab.
 
 Larger builds (high value, plan separately — see roadmap):
 
