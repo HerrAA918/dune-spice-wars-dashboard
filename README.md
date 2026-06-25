@@ -18,9 +18,10 @@ static page that runs **100% in your browser**. No account, no upload, no server
 - **Match-history dashboard** — playtime, win rate, faction activity, victory-condition
   breakdown, a faction performance leaderboard, hero/councillor stats, and a sortable,
   filterable match table with per-game detail.
-- **Compendium** — searchable reference for units, buildings, sietches, tech trees,
-  Landsraad politics, faction overviews, operations, regions, plus a match
-  randomizer.
+- **Compendium** — searchable reference for units (with live **DPS** + gear loadouts),
+  buildings, sietches, tech trees, Landsraad politics & treaties, faction overviews,
+  victory conditions & the **Hegemony ledger**, operations, regions, and an interactive
+  **Main Base district planner** — plus a match randomizer.
 - **Shareable links** — send your full results or a compact summary to a friend; the
   data rides inside the URL, so there is still no server involved.
 - **CSV export** — download your match history (honoring the active filters and sort) as
@@ -143,11 +144,28 @@ header (or the live site's compendium link) to open it.
 
 ### Units, Buildings & Sietches
 
-Searchable cards for every unit, building, and sietch, with type-filter pills that adapt
-to the current tab and the selected faction. Filter by House to see only that faction's
-roster.
+Searchable cards for every unit, building, and sietch, with type-filter pills that adapt to
+the current tab and the selected faction. Unit cards carry full stats including a computed
+**DPS**, plus an interactive **gear loadout** — pick each unit's equipment and the stats (and
+DPS) recompute live. Filter by House to see only that faction's roster.
 
 ![Compendium units tab](docs/sec-compendium-units.png)
+
+### Tech Trees
+
+The full development tree for each faction with an interactive cost calculator: select the
+developments you plan to research and it totals their cost and shows what each unlocks.
+Faction-specific replacements are shown in place of the generic techs they swap out.
+
+![Tech trees tab](docs/sec-compendium-techtree.png)
+
+### Landsraad & Politics
+
+A reference for diplomacy and the Landsraad. Every **treaty** with its real effect, cost, and
+the −10% Authority upkeep each active treaty carries; the **Council** voting mechanics and
+resolution-draw rules; all **Charters**; and the full resolution pool.
+
+![Landsraad & Politics tab](docs/sec-compendium-landsraad.png)
 
 ### Factions Overview
 
@@ -156,10 +174,20 @@ single House to focus on it, or **All Factions** to see them all stacked.
 
 ![Factions overview tab](docs/sec-compendium-factions.png)
 
+### Victory Conditions & Hegemony
+
+Every way to win — Domination, Hegemony, Political, Economic, and (optional) Assassination —
+with the exact thresholds and the three game modes. Plus a **Hegemony deep-dive**: the
+milestone ladder (2,500 = build in your Main Base → 5k / 10k bonus tiers → 20k race → 30k
+victory) and a full ledger of every source that generates Hegemony.
+
+![Victory conditions & Hegemony tab](docs/sec-compendium-victory.png)
+
 ### Operations
 
-Universal and faction-specific covert operations, with their cost, difficulty, and effect,
-grouped by faction.
+Universal and faction-specific covert operations with their cost, difficulty, effect, and the
+**Infiltration field + level** each requires — plus a reference for the five Infiltration
+fields (Arrakis, Spacing Guild, CHOAM, Landsraad, Opponent Faction).
 
 ![Operations tab](docs/sec-compendium-operations.png)
 
@@ -167,9 +195,20 @@ grouped by faction.
 
 What each region is worth, in two parts: **Region Specializations** (natural-resource nodes
 that unlock or supercharge a specific village building) and **Special Regions** (unique named
-landmarks that each grant a steady **Hegemony** income plus a powerful one-off bonus).
+landmarks that each grant **+1,000 Hegemony** while held, plus a powerful one-off bonus).
 
 ![Regions tab](docs/sec-compendium-regions.png)
+
+### Main Base Planner
+
+An interactive planner for your Main Base. Each faction's base is laid out as its real
+districts (1–3 building slots each); drop a building into each slot, and filling a district
+with a single domain (Economy / Military / Statecraft) earns that domain's tier-N bonus. It
+tallies the active district bonuses and total build cost, handles the faction quirks (Vernius
+auto-split, Fremen Bazaar wildcard, Corrino multi-base), and flags the 2,500-Hegemony
+construction gate.
+
+![Main Base planner tab](docs/sec-compendium-mainbase.png)
 
 ### Match Randomizer
 
@@ -216,5 +255,7 @@ data.
 
 A fan-made, unofficial project. *Dune: Spice Wars* is developed by Shiro Games and
 published by Funcom; *Dune* and related names are trademarks of their respective owners.
-Game data in the compendium is sourced from the community
+Game data in the compendium is derived from the game's own data files (the `data.cdb`
+database shipped with the install) and verified against them; a few values that aren't
+cleanly exposed in the data are cross-referenced with the community
 [Dune: Spice Wars Wiki](https://dunespicewars.fandom.com/).
