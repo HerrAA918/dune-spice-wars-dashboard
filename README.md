@@ -145,11 +145,15 @@ header (or the live site's compendium link) to open it.
 ### Units, Buildings & Sietches
 
 Searchable cards for every unit, building, and sietch, with type-filter pills that adapt to
-the current tab and the selected faction. Unit cards carry full stats including a computed
-**DPS**, plus an interactive **gear loadout** — pick each unit's equipment and the stats (and
-DPS) recompute live. Filter by House to see only that faction's roster.
+the current tab and the selected faction. Cards use the **real in-game art** — unit portraits,
+building illustrations, and faction crests extracted straight from the game files. Unit cards
+carry full stats including a computed **DPS**, plus an interactive **gear loadout** — pick each
+unit's equipment and the stats (and DPS) recompute live. Filter by House to see only that
+faction's roster.
 
 ![Compendium units tab](docs/sec-compendium-units.png)
+
+![Compendium buildings tab](docs/sec-compendium-buildings.png)
 
 ### Tech Trees
 

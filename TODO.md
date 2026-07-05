@@ -293,13 +293,21 @@ Larger builds (high value, plan separately — see roadmap):
       closing-speed (pairs with `Unit_Speed_EngageFactor`), NOT attack rate — exclude it. Caveat:
       raw DPS ignores target armor; it's offensive output, not effective damage vs a specific target.
 
-- [ ] Audit all icons/graphics across the dashboard and add relevant game art — the
-      dashboard and compendium currently lean on external wiki image URLs (WIKI_IMAGES),
-      emoji, and lucide icons. The game pak (`res.compressed.pak`) holds the real art:
-      unit/leader portraits (`unit@images` smallPortrait/bigPortrait/symbol), development
-      icons (`UI/developments/techIcons*.png`), building thumbnails (`building@visuals`),
-      resource/UI icons (`UI/icons/*`), and faction crests. Review every place we show an
-      icon/image, identify mismatches or low-quality/missing art, and source the matching
-      sprite from the pak (each `gfx` entry is a {file, size, x, y} sprite-sheet cell —
-      extract the cell, not the whole sheet). Decide how to host/bundle the art and mind
-      that it's proprietary game art (same caution as not committing raw game data).
+- [x] Audit all icons/graphics and add real game art (compendium) (2026-07-04) — the audit found
+      the WIKI_IMAGES external Fandom map gave **0/72 units** any art (all fell back to a generic
+      faction crest) and only 28/80 buildings, and the wiki couldn't fill the gap (names were
+      refreshed to in-game names in prior CDB audits, so 0 matches). **Extracted the real art from
+      the pak** (per-user decision: commit the sprites): 70/72 unit hex **portraits** (250px→160px,
+      from `unit@images.bigPortrait`, inherit-chain fallback), 79/80 building **illustrations**
+      (`building@visuals.thumbnail`, shown as a card-top banner that fades into the card), and 7
+      faction **crests** (`faction@images.emblem`, used in the randomizer / sietch / fallbacks) —
+      **154 PNGs, 6.4 MB in `assets/img/**`** with an inline `ART` manifest (no fetch, keeps the
+      single-file/offline behaviour). Removed the entire external `WIKI_IMAGES` map. The pak stores
+      art two ways, both now decoded by `src_scripts/_art_gen.js` (+ `_pnglib.js`): **plain PNG**
+      (buildings — the 8-byte signature + IHDR length prefix are stripped, and there's trailing pad)
+      and **Heaps raw texture** (units/crests — 20-byte header `w,h,stride=h·4,flags,fmt`; pixels are
+      **column-major** RGBA8 + a mip tail; `fmt` 10/11/12 all decode identically). Sprite cell model:
+      `size>1` ⇒ tile index `idx=y·cols+x` (cols=⌊w/size⌋); `size==1` ⇒ pixel `x,y,width,height`.
+      Verified headless: 70 unit imgs + 79 banners + randomizer crests all load, **0 broken, 0 console
+      errors, 0 failed requests**. Deferred (out of scope): resource cost-chip icons (already emoji,
+      not external), development/tech icons, and any dashboard.html art (it uses lucide, no wiki URLs).
