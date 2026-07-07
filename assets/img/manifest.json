@@ -35,9 +35,12 @@
   "Corrino|Sardaukar": "assets/img/units/corrino-sardaukar.png",
   "Corrino|Hammer": "assets/img/units/corrino-hammer.png",
   "Corrino|Cronos": "assets/img/units/corrino-cronos.png",
+  "Ecaz|Squire": "assets/img/units/ecaz-squire.png",
   "Ecaz|Musketeer": "assets/img/units/ecaz-musketeer.png",
   "Ecaz|Fencer": "assets/img/units/ecaz-fencer.png",
+  "Ecaz|War Banner": "assets/img/units/ecaz-war-banner.png",
   "Ecaz|Knight": "assets/img/units/ecaz-knight.png",
+  "Ecaz|Siren": "assets/img/units/ecaz-siren.png",
   "Ecaz|Monument": "assets/img/units/ecaz-monument.png",
   "Neutral|Militia": "assets/img/units/neutral-militia.png",
   "Neutral|Ranged Militia": "assets/img/units/neutral-ranged-militia.png",
@@ -48,10 +51,12 @@
   "Neutral|Fremen Mercenary": "assets/img/units/neutral-fremen-mercenary.png",
   "Neutral|Sardaukar": "assets/img/units/neutral-sardaukar.png",
   "Vernius|Fighting Mek": "assets/img/units/vernius-fighting-mek.png",
+  "Vernius|Labthopter": "assets/img/units/vernius-labthopter.png",
   "Vernius|Resonance Drone": "assets/img/units/vernius-resonance-drone.png",
   "Vernius|Fight-Engineer": "assets/img/units/vernius-fight-engineer.png",
   "Atreides|Duncan": "assets/img/units/atreides-duncan.png",
   "Atreides|Gurney": "assets/img/units/atreides-gurney.png",
+  "Corrino|Wensicia": "assets/img/units/corrino-wensicia.png",
   "Corrino|Aramsham": "assets/img/units/corrino-aramsham.png",
   "Ecaz|Whitmore": "assets/img/units/ecaz-whitmore.png",
   "Ecaz|Ilesa": "assets/img/units/ecaz-ilesa.png",
@@ -152,6 +157,7 @@
   "Fremen": "assets/img/factions/fremen.png",
   "Corrino": "assets/img/factions/corrino.png",
   "Ecaz": "assets/img/factions/ecaz.png",
-  "Vernius": "assets/img/factions/vernius.png"
+  "Vernius": "assets/img/factions/vernius.png",
+  "Neutral": "assets/img/factions/neutral.png"
  }
 }
