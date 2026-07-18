@@ -536,13 +536,11 @@ function renderProvenance(){
 
 function renderTabs(){
   const tabs=$("#tabs"); tabs.innerHTML="";
-  const active=(MAPDATA.meta&&MAPDATA.meta.file)||"loaded save";
-  const ghosts=["jeff_s_Game.sav","Vernius first game.sav","Jox win.sav","260717-2.sav"].filter(f=>f!==active);
-  const saves=[{f:active, active:true}, ...ghosts.map(f=>({f, ghost:true}))];
-  saves.forEach(s=>{ const t=el("div","tab"+(s.active?" active":"")+(s.ghost?" ghost":"")); t.textContent=s.f;
-    if(s.ghost){ t.title="Decode with parse_sav.js and load the JSON below"; }
-    tabs.appendChild(t);
-  });
+  const hasMatch = MAPDATA.zones && MAPDATA.zones.length;
+  const active = hasMatch ? ((MAPDATA.meta&&MAPDATA.meta.file)||"loaded save") : "No match";
+  const at=el("div","tab active"); at.textContent=active; tabs.appendChild(at);
+  // blank placeholder slots (no baked-in save names)
+  for(let i=0;i<4;i++){ const g=el("div","tab ghost"); g.style.minWidth="72px"; g.title="Load a match (parse_sav.js JSON)"; tabs.appendChild(g); }
 }
 
 function renderRegionsHeld(){
