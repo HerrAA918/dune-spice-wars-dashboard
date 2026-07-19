@@ -451,11 +451,11 @@
           return arr;
         }
         case 108: { const items = []; const lst = new HaxeList(items); this.cache.push(lst); while (this.buf.charCodeAt(this.pos) !== 104) items.push(this.unserialize()); this.pos++; return lst; }
-        case 111: { const obj = {}; this.cache.push(obj); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); obj[k] = v; } this.pos++; return obj; }
-        case 99: { const name = this.unserialize(); const inst = new HaxeClass(name, {}); this.cache.push(inst); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); inst[k] = v; } this.pos++; return inst; }
+        case 111: { const obj = {}; this.cache.push(obj); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); if (k!=="__proto__"&&k!=="constructor"&&k!=="prototype") obj[k] = v; } this.pos++; return obj; }
+        case 99: { const name = this.unserialize(); const inst = new HaxeClass(name, {}); this.cache.push(inst); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); if (k!=="__proto__"&&k!=="constructor"&&k!=="prototype") inst[k] = v; } this.pos++; return inst; }
         case 119: { const ename = this.unserialize(); return this.readEnum(ename, false); }
         case 106: { const ename = this.unserialize(); return this.readEnum(ename, true); }
-        case 98: { const m = new HaxeStringMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); m.data[k] = v; } this.pos++; return m; }
+        case 98: { const m = new HaxeStringMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); if (k!=="__proto__"&&k!=="constructor"&&k!=="prototype") m.data[k] = v; } this.pos++; return m; }
         case 113: { const m = new HaxeIntMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) === 58) { this.pos++; const k = this.readDigits(); const v = this.unserialize(); m.data.set(k, v); } if (this.buf.charCodeAt(this.pos) !== 104) throw new Error('Invalid IntMap end at ' + this.pos); this.pos++; return m; }
         case 77: { const m = new HaxeObjectMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); m.entries.push({ key: k, value: v }); } this.pos++; return m; }
         case 118: {
@@ -881,8 +881,10 @@ const FACTIONS = {
   Smugglers: {name:"Smugglers",       short:"Smugglers", color:"#26a6ab"},
   Neutral:   {name:"Neutral / open",  short:"Neutral",   color:"#5a6478"},
 };
+/* HTML-escape any save-derived string before it goes into innerHTML (a crafted .sav is untrusted input) */
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const facColor = id => (FACTIONS[id]||FACTIONS.Neutral).color;
-const facName  = id => (FACTIONS[id]||{short:id||"Neutral"}).short;
+const facName  = id => esc((FACTIONS[id]||{short:id||"Neutral"}).short);   /* escaped: used only in innerHTML */
 
 /* biome tints (terrain texture beneath faction colour) */
 const BIOME = {
@@ -1151,7 +1153,7 @@ function renderRegionsHeld(){
   rows.forEach(r=>{
     const row=el("div","rh-row");
     const col=r.neutral?FACTIONS.Neutral.color:facColor(r.id);
-    let sub = r.neutral?"open / sietch":(r.lost?"eliminated":(r.ai?("AI · difficulty "+r.diff):"you"));
+    let sub = r.neutral?"open / sietch":(r.lost?"eliminated":(r.ai?("AI · difficulty "+esc(r.diff)):"you"));
     if(r.res && r.res.Spice!=null) sub += ` · <span style="color:var(--spice)">${fmtNum(r.res.Spice)} spice</span>`;
     row.innerHTML=`<span class="rh-sw" style="background:${col}"></span>
       <span class="rh-name"><span class="n">${r.neutral?"Neutral":facName(r.id)}</span>
@@ -1168,7 +1170,7 @@ function renderRegionsHeld(){
       r.innerHTML=`<span class="rh-sw" style="width:8px;height:8px;background:${facColor(w.a)}"></span>
         <span class="rh-sw" style="width:8px;height:8px;background:${facColor(w.b)}"></span>
         <span>${facName(w.a)} · ${facName(w.b)}</span>
-        <b style="margin-left:auto;color:${c};font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase">${st}</b>`;
+        <b style="margin-left:auto;color:${c};font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase">${esc(st)}</b>`;
       dip.appendChild(r);
     });
     box.appendChild(dip);
@@ -1186,7 +1188,7 @@ function renderWars(){
   EVENTS.forEach((e,i)=>{
     const st=evStyle(e.kind);
     const region = e.regionName || (e.zoneId!=null && zoneById[e.zoneId] ? zoneById[e.zoneId].rn : null);
-    const secondary = [region, e.targetFaction?("→ "+facName(e.targetFaction)):null].filter(Boolean).join("  ") || "—";
+    const secondary = [region?esc(region):null, e.targetFaction?("→ "+facName(e.targetFaction)):null].filter(Boolean).join("  ") || "—";
     const item=el("div","ev-item"); item.dataset.i=i; item.dataset.min=e.minute;
     item.innerHTML=`<span class="ev-ic" style="background:${mix(st.col,'#0b0e17',.55)};color:${st.col}">${st.ic}</span>
       <span class="ev-main"><span class="k">${st.label}${e.instigator?` · ${facName(e.instigator)}`:""}</span>
@@ -1287,10 +1289,10 @@ function showTipForZone(zid,x,y){
   const strLine=Object.keys(byType).filter(t=>t!=="POI").map(t=>`${byType[t]} ${TYPE_LABEL[t]||t}${byType[t]>1?"s":""}`).join(" · ");
   const fac=MAPDATA.factions.find(f=>f.id===owner);
   const rebel=strs.some(s=>s.rebelling);
-  tip.innerHTML=`<div class="tt"><span class="swz" style="background:${owner?facColor(owner):FACTIONS.Neutral.color}"></span>${z.rn}</div>
+  tip.innerHTML=`<div class="tt"><span class="swz" style="background:${owner?facColor(owner):FACTIONS.Neutral.color}"></span>${esc(z.rn)}</div>
     <div class="owner" style="color:${owner?facColor(owner):'var(--ink-mut)'}">${owner?facName(owner):"Neutral / open"}${rebel?' <span style="color:var(--crit)">· in revolt</span>':''}</div>
     <div class="rows">
-      <span>Biome · <b>${z.b}</b>${z.w?` · wind <b>${z.w}</b>`:''}</span>
+      <span>Biome · <b>${esc(z.b)}</b>${z.w?` · wind <b>${esc(z.w)}</b>`:''}</span>
       ${z.sp?'<span style="color:var(--spice)">◆ Spice field</span>':''}
       ${z.si&&!strLine?'<span>◈ Sietch site</span>':''}
       ${strLine?`<span>${strLine}</span>`:''}
@@ -1338,7 +1340,7 @@ function renderFooter(){
     tl.innerHTML = decoded
       ? `<b>${EVENTS.length}</b> recorded conflict events replay at their timestamps · sandworm strikes pulse on the map · territory = end-of-match snapshot (a single save has no per-minute ownership history).`
       : `Scrub the match clock · load a decoded save below for the recorded event timeline.`;
-    f.innerHTML=`<b>${m.file||"match"}</b> · game <b>${m.gameVersion||"?"}</b> · seed <b>${m.seed}</b> · saved <b>${dt}</b> · match <b>${fmtTime(MATCH_MIN)}</b> (${Math.floor(MATCH_MIN*2)} days)${counts}.
+    f.innerHTML=`<b>${esc(m.file||"match")}</b> · game <b>${esc(m.gameVersion||"?")}</b> · seed <b>${esc(m.seed)}</b> · saved <b>${esc(dt)}</b> · match <b>${fmtTime(MATCH_MIN)}</b> (${Math.floor(MATCH_MIN*2)} days)${counts}.
     Decoded from the D4X <code>.sav</code>: 17-byte header → 3 sections (§1 Haxe-text config, §2 zlib→Haxe world geometry, §3 zlib→hxbit game-state). Ownership, structures &amp; the conflict log come from an exact-EOF walk of the §3 object graph.
     A single save stores the <b>current</b> ownership snapshot + a discrete event log — not per-minute history; sample successive autosaves to diff territory over time.
     <label class="drop" title="Drag a .sav here or click to choose"><input type="file" id="loadjson" accept=".sav,application/json,.json">▲ Load another match (.sav or JSON)</label>`;

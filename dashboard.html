@@ -7,10 +7,14 @@
     <meta name="description" content="A premium profile statistics dashboard for Dune: Spice Wars focused on Multiplayer. Analyze faction performance, playtimes, and game history.">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons (version-pinned + SRI to prevent supply-chain tampering) -->
+    <script src="https://unpkg.com/lucide@1.25.0/dist/umd/lucide.min.js"
+            integrity="sha384-UoXAhqcCCjwD94x4CCSExEHvtO49AfNiY7g/IxDgrPtx4U6o6tvy1cScx9v/RrS9"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Chart.js (version-pinned + SRI) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"
+            integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --bg-dark: #070609;
@@ -3364,6 +3368,7 @@
             safeCreateIcons();
         }
     </script>
+
 <!-- d4x-replay-parser: in-browser .sav decoder shared with replay.html -->
 <script>// sav_browser.js — self-contained, web-platform-only Dune: Spice Wars .sav parser.
 // Runs in a browser AND in Node v24 (uses only DecompressionStream, TextDecoder, DataView,
@@ -3548,11 +3553,11 @@
           return arr;
         }
         case 108: { const items = []; const lst = new HaxeList(items); this.cache.push(lst); while (this.buf.charCodeAt(this.pos) !== 104) items.push(this.unserialize()); this.pos++; return lst; }
-        case 111: { const obj = {}; this.cache.push(obj); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); obj[k] = v; } this.pos++; return obj; }
-        case 99: { const name = this.unserialize(); const inst = new HaxeClass(name, {}); this.cache.push(inst); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); inst[k] = v; } this.pos++; return inst; }
+        case 111: { const obj = {}; this.cache.push(obj); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); if (k!=="__proto__"&&k!=="constructor"&&k!=="prototype") obj[k] = v; } this.pos++; return obj; }
+        case 99: { const name = this.unserialize(); const inst = new HaxeClass(name, {}); this.cache.push(inst); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); if (k!=="__proto__"&&k!=="constructor"&&k!=="prototype") inst[k] = v; } this.pos++; return inst; }
         case 119: { const ename = this.unserialize(); return this.readEnum(ename, false); }
         case 106: { const ename = this.unserialize(); return this.readEnum(ename, true); }
-        case 98: { const m = new HaxeStringMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); m.data[k] = v; } this.pos++; return m; }
+        case 98: { const m = new HaxeStringMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); if (k!=="__proto__"&&k!=="constructor"&&k!=="prototype") m.data[k] = v; } this.pos++; return m; }
         case 113: { const m = new HaxeIntMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) === 58) { this.pos++; const k = this.readDigits(); const v = this.unserialize(); m.data.set(k, v); } if (this.buf.charCodeAt(this.pos) !== 104) throw new Error('Invalid IntMap end at ' + this.pos); this.pos++; return m; }
         case 77: { const m = new HaxeObjectMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); m.entries.push({ key: k, value: v }); } this.pos++; return m; }
         case 118: {
