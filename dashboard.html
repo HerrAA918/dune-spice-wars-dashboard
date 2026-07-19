@@ -2593,7 +2593,26 @@
             }
         }
 
-        function processFile(file) {
+        async function processFile(file) {
+            // A full in-battle match save is a "D4X" binary container -> open the map replay.
+            // (profile_stats_*.sav is raw Haxe text with no D4X header, so this never touches it.)
+            try {
+                const head = new Uint8Array(await file.slice(0, 5).arrayBuffer());
+                if (head[0] === 0x44 && head[1] === 0x34 && head[2] === 0x58) {   // "D4X"
+                    if (head[4] >= 3 && window.SavBrowser) {
+                        const data = await window.SavBrowser.parseSavBuffer(
+                            await file.arrayBuffer(),
+                            { cdbNames: window.D4X_CDB_NAMES || {}, fileName: file.name });
+                        sessionStorage.setItem('d4x_replay_match', JSON.stringify({ name: file.name, data }));
+                        window.location.href = 'replay.html';
+                        return;
+                    }
+                    alert("That's a conquest / meta save — it has no in-battle map. Drop a normal match save to see the replay, or a profile_stats_*.sav for career stats.");
+                    document.getElementById('file-input').value = '';
+                    return;
+                }
+            } catch (err) { console.error('match-save detection failed:', err); }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -3345,5 +3364,570 @@
             safeCreateIcons();
         }
     </script>
+<!-- d4x-replay-parser: in-browser .sav decoder shared with replay.html -->
+<script>// sav_browser.js — self-contained, web-platform-only Dune: Spice Wars .sav parser.
+// Runs in a browser AND in Node v24 (uses only DecompressionStream, TextDecoder, DataView,
+// Uint8Array, atob — no require('fs'/'zlib'/'path'/'buffer'), no Node Buffer).
+//
+// API:
+//   async parseSavBuffer(arrayBuffer, opts) -> { mapdata, state }
+//        opts.cdbNames = optional { regName, structName, eventName, factionName } (default {}: ids as names)
+//   isD4XMatchSave(arrayBuffer) -> bool   (true for 3-section D4X in-battle saves)
+//
+// Output shape is byte-for-byte identical to tooling/save-parser/parse_sav.js so an existing
+// viewer consumes it unchanged.
+(function (root, factory) {
+  const mod = factory();
+  if (typeof module !== 'undefined' && module.exports) module.exports = mod;        // Node / CJS
+  else if (typeof define === 'function' && define.amd) define([], () => mod);       // AMD
+  else root.SavBrowser = mod;                                                        // browser global
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  // ===================================================================================
+  // Embedded data (clids.json CLIDS list + enum_defs.json). Pasted as JS literals so the
+  // module is fully self-contained — no fetch/require for data.
+  // ===================================================================================
+  const CLIDS = [
+    "ConditionApplication","LobbyState","VisitSpecialRegionsConditionApplication","ent.Army",
+    "ent.ArmyModel","ent.AttachedStructure","ent.BaseBuilding","ent.Building","ent.CameraInfo",
+    "ent.Carrier","ent.Entity","ent.Faction","ent.FactionData","ent.Harvester","ent.Headquarter",
+    "ent.HegemonyData","ent.HegemonyValue","ent.LocalSietch","ent.MainBaseHeadquarter","ent.MissileGen",
+    "ent.MobileEntity","ent.NuclearHead","ent.NuclearSilo","ent.Object","ent.Ornithopter","ent.Player",
+    "ent.Probe","ent.RecyclingPlant","ent.Refinery","ent.Resources","ent.ResourcesGenerator",
+    "ent.Sandstorm","ent.Sandworm","ent.SelectGroup","ent.Shuttle","ent.ShuttleSpawn",
+    "ent.SpacingGuildBranch","ent.Spectator","ent.SpiceField","ent.SpiceHarvester","ent.StateInfo",
+    "ent.Structure","ent.Team","ent.Unit","ent.Zone","ent.comp.Achievements","ent.comp.AttackComponent",
+    "ent.comp.AutoAttackComponent","ent.comp.CaptureComponent","ent.comp.CarrierComponent",
+    "ent.comp.EntityComponent","ent.comp.HarvestComponent","ent.comp.Projectile",
+    "ent.comp.ProjectileComponent","ent.comp.SiegeComponent","ent.comp.SietchComponent",
+    "ent.comp.StructureComponent","ent.comp.SubAttackComponent","ent.comp.SubUnitHandler",
+    "ent.comp.WorldEventComponent","ent.comp.WorldEventCooldown","ent.comp.WorldEventFactionData",
+    "gamepad.WorldCursor","logic.Application","logic.AttributeApplication","logic.AttributesManager",
+    "logic.FogOfWar","logic.Logic","logic.Ping","logic.TradeManager","logic.TraitsManager",
+    "logic.Upgrades","logic.ai.AIBattles","logic.ai.AIController","logic.ai.AIControllerData",
+    "logic.ai.AIEntityGroup","logic.ai.AILogic","logic.ai.AIMilitary","logic.ai.AIModule",
+    "logic.ai.AIOrders","logic.ai.AIQuests","logic.ai.AIUnits","logic.ai.BuildingManager",
+    "logic.ai.Diplomacy","logic.ai.MilitaryManager","logic.ai.Politics","logic.ai.ResourceManager",
+    "logic.ai.Spying","logic.ai.Trading","logic.faction.Ability","logic.faction.AbilityManager",
+    "logic.faction.ActiveAbility","logic.faction.Agent","logic.faction.Airfield","logic.faction.Alert",
+    "logic.faction.AlertsManager","logic.faction.BaseQuest","logic.faction.ChoamContract",
+    "logic.faction.Complication","logic.faction.Contract","logic.faction.Contracts",
+    "logic.faction.ControlGroups","logic.faction.Development","logic.faction.Developments",
+    "logic.faction.Equipments","logic.faction.FactionManager","logic.faction.Interactions",
+    "logic.faction.Mission","logic.faction.MissionManager","logic.faction.NeuralGrid",
+    "logic.faction.Objective","logic.faction.ObjectiveStep","logic.faction.Objectives",
+    "logic.faction.Quest","logic.faction.Quests","logic.faction.SpyManager",
+    "logic.faction.SpyManagerState","logic.faction.Subquest","logic.faction.SupplyLine",
+    "logic.faction.SupplyLines","logic.faction.TransportWorm","logic.faction.Tutorial",
+    "logic.faction.TutorialManager","logic.faction.WormRiding","logic.state.Blackboard",
+    "logic.state.Charters","logic.state.ChoamMarket","logic.state.CouncilResolution",
+    "logic.state.DiplomacyManager","logic.state.FactionRaidData","logic.state.FactionStateData",
+    "logic.state.GameStats","logic.state.LandsraadData","logic.state.LandsraadManager",
+    "logic.state.LandsraadManagerJunk","logic.state.MeteoManager","logic.state.POITriggerTimer",
+    "logic.state.Raid","logic.state.Raids","logic.state.RegionData","logic.state.ResolutionManager",
+    "logic.state.SandstormManager","logic.state.SpiceFieldManager","logic.state.SpiceReport",
+    "logic.state.State","logic.state.StateData","logic.state.Warzone","logic.state.Warzones",
+    "logic.state.WorldEventData","logic.state.WorldEventManager","net.Serializable",
+    "tools.PreviewEntity","ui.comp.ChatRoom"
+  ];
+
+  // enum_defs.json — pasted verbatim as a JS object literal (valid JS; JSON is a subset).
+  const ENUM_DEFS = {"EScope":{"ctors":["ELocal","ERegional","EFaction","EMilitia","ENeighborRegions"],"args":[null,null,null,null,null]},"ent.MovementMode":{"ctors":["Target","Follow"],"args":[{"t":"PObj","fields":[{"name":"x","opt":false,"type":{"t":"PFloat"}},{"name":"y","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]}]},"EAgentAssignment":{"ctors":["Unassigned","CounterIntel","Faction","Landsraad","SpaceGuild","Choam","Field","MissionSacrifice"],"args":[null,null,{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]},null,null,null,null,{"t":"PObj","fields":[{"name":"id","opt":false,"type":{"t":"PString"}},{"name":"targetFaction","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]}]},"Comparison":{"ctors":["Equal","NotEqual","Under","UnderEqual","Over","OverEqual"],"args":[null,null,null,null,null,null]},"logic.EApplicationStyle":{"ctors":["EPermanent","EStatus","ETemporary"],"args":[null,null,{"t":"PObj","fields":[{"name":"d","opt":false,"type":{"t":"PFloat"}}]}]},"logic.state.LState":{"ctors":["Preparation","Decide","Vote","Closed"],"args":[null,null,null,null]},"WorldEventActionType":{"ctors":["PayResources","UnitInvestigation","OrniInvestigation","InvestKnowledge","FieldAgents"],"args":[null,null,null,null,null]},"ent.StabilityStatus":{"ctors":["Normal","Low","Critical"],"args":[null,null,null]},"ent.State":{"ctors":["Sleep","Stand","Move","Dead","Engage","Fight","Wait"],"args":[null,null,null,null,{"t":"PObj","fields":[{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"t","opt":false,"type":{"t":"PFloat"}}]}]},"ESourceKind":{"ctors":["EDevelopment","ETrait","EUpgrade","EResolution","ETreaty","ECheat","EMission"],"args":[{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"s","opt":false,"type":{"t":"PInt"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"choice","opt":false,"type":{"t":"PInt"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"t","opt":false,"type":{"t":"PObj","fields":[{"name":"faction1","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"faction2","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"kind","opt":false,"type":{"t":"PString"}},{"name":"startTime","opt":false,"type":{"t":"PFloat"}}]}}]},null,{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]}]},"ent.LossReason":{"ctors":["Forfeited","Assassinated","Destroyed","DestroyedNeutral","Governed","Dominated"],"args":[null,{"t":"PObj","fields":[{"name":"killer","opt":false,"type":{"t":"PSerializable","name":"ent.Player"}}]},{"t":"PObj","fields":[{"name":"destructor","opt":false,"type":{"t":"PSerializable","name":"ent.Player"}}]},{"t":"PObj","fields":[{"name":"destructor","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"governor","opt":false,"type":{"t":"PSerializable","name":"ent.Player"}}]},{"t":"PObj","fields":[{"name":"leader","opt":false,"type":{"t":"PSerializable","name":"ent.Player"}}]}]},"logic.state.StartupStatus":{"ctors":["HostReady","GameplayStarted"],"args":[null,null]},"logic.ai.OrderProgress":{"ctors":["Regroup","SiegeAction","Action"],"args":[null,null,null]},"logic.ApplicationCondition":{"ctors":["DistanceTo","DistanceBetween","IsAlive","IsInCombat","IsInCombatWith","IsEngagedInMelee","IsNearCombat","IsInZone","IsResolutionActive","AgentAssigned","IsOwned","HasUniqueAtb","IsAttacking","HealthRatio","SupplyRatio","IsRaiding","OwnedZones","OwnedAirfields","ResStock","IsMoving","HasTrait","HasTreaty","IsFollowing","HasNearbyAlly","IsRebelling","IsCapturing","IsSietchAlly","DistrictLevelOver","IsInTerritory","IsAlly","IsCurrentEnv","OwnedUnitsInRegion","OccupiedSlots","IsOccupying","IsInActiveCombat"],"args":[{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"dist","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"dist","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"fight","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"z","opt":false,"type":{"t":"PSerializable","name":"ent.Zone"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"b","opt":false,"type":{"t":"PBool"}},{"name":"target","opt":true,"type":{"t":"PSerializable","name":"ent.Faction"}}]},null,{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"logic.Logic"}},{"name":"uId","opt":false,"type":{"t":"PInt"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"attackTarget","opt":true,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"ratio","opt":false,"type":{"t":"PFloat"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Army"}},{"name":"ratio","opt":false,"type":{"t":"PFloat"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Army"}},{"name":"raidTarget","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"value","opt":false,"type":{"t":"PInt"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"value","opt":false,"type":{"t":"PInt"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}},{"name":"res","opt":false,"type":{"t":"PString"}},{"name":"value","opt":false,"type":{"t":"PInt"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.MobileEntity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}},{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"treaty","opt":false,"type":{"t":"PObj","fields":[{"name":"faction1","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"faction2","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"kind","opt":false,"type":{"t":"PString"}},{"name":"startTime","opt":false,"type":{"t":"PFloat"}}]}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.MobileEntity"}},{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}},{"name":"allyFaction","opt":true,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Structure"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Structure"}},{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.comp.SietchComponent"}},{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"s","opt":false,"type":{"t":"PSerializable","name":"ent.Structure"}},{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"i","opt":false,"type":{"t":"PInt"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"owner","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"with","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"env","opt":false,"type":{"t":"PString"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Zone"}},{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"c","opt":false,"type":{"t":"PInt"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Structure"}},{"name":"c","opt":false,"type":{"t":"PInt"}},{"name":"comp","opt":false,"type":{"t":"PEnum","name":"Comparison"}}]},{"t":"PObj","fields":[{"name":"a","opt":false,"type":{"t":"PSerializable","name":"ent.Army"}},{"name":"b","opt":false,"type":{"t":"PBool"}},{"name":"target","opt":true,"type":{"t":"PSerializable","name":"ent.Structure"}}]},{"t":"PObj","fields":[{"name":"target","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}},{"name":"b","opt":false,"type":{"t":"PBool"}}]}]},"logic.UpgradeType":{"ctors":["Add","Remove"],"args":[null,null]},"ent.WormState":{"ctors":["Roam","PreAttack","Attack","Wait"],"args":[{"t":"PObj","fields":[{"name":"until","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"until","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"until","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"until","opt":false,"type":{"t":"PFloat"}}]}]},"logic.state.VoteType":{"ctors":["YesNo","Faction"],"args":[null,null]},"logic.DistrictState":{"ctors":["Empty","Started","Completed"],"args":[null,null,{"t":"PObj","fields":[{"name":"kinds","opt":true,"type":{"t":"PArray","k":{"t":"PString"}}}]}]},"ent.EActionState":{"ctors":["EGoingToTarget","EInProgress","EWaitUntil","EReturning"],"args":[null,null,{"t":"PObj","fields":[{"name":"t","opt":false,"type":{"t":"PFloat"}}]},{"t":"PObj","fields":[{"name":"r","opt":false,"type":{"t":"PEnum","name":"ent.ActionEndReason"}}]}]},"ent.EKind":{"ctors":["EUnit","EStructure","EArmy","EBuilding","SpiceField","EFaction","EVisual","ESelectGroup","ESandworm","EProbe"],"args":[{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},null,null,null,null,null,null]},"logic.faction.FocusKind":{"ctors":["FEntity","FDevelopment","FUpgrade","FRegion","FSpying","FComplication","FSpiceReport","FLandsraad","FTradeRequest","FRaid","FResource","FAbility","FResCount","FInteraction","FResolution","FTreaty","FSpyingWindow","FWarzone","FTrade","FForceTreaty"],"args":[{"t":"PObj","fields":[{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}},{"name":"e","opt":false,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"z","opt":false,"type":{"t":"PSerializable","name":"ent.Zone"}}]},{"t":"PObj","fields":[{"name":"a","opt":true,"type":{"t":"PSerializable","name":"logic.faction.Agent"}},{"name":"m","opt":true,"type":{"t":"PSerializable","name":"logic.faction.Mission"}},{"name":"z","opt":true,"type":{"t":"PSerializable","name":"ent.Zone"}},{"name":"e","opt":true,"type":{"t":"PSerializable","name":"ent.Entity"}}]},{"t":"PObj","fields":[{"name":"a","opt":false,"type":{"t":"PSerializable","name":"logic.faction.Complication"}}]},null,null,{"t":"PObj","fields":[{"name":"a","opt":false,"type":{"t":"PObj","fields":[{"name":"investedRes","opt":true,"type":{"t":"PArray","k":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}}},{"name":"receiveRes","opt":false,"type":{"t":"PObj","fields":[{"name":"agents","opt":true,"type":{"t":"PArray","k":{"t":"PSerializable","name":"logic.faction.Agent"}}},{"name":"list","opt":false,"type":{"t":"PArray","k":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}}},{"name":"modifiers","opt":true,"type":{"t":"PMap","k":{"t":"PString"},"v":{"t":"PFloat"}}},{"name":"object","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}},{"name":"treaties","opt":true,"type":{"t":"PArray","k":{"t":"PString"}}},{"name":"weight","opt":false,"type":{"t":"PFloat"}}]}},{"name":"relationship","opt":false,"type":{"t":"PFloat"}},{"name":"sendRes","opt":false,"type":{"t":"PObj","fields":[{"name":"agents","opt":true,"type":{"t":"PArray","k":{"t":"PSerializable","name":"logic.faction.Agent"}}},{"name":"list","opt":false,"type":{"t":"PArray","k":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}}},{"name":"modifiers","opt":true,"type":{"t":"PMap","k":{"t":"PString"},"v":{"t":"PFloat"}}},{"name":"object","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}},{"name":"treaties","opt":true,"type":{"t":"PArray","k":{"t":"PString"}}},{"name":"weight","opt":false,"type":{"t":"PFloat"}}]}},{"name":"style","opt":false,"type":{"t":"PEnum","name":"logic.faction.ProposeStyle"}},{"name":"time","opt":false,"type":{"t":"PFloat"}}]}}]},{"t":"PObj","fields":[{"name":"r","opt":false,"type":{"t":"PSerializable","name":"logic.state.Raid"}}]},{"t":"PObj","fields":[{"name":"r","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"a","opt":false,"type":{"t":"PString"}},{"name":"t","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}}]},{"t":"PObj","fields":[{"name":"a","opt":false,"type":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}},{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"interaction","opt":false,"type":{"t":"PObj","fields":[{"name":"kind","opt":false,"type":{"t":"PString"}},{"name":"receiver","opt":false,"type":{"t":"PSerializable","name":"ent.Player"}},{"name":"sendTime","opt":false,"type":{"t":"PFloat"}},{"name":"sender","opt":false,"type":{"t":"PSerializable","name":"ent.Player"}}]}}]},{"t":"PObj","fields":[{"name":"resolution","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"t","opt":false,"type":{"t":"PObj","fields":[{"name":"faction1","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"faction2","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}},{"name":"kind","opt":false,"type":{"t":"PString"}},{"name":"startTime","opt":false,"type":{"t":"PFloat"}}]}}]},{"t":"PObj","fields":[{"name":"a","opt":true,"type":{"t":"PSerializable","name":"logic.faction.Agent"}},{"name":"m","opt":true,"type":{"t":"PSerializable","name":"logic.faction.Mission"}},{"name":"selectedFaction","opt":true,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"w","opt":false,"type":{"t":"PSerializable","name":"logic.state.Warzone"}}]},{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"a","opt":false,"type":{"t":"PObj","fields":[{"name":"investedRes","opt":true,"type":{"t":"PArray","k":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}}},{"name":"receiveRes","opt":false,"type":{"t":"PObj","fields":[{"name":"agents","opt":true,"type":{"t":"PArray","k":{"t":"PSerializable","name":"logic.faction.Agent"}}},{"name":"list","opt":false,"type":{"t":"PArray","k":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}}},{"name":"modifiers","opt":true,"type":{"t":"PMap","k":{"t":"PString"},"v":{"t":"PFloat"}}},{"name":"object","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}},{"name":"treaties","opt":true,"type":{"t":"PArray","k":{"t":"PString"}}},{"name":"weight","opt":false,"type":{"t":"PFloat"}}]}},{"name":"relationship","opt":false,"type":{"t":"PFloat"}},{"name":"sendRes","opt":false,"type":{"t":"PObj","fields":[{"name":"agents","opt":true,"type":{"t":"PArray","k":{"t":"PSerializable","name":"logic.faction.Agent"}}},{"name":"list","opt":false,"type":{"t":"PArray","k":{"t":"PObj","fields":[{"name":"qty","opt":false,"type":{"t":"PFloat"}},{"name":"res","opt":false,"type":{"t":"PString"}}]}}},{"name":"modifiers","opt":true,"type":{"t":"PMap","k":{"t":"PString"},"v":{"t":"PFloat"}}},{"name":"object","opt":false,"type":{"t":"PSerializable","name":"ent.Object"}},{"name":"treaties","opt":true,"type":{"t":"PArray","k":{"t":"PString"}}},{"name":"weight","opt":false,"type":{"t":"PFloat"}}]}},{"name":"style","opt":false,"type":{"t":"PEnum","name":"logic.faction.ProposeStyle"}},{"name":"time","opt":false,"type":{"t":"PFloat"}}]}}]}]},"logic.ai.BlockerSource":{"ctors":["GaugeFailure","GaugeSuccess","AnnexationFailure"],"args":[{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},null]},"ent.ClientStatus":{"ctors":["Connecting","Loading","Ready"],"args":[null,null,null]},"ent.comp.OccupierKind":{"ctors":["EFaction","ERaid"],"args":[{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"r","opt":false,"type":{"t":"PSerializable","name":"logic.state.Raid"}}]}]},"ETargetKind":{"ctors":["ETUnit","ETStructure","ETResource","ETBuilding","ETTrait","ETTreaty","ETFaction","ETMission","ETAction","ETAbility","ETDomain","ETRaid","ETHegemony","ETInfiltration","ETQuest","ETResAction","ETInformation","ETSiegeAction","ETOperationSlotUnlock"],"args":[{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]},null]},"ent.EndGameResult":{"ctors":["Victory","Defeat"],"args":[null,null]},"EResolutionChoice":{"ctors":["RCFaction","RCSupport"],"args":[{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"b","opt":false,"type":{"t":"PBool"}}]}]},"ent.CarrierStatus":{"ctors":["EReachingTarget","EPickingUp","EMoving","EDropping","ELeaving"],"args":[null,null,null,null,null]},"logic.ai.TransportMode":{"ctors":["Walk","Shuttle"],"args":[null,null]},"logic.state.VoteHolder":{"ctors":["EPlayer","EFaction"],"args":[{"t":"PObj","fields":[{"name":"f","opt":false,"type":{"t":"PSerializable","name":"ent.Faction"}}]},{"t":"PObj","fields":[{"name":"k","opt":false,"type":{"t":"PString"}}]}]},"ent.EStatus":{"ctors":["EParked","EDeploying","EWorking","ERecalling"],"args":[null,null,null,null]}};
+
+  // ===================================================================================
+  // Low-level web-platform helpers
+  // ===================================================================================
+  const LATIN1 = new TextDecoder('latin1');
+  const latin1 = (u8, start, end) =>
+    LATIN1.decode(start == null ? u8 : u8.subarray(start, end));
+
+  // async zlib(RFC1950)/deflate inflate via DecompressionStream. RFC1950 zlib == 'deflate' here.
+  async function inflate(u8) {
+    const ds = new DecompressionStream('deflate');
+    const stream = new Response(new Blob([u8])).body.pipeThrough(ds);
+    const ab = await new Response(stream).arrayBuffer();
+    return new Uint8Array(ab);
+  }
+  const inflateMaybe = async (u8) => (u8[0] === 0x78 ? inflate(u8) : u8);
+
+  // base64 -> Uint8Array (for Haxe 's' Bytes code) using atob (present in Node 24 + browsers).
+  function b64ToU8(b64) {
+    const bin = atob(b64.replace(/-/g, '+').replace(/_/g, '/'));
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  const r4 = n => Math.round(n * 10000) / 10000;
+
+  // ===================================================================================
+  // Haxe Unserializer (text) — logic ported from haxe_deser.js. Operates on a latin1 string.
+  // ===================================================================================
+  function haxeUrlDecode(s) {
+    let out = '';
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (ch === '+') out += ' ';
+      else if (ch === '%') {
+        const hex = s.substr(i + 1, 2);
+        if (/^[0-9a-fA-F]{2}$/.test(hex)) { out += String.fromCharCode(parseInt(hex, 16)); i += 2; }
+        else out += ch;
+      } else out += ch;
+    }
+    return out;
+  }
+  class HaxeEnum { constructor(name, index, args) { this.__enum__ = name; this.__index__ = index; this.args = args; } }
+  class HaxeClass { constructor(name, fields) { this.__class__ = name; Object.assign(this, fields); } }
+  class HaxeStringMap { constructor() { this.__map__ = 'String'; this.data = {}; } }
+  class HaxeIntMap { constructor() { this.__map__ = 'Int'; this.data = new Map(); } }
+  class HaxeObjectMap { constructor() { this.__map__ = 'Object'; this.entries = []; } }
+  class HaxeBytes { constructor(u8) { this.__bytes__ = true; this.buffer = u8; } }
+  class HaxeDate { constructor(t) { this.__date__ = true; this.time = t; this.iso = new Date(t * 1000).toISOString(); } }
+  class HaxeList { constructor(items) { this.__list__ = true; this.items = items; } }
+
+  class Unserializer {
+    constructor(s) { this.buf = s; this.pos = 0; this.length = s.length; this.scache = []; this.cache = []; }
+    readDigits() {
+      let k = 0, s = false, fp = this.pos;
+      while (true) {
+        const c = this.buf.charCodeAt(this.pos);
+        if (isNaN(c)) break;
+        if (c === 45) { if (this.pos !== fp) break; s = true; }
+        else if (c >= 48 && c <= 57) k = k * 10 + (c - 48);
+        else break;
+        this.pos++;
+      }
+      if (s) k *= -1;
+      return k;
+    }
+    readFloat() {
+      const start = this.pos;
+      while (true) {
+        const c = this.buf.charCodeAt(this.pos);
+        if (isNaN(c)) break;
+        if ((c >= 43 && c <= 57 && c !== 44) || c === 101 || c === 69) { if (c === 47) break; this.pos++; }
+        else break;
+      }
+      return parseFloat(this.buf.substr(start, this.pos - start));
+    }
+    unserializeString() {
+      const len = this.readDigits();
+      if (this.buf.charCodeAt(this.pos) !== 58) throw new Error('Invalid string length at ' + this.pos);
+      this.pos++;
+      if (this.length - this.pos < len) throw new Error('Invalid string len (past eof) at ' + this.pos);
+      const raw = this.buf.substr(this.pos, len);
+      this.pos += len;
+      const s = haxeUrlDecode(raw);
+      this.scache.push(s);
+      return s;
+    }
+    unserialize() {
+      const code = this.buf.charCodeAt(this.pos++);
+      switch (code) {
+        case 110: return null;
+        case 116: return true;
+        case 102: return false;
+        case 122: return 0;
+        case 105: return this.readDigits();
+        case 100: return this.readFloat();
+        case 107: return NaN;
+        case 109: return -Infinity;
+        case 112: return Infinity;
+        case 121: return this.unserializeString();
+        case 82: { const n = this.readDigits(); if (n < 0 || n >= this.scache.length) throw new Error('Invalid string ref ' + n); return this.scache[n]; }
+        case 114: { const n = this.readDigits(); if (n < 0 || n >= this.cache.length) throw new Error('Invalid object ref ' + n); return this.cache[n]; }
+        case 97: {
+          const arr = []; this.cache.push(arr);
+          while (true) {
+            const c = this.buf.charCodeAt(this.pos);
+            if (c === 104) { this.pos++; break; }
+            if (c === 117) { this.pos++; const k = this.readDigits(); for (let i = 0; i < k; i++) arr.push(null); }
+            else arr.push(this.unserialize());
+          }
+          return arr;
+        }
+        case 108: { const items = []; const lst = new HaxeList(items); this.cache.push(lst); while (this.buf.charCodeAt(this.pos) !== 104) items.push(this.unserialize()); this.pos++; return lst; }
+        case 111: { const obj = {}; this.cache.push(obj); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); obj[k] = v; } this.pos++; return obj; }
+        case 99: { const name = this.unserialize(); const inst = new HaxeClass(name, {}); this.cache.push(inst); while (this.buf.charCodeAt(this.pos) !== 103) { const k = this.unserialize(); const v = this.unserialize(); inst[k] = v; } this.pos++; return inst; }
+        case 119: { const ename = this.unserialize(); return this.readEnum(ename, false); }
+        case 106: { const ename = this.unserialize(); return this.readEnum(ename, true); }
+        case 98: { const m = new HaxeStringMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); m.data[k] = v; } this.pos++; return m; }
+        case 113: { const m = new HaxeIntMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) === 58) { this.pos++; const k = this.readDigits(); const v = this.unserialize(); m.data.set(k, v); } if (this.buf.charCodeAt(this.pos) !== 104) throw new Error('Invalid IntMap end at ' + this.pos); this.pos++; return m; }
+        case 77: { const m = new HaxeObjectMap(); this.cache.push(m); while (this.buf.charCodeAt(this.pos) !== 104) { const k = this.unserialize(); const v = this.unserialize(); m.entries.push({ key: k, value: v }); } this.pos++; return m; }
+        case 118: {
+          const c = this.buf.charCodeAt(this.pos);
+          if (c >= 48 && c <= 57 && this.buf.substr(this.pos, 4).indexOf('-') === -1 && !/^\d{4}-/.test(this.buf.substr(this.pos, 5))) {
+            const t = this.readFloat(); const d = new HaxeDate(t); this.cache.push(d); return d;
+          }
+          const str = this.buf.substr(this.pos, 19); this.pos += 19;
+          const d = new HaxeDate(Date.parse(str.replace(' ', 'T')) / 1000); this.cache.push(d); return d;
+        }
+        case 115: {
+          const len = this.readDigits();
+          if (this.buf.charCodeAt(this.pos) !== 58) throw new Error('Invalid bytes length at ' + this.pos);
+          this.pos++;
+          const raw = this.buf.substr(this.pos, len); this.pos += len;
+          const hb = new HaxeBytes(b64ToU8(raw)); this.cache.push(hb); return hb;
+        }
+        case 120: throw new Error('Haxe exception marker at ' + this.pos);
+        default: throw new Error("Unknown code '" + String.fromCharCode(code) + "' (" + code + ') at pos ' + (this.pos - 1));
+      }
+    }
+    readEnum(ename, byIndex) {
+      let tag, index;
+      if (byIndex) {
+        if (this.buf.charCodeAt(this.pos) !== 58) throw new Error('Invalid enum index sep at ' + this.pos);
+        this.pos++; index = this.readDigits(); tag = null;
+      } else { tag = this.unserialize(); index = null; }
+      if (this.buf.charCodeAt(this.pos) !== 58) throw new Error('Invalid enum arg-count sep at ' + this.pos);
+      this.pos++;
+      const argc = this.readDigits(); const args = [];
+      const e = new HaxeEnum(ename, index, args); this.cache.push(e);
+      for (let i = 0; i < argc; i++) args.push(this.unserialize());
+      if (tag !== null) e.tag = tag;
+      return e;
+    }
+  }
+  function deserialize(str) { const u = new Unserializer(str); const value = u.unserialize(); return { value, pos: u.pos }; }
+
+  // ===================================================================================
+  // hxbit binary walker — logic ported from clean_walk.js (Node Buffer reads -> DataView).
+  // ===================================================================================
+  function walkClean(u8, clids, opts = {}) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const N = u8.length;
+    let p = 0;
+    const clidRead = new Set(clids);
+    function getInt() { const c = u8[p++]; if (c !== 0x80) return c; const v = dv.getInt32(p, true); p += 4; return v; }
+    function getFloat() { const v = dv.getFloat32(p, true); p += 4; return v; }
+    function getInt64() { const v = dv.getBigInt64(p, true); p += 8; return v; }
+    let ctx = '';
+    function getString() { const l = getInt(); if (l === 0) return null; if (l < 0 || p + l - 1 > N) throw new Error('huge string len ' + l + ' @' + p + ' ctx=' + ctx); const s = latin1(u8, p, p + l - 1); p += l - 1; return s; }
+    function getBytes() { const l = getInt(); if (l === 0) return null; if (l < 0 || p + l - 1 > N) throw new Error('huge bytes ' + l + ' @' + p + ' ctx=' + ctx); const s = u8.subarray(p, p + l - 1); p += l - 1; return s; }
+    function getCLID() { const v = (u8[p] << 8) | u8[p + 1]; p += 2; return v; }
+
+    getString(); p++; // header string + 1 byte (u8v)
+    const entries = [];
+    while (true) { const name = getString(); if (name === null) break; const clid = getCLID(); const crc = dv.getInt32(p, true); p += 4; entries.push({ name, clid, crc: crc >>> 0 }); }
+    const schemaLen = getInt();
+    const schemaStart = p;
+    function readPropType() {
+      const t = u8[p++];
+      switch (t) {
+        case 0: return null;
+        case 1: return { t: 'PInt' }; case 2: return { t: 'PFloat' }; case 3: return { t: 'PBool' };
+        case 4: return { t: 'PString' }; case 5: return { t: 'PBytes' };
+        case 6: return { t: 'PSerializable', name: getString() };
+        case 7: return { t: 'PEnum', name: getString() };
+        case 8: return { t: 'PMap', k: readPropType(), v: readPropType() };
+        case 9: return { t: 'PArray', k: readPropType() };
+        case 10: return { t: 'PObj', fields: readObjFields() };
+        case 11: return { t: 'PAlias', k: readPropType() };
+        case 12: return { t: 'PVector', k: readPropType() };
+        case 13: return { t: 'PNull', k: readPropType() };
+        case 14: return { t: 'PUnknown' }; case 15: return { t: 'PDynamic' };
+        case 16: return { t: 'PInt64' };
+        case 17: return { t: 'PFlags', k: readPropType() };
+        case 18: return { t: 'PCustom' };
+        case 19: return { t: 'PSerInterface', name: getString() };
+        case 20: return { t: 'PStruct', name: getString(), fields: readStructFields() };
+        case 21: return { t: 'PAliasCDB', k: readPropType() };
+        case 22: return { t: 'PNoSave', k: readPropType() };
+        default: throw new Error('bad proptype ' + t + ' @' + (p - 1));
+      }
+    }
+    function readObjFields() { const l = getInt(); if (l === 0) return null; const n = l - 1; const a = []; for (let i = 0; i < n; i++) { const m = getInt(); if (m === 0) { a.push(null); continue; } const mask = m - 1; let name = null, type = null, opt = false; if (mask & 1) name = getString(); opt = u8[p++] !== 0; if (mask & 2) type = readPropType(); a.push({ name, opt, type }); } return a; }
+    function readStructFields() { const l = getInt(); if (l === 0) return null; const n = l - 1; const a = []; for (let i = 0; i < n; i++) { const m = getInt(); if (m === 0) { a.push(null); continue; } const mask = m - 1; let name = null, type = null; if (mask & 1) name = getString(); if (mask & 2) type = readPropType(); a.push({ name, type }); } return a; }
+    for (const e of entries) { getInt(); const isFinal = u8[p++] !== 0; let l = getInt(); const names = []; for (let j = 0; l && j < l - 1; j++) names.push(getString()); l = getInt(); const types = []; for (let j = 0; l && j < l - 1; j++) types.push(readPropType()); e.schema = { isFinal, names, types }; }
+    const objStart = schemaStart + schemaLen;
+    p = objStart;
+
+    function clidHash(name) { let h = 1; for (let i = 0; i < name.length; i++) h = (Math.imul(h, 223) + name.charCodeAt(i)) | 0; return 1 + ((h & 0x3FFFFFFF) % 65423); }
+    const byClid = {}, byName = {}, byHash = {}, enums = {};
+    for (const e of entries) { if (e.clid) { byClid[e.clid] = e; byName[e.name] = e; byHash[clidHash(e.name)] = e; } else enums[e.name] = { ctors: e.schema.names, args: e.schema.types }; }
+    const enumDefs = opts.enumDefs || ENUM_DEFS;
+    if (enumDefs) { for (const k in enumDefs) { if (!enums[k]) enums[k] = enumDefs[k]; } }
+    const objs = {}; const unknownEnums = {}; const missClid = {}; const missName = {};
+
+    function isNullable(ty) {
+      if (!ty) return true;
+      switch (ty.t) {
+        case 'PInt': case 'PFloat': case 'PBool': case 'PInt64': case 'PFlags': case 'PDynamic': case 'PUnknown': case 'PCustom': return false;
+        case 'PAlias': case 'PAliasCDB': case 'PNoSave': return isNullable(ty.k);
+        default: return true;
+      }
+    }
+    function getRef(typeName, force) {
+      const uid = getInt();
+      if (uid === 0) return null;
+      if (objs[uid]) return { $ref: uid };
+      let e;
+      if (force) {
+        const clid = getCLID(); e = byClid[clid];
+        if (!e) { missClid[clid] = (missClid[clid] || 0) + 1; throw new Error('bad global-clid ' + clid + ' for ' + typeName + ' uid ' + uid + ' @' + (p - 2) + ' ctx=' + ctx); }
+      } else if (clidRead.has(typeName)) {
+        const clid = getCLID(); e = byHash[clid];
+        if (!e) { missClid[clid] = (missClid[clid] || 0) + 1; throw new Error('bad hash-clid ' + clid + ' for ' + typeName + ' uid ' + uid + ' @' + (p - 2) + ' ctx=' + ctx); }
+      } else { e = byName[typeName]; if (!e) { missName[typeName] = (missName[typeName] || 0) + 1; throw new Error('mono type not in table: ' + typeName + ' @' + p + ' ctx=' + ctx); } }
+      const o = { __uid: uid, __class: e.name }; objs[uid] = o;
+      const nm = e.schema.names, ty = e.schema.types;
+      for (let i = 0; i < nm.length; i++) { ctx = e.name + '.' + nm[i] + '@' + p; o[nm[i]] = readValue(ty[i]); }
+      return o;
+    }
+    function readValue(t) {
+      if (!t) return null;
+      switch (t.t) {
+        case 'PInt': return getInt();
+        case 'PFloat': return getFloat();
+        case 'PBool': return u8[p++] !== 0;
+        case 'PString': return getString();
+        case 'PBytes': { const by = getBytes(); return by ? { $bytes: by.length } : null; }
+        case 'PSerializable': return getRef(t.name, false);
+        case 'PSerInterface': return getRef(t.name, true);
+        case 'PEnum': return readEnum(t.name);
+        case 'PMap': { const l = getInt(); if (l === 0) return null; const n = l - 1; const m = []; for (let i = 0; i < n; i++) { const k = readValue(t.k); const v = readValue(t.v); m.push([k, v]); } return m; }
+        case 'PArray': case 'PVector': { const l = getInt(); if (l === 0) return null; const n = l - 1; const a = []; for (let i = 0; i < n; i++) a.push(readValue(t.k)); return a; }
+        case 'PObj': case 'PStruct': {
+          const m = getInt(); if (m === 0) return null; const mask = m - 1; const o = {}; let bit = 0;
+          for (const f of (t.fields || [])) { if (!f) continue; if (isNullable(f.type)) { const bb = 1 << bit; bit++; if ((mask & bb) === 0) continue; } o[f.name] = readValue(f.type); }
+          return o;
+        }
+        case 'PNull': { const flag = u8[p++]; return flag === 0 ? null : readValue(t.k); }
+        case 'PAlias': case 'PAliasCDB': case 'PNoSave': return readValue(t.k);
+        case 'PFlags': return getInt();
+        case 'PInt64': return Number(getInt64());
+        default: throw new Error('unhandled ' + t.t + ' @' + p);
+      }
+    }
+    function readEnum(name) {
+      const idx = getInt(); if (idx === 0) return null;
+      const es = enums[name];
+      if (!es) { unknownEnums[name] = (unknownEnums[name] || 0) + 1; return { c: '?' + name + '#' + idx }; }
+      const ct = es.ctors[idx - 1]; const at = es.args[idx - 1];
+      if (!at) return ct;
+      const a = {}; if (at.fields) for (const f of at.fields) { if (!f) continue; a[f.name] = readValue(f.type); }
+      return { c: ct, a };
+    }
+
+    let n = 0, err = null, errCtx = null;
+    try { while (p < N) { const save = p; const uid = getInt(); p = save; if (uid === 0) { p = save + 1; break; } getRef('__ROOT__', true); n++; if (n > 2000000) break; } }
+    catch (e) { err = e.message; errCtx = ctx; }
+    return { objs, entries, byClid, byName, enums, objStart, endPos: p, eof: p === N, fileLen: N, err, errCtx, unknownEnums, missClid, missName };
+  }
+
+  // ===================================================================================
+  // extract_state — pure JS port (cdb names supplied via opts.cdbNames)
+  // ===================================================================================
+  const round = (x, d) => (typeof x === 'number' && isFinite(x)) ? Math.round(x * 10 ** d) / 10 ** d : x;
+  const enumK = e => (e && typeof e === 'object' && e.a && e.a.k != null) ? e.a.k : (e && e.c ? e.c : (typeof e === 'string' ? e : null));
+
+  function extractFromBuf(u8, ver, fname, cdbNames) {
+    const regName = cdbNames.regName || {}, structName = cdbNames.structName || {},
+          eventName = cdbNames.eventName || {}, factionName = cdbNames.factionName || {};
+    const file = fname || '';
+    const r = walkClean(u8, CLIDS);
+    const O = r.objs;
+    const R = x => (x && x.$ref) ? O[x.$ref] : x;
+    const uidOf = x => x ? (x.$ref || x.__uid || null) : null;
+    const st = O[1];
+    if (!st || st.__class !== 'logic.state.State') throw new Error('State (uid 1) not found');
+
+    const facById = {}; const facList = [];
+    for (const fe of (st.factions || [])) {
+      const f = R(fe); if (!f) continue;
+      const id = f.kind; const stock = {};
+      const res = R(f.resources);
+      if (res && Array.isArray(res.stock)) for (const kv of res.stock)
+        if (Array.isArray(kv) && typeof kv[0] === 'string' && typeof kv[1] === 'number') stock[kv[0]] = round(kv[1], 2);
+      const rec = {
+        uid: f.__uid, id, name: factionName[id] || id,
+        isAI: !!f.isAI, hasLost: f.status === 'Defeated' || f.status === 'Lost' || !!f.hasLost,
+        status: f.status, teamId: f.teamId,
+        zonesHeld: Array.isArray(f.zones) ? f.zones.length : null,
+        resources: stock
+      };
+      facById[f.__uid] = rec; facList.push(rec);
+    }
+    const facId = uid => (uid != null && facById[uid]) ? facById[uid].id : (uid != null ? ('uid' + uid) : null);
+
+    const zoneOwners = {}; const zoneOwnersById = {}; const regionsHeld = {}; const zonesOut = []; const zoneByUid = {};
+    for (const ze of (st.zones || [])) {
+      const z = R(ze); if (!z || z.__class !== 'ent.Zone') continue;
+      zoneByUid[z.__uid] = z;
+      const ownerUid = uidOf(z.owner);
+      const oid = ownerUid != null ? facId(ownerUid) : null;
+      if (oid) { zoneOwners[z.kind] = oid; zoneOwnersById[z.id] = oid; regionsHeld[oid] = (regionsHeld[oid] || 0) + 1; }
+      zonesOut.push({ uid: z.__uid, id: z.id, regionId: z.kind, regionName: regName[z.kind] || z.kind,
+        owner: oid, windForce: z.windForce, baseWormActivity: z.baseWormActivity,
+        hasSpice: z.spiceArea != null, structureUids: (z.structures || []).map(uidOf) });
+    }
+    for (const f of facList) f.regionsHeld = regionsHeld[f.id] || 0;
+
+    const structures = []; const seenStruct = new Set();
+    function pushStruct(s, zone) {
+      if (!s || seenStruct.has(s.__uid)) return; seenStruct.add(s.__uid);
+      const type = enumK(s.ekind);
+      const ownerUid = uidOf(s._owner);
+      const owner = ownerUid != null ? facId(ownerUid) : (zone ? (zone.owner ? facId(uidOf(zone.owner)) : null) : null);
+      structures.push({
+        uid: s.__uid, kind: s.kind, type, typeName: structName[s.kind] || s.kind,
+        owner, zoneId: zone ? zone.kind : null, zoneNum: zone ? zone.id : null,
+        cx: round(s.posx, 2), cy: round(s.posy, 2),
+        villageTraits: Array.isArray(s.villageTraits) ? s.villageTraits.slice() : [],
+        placeName: s.placeName || null,
+        stability: enumK(s.stabilityStatus), rebelling: s.rebellingRaid != null
+      });
+    }
+    for (const z of Object.values(zoneByUid)) for (const se of (z.structures || [])) pushStruct(R(se), z);
+    for (const u in O) { const o = O[u];
+      if ((o.__class === 'ent.Structure' || o.__class === 'ent.BaseBuilding' || o.__class === 'ent.Refinery') && !seenStruct.has(o.__uid))
+        pushStruct(o, null);
+    }
+
+    const events = (st.dataEvents || []).map(ev => { const e = R(ev); if (!e || typeof e.kind !== 'string') return null;
+      const zone = e.zone ? R(e.zone) : null;
+      return {
+        kind: e.kind, name: eventName[e.kind] || e.kind,
+        minute: round((e.time || 0) / 60, 1), time: round(e.time, 2),
+        regionId: zone ? zone.kind : null, regionName: zone ? (regName[zone.kind] || zone.kind) : null,
+        zoneId: zone ? zone.kind : null, zoneNum: zone ? zone.id : null,
+        instigator: facId(uidOf(e.instigator)), targetFaction: facId(uidOf(e.targetFaction)),
+        targetUid: uidOf(e.target)
+      };
+    }).filter(Boolean);
+
+    const wars = (st.relationshipData || []).map(rd => {
+      const ua = uidOf(rd.f1), ub = uidOf(rd.f2);
+      if (ua === ub) return null;
+      const a = facId(ua), b = facId(ub);
+      const val = round(rd.val, 1);
+      const status = val <= -50 ? 'war' : (val < 0 ? 'hostile' : (val >= 50 ? 'allied' : 'neutral'));
+      return { a, b, relationship: val, status, declaredMinute: null, discovered: !!rd.discovered };
+    }).filter(Boolean);
+
+    const matchSeconds = round(st.time, 2);
+    return {
+      meta: { file, saveVersion: ver,
+        walkBytes: r.endPos, fileLen: r.fileLen, walkEof: r.eof, objectCount: Object.keys(O).length,
+        walkError: r.err || null },
+      matchSeconds, matchMinutes: round(st.time / 60, 1), matchDay: st.previousDay,
+      gameSpeed: st.gameSpeed, gameSpeedLevel: st.gameSpeedLevel,
+      zoneOwners, zoneOwnersById,
+      factions: facList.map(f => ({ id: f.id, name: f.name, isAI: f.isAI, hasLost: f.hasLost,
+        status: f.status, teamId: f.teamId, regionsHeld: f.regionsHeld, resources: f.resources })),
+      zones: zonesOut, structures, events, wars,
+      _note: 'Section-2 walked to EXACT-EOF via clean_walk + clids.json (+ borrowed enum_defs.json for saves that omit enum schemas). ' +
+        'wars[].declaredMinute is null and status is derived from the stored relationship value: this save format keeps only a per-pair relationship float (relationshipData.val, -100..100), not a war-declaration timestamp; activeTreaties was empty.'
+    };
+  }
+
+  // ===================================================================================
+  // Container + geometry + config (ported from parse_sav.js)
+  // ===================================================================================
+  function readContainer(u8) {
+    if (latin1(u8, 0, 3) !== 'D4X') throw new Error('not a D4X save');
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const ver = u8[3], cnt = u8[4]; let off = 5 + cnt * 4; const lens = [];
+    for (let i = 0; i < cnt; i++) lens.push(dv.getUint32(5 + i * 4, true));
+    const secs = []; for (let i = 0; i < cnt; i++) { secs.push(u8.subarray(off, off + lens[i])); off += lens[i]; }
+    return { ver, cnt, lens, secs };
+  }
+
+  function worldText(inf) {
+    if (latin1(inf, 0, 5) !== 'WORLD') throw new Error('§1 is not WORLD-framed');
+    const dv = new DataView(inf.buffer, inf.byteOffset, inf.byteLength);
+    const haxeLen = dv.getUint32(7, true); // "WORLD"(5)+u16 ver+u32 haxeLen+u32 pixelLen, text @15
+    return latin1(inf, 15, 15 + haxeLen);
+  }
+
+  function buildGeometry(world, regName) {
+    const R = world.regions;
+    const hullById = {}, neighById = {};
+    for (const g of R.geom) { hullById[g.id] = (g.hull || []).map(pt => [r4(pt.x), r4(pt.y)]); neighById[g.id] = g.neighbors || []; }
+    const cells = [], gset = new Set(), polyById = {};
+    for (const c of R.cells) {
+      if (c.groupId == null) continue; gset.add(c.id);
+      const pl = hullById[c.id] || []; polyById[c.id] = pl;
+      cells.push({ id: c.id, z: c.groupId, b: c.biome, h: c.height, p: pl });
+    }
+    const EPS = 0.006, near = (a, b) => Math.abs(a[0] - b[0]) < EPS && Math.abs(a[1] - b[1]) < EPS;
+    const shared = (pa, pb) => { const m = []; for (const va of pa) { for (const vb of pb) if (near(va, vb)) { m.push(va); break; } }
+      return m.length >= 2 ? [r4(m[0][0]), r4(m[0][1]), r4(m[1][0]), r4(m[1][1])] : null; };
+    const edges = [], seen = new Set();
+    for (const c of cells) for (const nb of (neighById[c.id] || [])) {
+      if (!gset.has(nb)) continue; const k = c.id < nb ? c.id + '_' + nb : nb + '_' + c.id; if (seen.has(k)) continue; seen.add(k);
+      const seg = shared(c.p, polyById[nb] || []); if (seg) edges.push([c.id, nb, seg]);
+    }
+    const cellsByZone = {}; cells.forEach(c => (cellsByZone[c.z] = cellsByZone[c.z] || []).push(c));
+    const zones = R.zones.map(z => {
+      const members = cellsByZone[z.id] || [];
+      let sx = 0, sy = 0, n = 0; const bc = {};
+      members.forEach(c => { c.p.forEach(pt => { sx += pt[0]; sy += pt[1]; n++; }); bc[c.b] = (bc[c.b] || 0) + 1; });
+      const biome = Object.keys(bc).sort((a, b) => bc[b] - bc[a])[0] || null;
+      const cx = n ? r4(sx / n) : (z.mineralArea ? r4(z.mineralArea.x) : 0);
+      const cy = n ? r4(sy / n) : (z.mineralArea ? r4(z.mineralArea.y) : 0);
+      return { id: z.id, reg: z.region, rn: regName[z.region] || z.region, b: biome, cx, cy,
+        sp: z.spiceArea != null, si: z.sietch || null, w: z.windForce,
+        mineral: z.mineralArea ? [r4(z.mineralArea.x), r4(z.mineralArea.y)] : null };
+    });
+    return { cells, edges, zones, biomes: [...new Set(cells.map(c => c.b))], seed: world.seed, realSize: world.realSize };
+  }
+
+  // ===================================================================================
+  // Public API
+  // ===================================================================================
+  function toU8(arrayBuffer) {
+    if (arrayBuffer instanceof Uint8Array) return arrayBuffer;
+    if (arrayBuffer instanceof ArrayBuffer) return new Uint8Array(arrayBuffer);
+    if (ArrayBuffer.isView(arrayBuffer)) return new Uint8Array(arrayBuffer.buffer, arrayBuffer.byteOffset, arrayBuffer.byteLength);
+    throw new Error('parseSavBuffer: expected ArrayBuffer / Uint8Array');
+  }
+
+  function isD4XMatchSave(arrayBuffer) {
+    try {
+      const u8 = toU8(arrayBuffer);
+      if (u8.length < 5) return false;
+      if (latin1(u8, 0, 3) !== 'D4X') return false;
+      return u8[4] >= 3; // 3-section = in-battle save (config + world + state)
+    } catch (e) { return false; }
+  }
+
+  async function parseSavBuffer(arrayBuffer, opts = {}) {
+    const cdbNames = opts.cdbNames || {};
+    const regName = cdbNames.regName || {};
+    const u8 = toU8(arrayBuffer);
+    const c = readContainer(u8);
+
+    const cfg = deserialize(latin1(c.secs[0])).value;
+    const C = cfg.config || cfg;
+    const players = (C.players || []).map(pl => ({ id: pl.faction, isAI: !!pl.ai,
+      difficulty: pl.ai && pl.ai.difficulty, uid: pl.uid || null, councilors: pl.councilors || [], hasLost: !!pl.hasLost }));
+
+    let geom = { cells: [], edges: [], zones: [], biomes: [] }, state = null;
+    if (c.cnt >= 3) {
+      try { const inf1 = await inflateMaybe(c.secs[1]); geom = buildGeometry(deserialize(worldText(inf1)).value, regName); }
+      catch (e) { geom._error = String(e.message || e); }
+      try { const inf2 = await inflateMaybe(c.secs[2]); state = extractFromBuf(inf2, c.ver, opts.fileName || '', cdbNames); }
+      catch (e) { state = { _error: String(e.message || e) }; }
+    }
+    if (state && !state._error) state.provenance = { ownership: 'decoded', events: 'decoded' };
+
+    const mapdata = {
+      meta: { file: opts.fileName || '', gameVersion: cfg.gameVersion || C.gameVersion,
+        seed: geom.seed != null ? geom.seed : cfg.seed, mapSize: cfg.mapSize, realSize: geom.realSize || null,
+        sysTime: cfg.sysTime, time: cfg.time,
+        matchMinutes: cfg.time ? Math.round(cfg.time / 60 * 10) / 10 : (state ? state.matchMinutes : null),
+        human: (C.client && C.client.faction) || cfg.me, sectionCount: c.cnt, saveVersion: c.ver },
+      factions: players, zones: geom.zones, cells: geom.cells, edges: geom.edges, biomes: geom.biomes,
+    };
+    return { mapdata, state };
+  }
+
+  return { parseSavBuffer, isD4XMatchSave, inflate, deserialize, walkClean, extractFromBuf, readContainer, CLIDS, ENUM_DEFS };
+});
+</script>
+<script>window.D4X_CDB_NAMES={"regName":{"DeepDesert":"Deep Desert","STuek":"Sietch Tuek","STabr":"Sietch Tabr","ImperialBase":"Imperial Base","IxianCore":"S-Vault","TESTBase":"TestBase","ConquestBase_Atreides":"Atreides Outpost","ConquestBase_Harkonnen":"Harkonnen Outpost","ConquestBase_Smugglers":"Smugglers Outpost","ConquestBase_Fremen":"Fremen Outpost","ConquestBase_Corrino":"Corrino Outpost","ConquestBase_Ecaz":"Ecaz Outpost","ConquestBase_Vernius":"Vernius Outpost","ConquestBase_Vernius1":"Smugglers Outpost","TheDesolation":"The Desolation","Pole":"Polar Sink","ShieldWall":"Shield Wall","ShieldWall_Volcano":"Shield Wall","ImperialBasin":"Imperial Basin","MountIdaho":"Mount Idaho","RichPit":"Well of Riches","RichPit_Volcanic":"Well of Riches","RichPit_Red":"Well of Riches","MoonDewVale":"Moon Dew Vale","MoonDewVale_Volcanic":"Moon Dew Vale","ObservatoryM":"Observatory Mountain","Volcano":"Great Volcano","Pit":"White Rift","Pit_Volcanic":"Black Rift","Pit_Polar":"White Rift","AcidLake":"Acid Lakes","AcidLake_Red":"Acid Lakes","AcidLake_Volcanic":"Acid Lakes","CrescentRidge":"Crescent Ridge","CrescentRidge_Red":"Crescent Ridge","CrescentRidge_Idaho":"Crescent Ridge","CrescentRidge_Polar":"Crescent Ridge","WormNest":"Worm Nest","SpaceCruiserWreck":"Space Cruiser Wreck","SpaceCruiserWreck_Red":"Space Cruiser Wreck","SpaceCruiserWreck_Polar":"Space Cruiser Wreck","SpaceCruiserWreck_Volcanic":"Space Cruiser Wreck","SandFall":"Sand Fall","RedChasm":"Red Chasm","LowerErg":"Lower Erg","GreatFlat":"Great Flat","KamrietN":"Kamriet North","KamrietS":"Kamriet South","Adara":"Ada'ra","AkhunRidge":"Akhun Ridge","AsaranPlains":"Asaran Plains","AshamRidge":"Asham Ridge","BardanPass":"Bardan Pass","BightofaCliff":"Bight of a Cliff","ChaiHills":"Chai Hills","ChasihaRidge":"Chasiha Ridge","Cielago":"Cielago Depression","FalseWallSouth":"False Wall South","FalseWallWest":"False Wall West","GaraKulon":"Gara Kulon","HabbanyaErg":"Habbanya Erg","HaggaBasin":"Hagga Basin","HargPass":"Harg Pass","HebaPlateau":"Heba Plateau","HiegaPlateau":"Hiega Plateau","IralBasin":"Iral Basin","KaniaSwirls":"Kania Swirls","KarmrietE":"Kamriet East","MasraGara":"Masra Gara","MavenTal":"Maven T'al","MiethN":"Mieth Erg North","MiethS":"Mieth Erg South","NarmisPass":"Narmis Pass","NuqtatFlat":"Nuqtat Flat","OldGap":"Old Gap","PastyMesa":"Pasty Mesa","QarnSouth":"Qarn South","QarnWest":"Qarn West","RedCliff":"Red Cliff","RimWallWest":"Rim Wall West","RockOutcroppings":"Rock Outcroppings","ShiyahaRidge":"Sihaya Ridge","SplinteredRock":"Splintered Rock","StufalBasin":"Stufal Basin","TheFuneralPlain":"The Funeral Plain","TheMinorErg":"The Minor Erg","TuonoBasin":"Tuono Basin","WindPass":"Wind Pass","IlinPlains":"Ilin Plains","LostPlains":"Lost Plains","ShadowRidge":"Shadow Ridge","lowlands":"Low Lands","IlinWest":"Ilin West","MirrorBasin":"Mirror Basin","ErinRidge":"Erin Ridge","AanaPlains":"Aana Plains","EssetErg":"Esset Erg","TallHills":"Tall Hills","QajdarPlains":"Qajdar Plains","TheFault":"The Fault","AmsChasm":"Ams Chasm","WhitePlains":"White Plains","CaveofRiches":"Cave of Riches","Orbit":"In Shuttle","Carryall":"In Transit","TransportWorm_Zone":"Riding a Sandworm"},"structName":{"Tuek":"Sietch Tuek","Tabr":"Sietch Tabr","ImpBase":"Imperial Base","IxianCore":"S-Vault","TESTBase":"Arrakeen","ConquestBase":"Advanced Outpost","ConquestBase_Atreides":"Advanced Outpost","ConquestBase_Harkonnen":"Advanced Outpost","ConquestBase_Smugglers":"Advanced Outpost","ConquestBase_Ecaz":"Advanced Outpost","ConquestBase_Vernius":"Advanced Outpost","ConquestBase_Fremen":"Major Sietch","VillageFortified":"Fortified Village","SietchNeutral":"Wary Sietch","SietchHostile":"Hostile Sietch","SietchAncient":"Ancient Sietch","SietchAccursed":"Accursed Sietch","LocalSietch":"Settlement","UWHeadquarters":"Underworld Headquarters","UWCells":"Underworld Cell","MBUWHeadquarters":"Major Underworld Headquarters","Outpost":"Village","RenegadeBase":"Renegade Base","InfiltrationCell":"Infiltration Cell","SpiceArea":"Spice Field","GeothermalEnergyArea":"Energy sources","MineralArea":"Minerals","PreciousMetalsArea":"Rare Elements","ResearchArea":"Abandoned Imperial Station","CrashedOrnithopter":"Crashed Ornithopter","CrashedShuttle":"Crashed Shuttle","CrashedShuttle_quest":"Crashed Shuttle","CrashedHarvester":"Harvester Wreck","AbandonnedFremenCamp":"Abandoned Fremen Camp","Hiereg":"Settled Hiereg","SmugglerBlackMarket":"Black Market","MaraudersCamp":"Marauder Camp","WaterSellerCaravan":"Water Seller Caravan","LostDonation":"Lost Box","CrashedSpacefolder":"Space Scrap","CrashedShip":"Crashed Spaceship","CrashedShip_quest":"Crashed Spaceship","BeneGesseritRelic":"Bene Gesserit Relic","BeneGesseritRelic_quest":"Bene Gesserit Relic","MinorHousesDonation":"House Gift","SmugglerStash1":"Smuggling Stash","LostWeatherStation":"Lost Weather Station","SpaceCruiserScrap":"Space Cruiser Scrap","DeadMessenger":"Dead Messenger","BuriedTemple":"Buried Temple","IxWreck":"Ix Wreck","GhostMarketDiscovery":"Ghost Market","ImpStation":"Abandoned Imperial Station"},"eventName":{"ContractPaid":"[::contract::] paid","ContractDue":"[Spice] Contract","AbilityUsed":"Atomics","UnitRecruited":"Recruited [::target::]","HeroKilledByTFaction":"[::entityKind::] is killed by [::target::-longname]","HeroDiedNoKiller":"[::entityKind::] dies to the harshness of Arrakis","HeroEatenByWorm":"[::entityKind::] is eaten by a [Sandworm]","EcazChampionKilledByTFaction":"The [!TEcazChampion] is killed by [::target::-longname]","EcazChampionDiedNoKiller":"The [!TEcazChampion] dies to the harshness of Arrakis","EcazChampionEatenByWorm":"The [!TEcazChampion] is eaten by a [Sandworm]","VillagePillage":"[Village] pillaged","SietchPillage":"[Sietch] pillaged","SpecialRegionControlled":"::regionName::","SolariDeficit":"Solari Deficit","PlascreteDeficit":"Plascrete Deficit","TruceBroken_Traitor":"Betrayal","PlayerWin":"Victory","PlayerDefeat":"Defeat","PlayerDefeat_Assassination":"Defeat","PlayerForfeit":"Defeat","CharterObtained":"[::target::]","HegemonyThreshold":"Hegemony Threshold","TreatyBroken":"Treaty broken","TreatySigned":"Treaty signed","MainBaseSpawned":"[::mainbase::] Deployment","MainBaseLost_NotLast":"[::mainbase::] Loss"},"factionName":{"Atreides":"House Atreides","Harkonnen":"House Harkonnen","Corrino":"House Corrino","Ecaz":"House Ecaz","Vernius":"House Vernius","MinorHouses":"Houses Minor","Landsraad":"Landsraad Council","SpacingGuild":"Spacing Guild","BeneGesserit_Faction":"Bene Gesserit"}};</script>
+<!-- /d4x-replay-parser -->
 </body>
 </html>
